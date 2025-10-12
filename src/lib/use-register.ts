@@ -1,7 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
-import { useApiClient } from '@/lib/api-client'
-// eslint-disable-next-line
-import { auth, type AuthResponse } from '@/lib/auth'
+import Zoriapi from 'zorihq'
+import { auth } from '@/lib/auth'
 
 export interface RegisterData {
   email: string
@@ -11,25 +10,21 @@ export interface RegisterData {
   organization_name: string
 }
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || 'http://localhost:1323'
+
 export function useRegister() {
-  const apiClient = useApiClient()
+  const zori = new Zoriapi({
+    baseURL: API_BASE_URL,
+    apiKey: '__empty__',
+  })
 
   return useMutation({
     mutationKey: ['register'],
     mutationFn: async (data: RegisterData) => {
-      const response = await apiClient.post<AuthResponse>(
-        `/api/v1/auth/register`,
-        data,
-      )
-
-      // Store the auth data in localStorage
+      const response = await zori.v1.auth.registerAccount(data)
       auth.setAuthData(response)
-
       return response
-    },
-    onSuccess: (data) => {
-      // Optional: Redirect to dashboard or home page after successful registration
-      // window.location.href = '/dashboard'
     },
     onError: (error) => {
       // Clear any existing auth data on registration error

@@ -75,7 +75,7 @@ function FieldError({ error }: { error?: string | Array<string> }) {
 export function RegistrationForm({
   className,
   onSuccess,
-  redirectTo = '/dashboard',
+  redirectTo = '/projects',
   ...props
 }: React.ComponentProps<'div'> & {
   onSuccess?: () => void
