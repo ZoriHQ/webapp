@@ -212,7 +212,7 @@ export function ProjectOnboarding() {
                 onClick={() => window.location.reload()}
                 className="flex items-center gap-2 font-mono tracking-tight shadow-sm"
               >
-                View Dashboard
+                View Projects
                 <IconChevronRight className="w-4 h-4" />
               </Button>
             )}

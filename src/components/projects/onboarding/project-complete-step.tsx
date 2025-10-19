@@ -84,8 +84,8 @@ export function ProjectCompleteStep({ project }: ProjectCompleteStepProps) {
               <div>
                 <h4 className="font-medium mb-1">Real-time Analytics</h4>
                 <p className="text-sm text-muted-foreground">
-                  View live visitor data, page views, and user behavior on your
-                  dashboard.
+                  View live visitor data, page views, and user behavior in
+                  real-time.
                 </p>
               </div>
             </div>
@@ -134,7 +134,7 @@ export function ProjectCompleteStep({ project }: ProjectCompleteStepProps) {
       <div className="flex flex-col sm:flex-row gap-3 pt-4">
         <Button className="flex-1" size="lg">
           <IconChartLine className="w-4 h-4 mr-2" />
-          View Analytics Dashboard
+          View Project Analytics
         </Button>
         <Button variant="outline" className="flex-1" size="lg">
           <IconExternalLink className="w-4 h-4 mr-2" />

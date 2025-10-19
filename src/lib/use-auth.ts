@@ -122,7 +122,7 @@ export function useAuthGuard(redirectTo = '/login') {
 }
 
 // Hook for redirecting authenticated users (e.g., from login page)
-export function useGuestGuard(redirectTo = '/dashboard') {
+export function useGuestGuard(redirectTo = '/projects') {
   const { isAuthenticated, isLoading } = useAuth()
   const router = useRouter()
 

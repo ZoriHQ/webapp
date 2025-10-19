@@ -39,9 +39,9 @@ const data = {
   },
   navMain: [
     {
-      title: 'Dashboard',
-      url: '#',
-      icon: IconDashboard,
+      title: 'Projects',
+      url: '/projects',
+      icon: IconFolder,
     },
     {
       title: 'Lifecycle',
@@ -52,11 +52,6 @@ const data = {
       title: 'Analytics',
       url: '#',
       icon: IconChartBar,
-    },
-    {
-      title: 'Projects',
-      url: '/projects',
-      icon: IconFolder,
     },
     {
       title: 'Team',

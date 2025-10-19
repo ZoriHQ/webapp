@@ -53,7 +53,7 @@ function usePersistedEmail() {
 export function LoginFormEnhanced({
   className,
   onSuccess,
-  redirectTo = '/dashboard',
+  redirectTo = '/projects',
   ...props
 }: React.ComponentProps<'div'> & {
   onSuccess?: () => void

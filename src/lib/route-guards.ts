@@ -92,5 +92,5 @@ export function getPostLoginRedirect(search: Record<string, any>): string {
     return redirect
   }
 
-  return '/dashboard'
+  return '/projects'
 }

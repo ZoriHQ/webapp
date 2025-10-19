@@ -11,6 +11,7 @@ import {
   IconTrash,
   IconWorld,
 } from '@tabler/icons-react'
+import { Link } from '@tanstack/react-router'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -235,15 +236,20 @@ export function ProjectCard({
           </Tabs>
 
           <div className="flex gap-2">
-            <Button
-              variant="default"
-              size="sm"
+            <Link
+              to="/projects/$projectId"
+              params={{ projectId: project.id }}
               className="flex-1"
-              onClick={() => onViewAnalytics?.(project.id)}
             >
-              <IconChartLine className="mr-2 h-4 w-4" />
-              View Analytics
-            </Button>
+              <Button
+                variant="default"
+                size="sm"
+                className="w-full"
+              >
+                <IconChartLine className="mr-2 h-4 w-4" />
+                View Analytics
+              </Button>
+            </Link>
             <Button
               variant="outline"
               size="sm"

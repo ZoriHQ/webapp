@@ -195,7 +195,7 @@ export interface NavbarProps extends HTMLAttributes<HTMLElement> {
 
 // Default navigation links
 const defaultNavigationLinks: Array<NavbarNavItem> = [
-  { href: '#', label: 'Dashboard' },
+  { href: '/projects', label: 'Projects' },
   { href: '#', label: 'Docs' },
   { href: '#', label: 'API reference' },
 ]

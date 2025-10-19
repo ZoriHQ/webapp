@@ -57,8 +57,8 @@ function AboutPage() {
                 {auth.organization?.name || 'No organization'}
               </p>
               <div className="flex gap-4">
-                <Link to="/">
-                  <Button>Go to Dashboard</Button>
+                <Link to="/projects">
+                  <Button>Go to Projects</Button>
                 </Link>
                 <Link to="/">
                   <Button variant="outline">Account Settings</Button>
