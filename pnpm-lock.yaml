@@ -153,8 +153,8 @@ importers:
         specifier: ^4.1.11
         version: 4.1.11
       zorihq:
-        specifier: ^0.4.1
-        version: 0.4.1
+        specifier: ^0.5.0
+        version: 0.5.0
     devDependencies:
       '@tanstack/eslint-config':
         specifier: ^0.3.0
@@ -3873,8 +3873,8 @@ packages:
   zod@4.1.11:
     resolution: {integrity: sha512-WPsqwxITS2tzx1bzhIKsEs19ABD5vmCVa4xBo2tq/SrV4RNZtfws1EnCWQXM6yh8bD08a1idvkB5MZSBiZsjwg==}
 
-  zorihq@0.4.1:
-    resolution: {integrity: sha512-s9A8nl6kxMXjc6MseDDUIwDQZIDR6Frc7EEwBRJRWK9Ut8lnqIsQmMjomRKq+soKbc7ky6h/xp71ukZv2RAe5w==}
+  zorihq@0.5.0:
+    resolution: {integrity: sha512-p2SLUKY21iRLdmANaCJltS7bH5H/kW/cQDoA6ivbULRkv7PkG617Wlu3PEi7jcV5YTQNHd97tV6zv/SdJ6826g==}
 
 snapshots:
 
@@ -7631,4 +7631,4 @@ snapshots:
 
   zod@4.1.11: {}
 
-  zorihq@0.4.1: {}
+  zorihq@0.5.0: {}
