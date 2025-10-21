@@ -25,7 +25,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import type { TimeRange } from '@/hooks/use-analytics'
 
 export const description = 'An interactive area chart'
@@ -72,6 +71,23 @@ export function ChartAreaInteractive({
 
   const hasData = chartData.length > 0
 
+  // Calculate key metrics from chart data
+  const metrics = React.useMemo(() => {
+    if (!hasData) return { total: 0, desktop: 0, mobile: 0, desktopPercent: 0, mobilePercent: 0 }
+
+    const total = chartData.reduce((sum, item) => sum + item.desktop + item.mobile, 0)
+    const desktop = chartData.reduce((sum, item) => sum + item.desktop, 0)
+    const mobile = chartData.reduce((sum, item) => sum + item.mobile, 0)
+
+    return {
+      total,
+      desktop,
+      mobile,
+      desktopPercent: total > 0 ? (desktop / total) * 100 : 0,
+      mobilePercent: total > 0 ? (mobile / total) * 100 : 0,
+    }
+  }, [chartData, hasData])
+
   const timeRangeLabel = {
     last_hour: 'Last Hour',
     today: 'Today',
@@ -83,28 +99,21 @@ export function ChartAreaInteractive({
   return (
     <Card className="@container/card">
       <CardHeader>
-        <CardTitle>Unique Visitors</CardTitle>
-        <CardDescription>
-          <span className="hidden @[540px]/card:block">
-            Desktop and mobile visitors over time
-          </span>
-          <span className="@[540px]/card:hidden">Visitors over time</span>
-        </CardDescription>
-        <CardAction>
-          <ToggleGroup
-            type="single"
-            value={timeRange}
-            onValueChange={(value) => value && onTimeRangeChange(value as TimeRange)}
-            variant="outline"
-            className="hidden *:data-[slot=toggle-group-item]:!px-4 @[767px]/card:flex"
-          >
-            <ToggleGroupItem value="last_90_days">Last 90 Days</ToggleGroupItem>
-            <ToggleGroupItem value="last_30_days">Last 30 Days</ToggleGroupItem>
-            <ToggleGroupItem value="last_7_days">Last 7 Days</ToggleGroupItem>
-          </ToggleGroup>
+        <div className="flex flex-col gap-3">
+          <div className="flex items-start justify-between">
+            <div>
+              <CardTitle>Unique Visitors</CardTitle>
+              <CardDescription>
+                <span className="hidden @[540px]/card:block">
+                  Desktop and mobile visitors over time
+                </span>
+                <span className="@[540px]/card:hidden">Visitors over time</span>
+              </CardDescription>
+            </div>
+            <CardAction>
           <Select value={timeRange} onValueChange={(value) => onTimeRangeChange(value as TimeRange)}>
             <SelectTrigger
-              className="flex w-40 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate @[767px]/card:hidden"
+              className="flex w-40 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate"
               size="sm"
               aria-label="Select a value"
             >
@@ -128,7 +137,29 @@ export function ChartAreaInteractive({
               </SelectItem>
             </SelectContent>
           </Select>
-        </CardAction>
+            </CardAction>
+          </div>
+          {hasData && !isLoading && (
+            <div className="flex flex-wrap gap-4 text-sm">
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground">Total:</span>
+                <span className="font-semibold">{metrics.total.toLocaleString()}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-sm bg-[hsl(217,91%,60%)]" />
+                <span className="text-muted-foreground">Desktop:</span>
+                <span className="font-semibold">{metrics.desktop.toLocaleString()}</span>
+                <span className="text-muted-foreground text-xs">({metrics.desktopPercent.toFixed(1)}%)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-sm bg-[hsl(32,98%,56%)]" />
+                <span className="text-muted-foreground">Mobile:</span>
+                <span className="font-semibold">{metrics.mobile.toLocaleString()}</span>
+                <span className="text-muted-foreground text-xs">({metrics.mobilePercent.toFixed(1)}%)</span>
+              </div>
+            </div>
+          )}
+        </div>
       </CardHeader>
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         {isLoading ? (
@@ -185,6 +216,15 @@ export function ChartAreaInteractive({
               minTickGap={32}
               tickFormatter={(value) => {
                 const date = new Date(value)
+                // For hourly data (last_hour, today), show time
+                if (timeRange === 'last_hour' || timeRange === 'today') {
+                  return date.toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true,
+                  })
+                }
+                // For daily/weekly/monthly data, show date
                 return date.toLocaleDateString('en-US', {
                   month: 'short',
                   day: 'numeric',
@@ -196,7 +236,19 @@ export function ChartAreaInteractive({
               content={
                 <ChartTooltipContent
                   labelFormatter={(value) => {
-                    return new Date(value).toLocaleDateString('en-US', {
+                    const date = new Date(value)
+                    // For hourly data (last_hour, today), show full date + time
+                    if (timeRange === 'last_hour' || timeRange === 'today') {
+                      return date.toLocaleString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true,
+                      })
+                    }
+                    // For daily/weekly/monthly data, show date only
+                    return date.toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',
                     })

@@ -15,14 +15,12 @@ import {
   type TimeRange,
 } from '@/hooks/use-analytics'
 import { ProjectHeader } from '@/components/analytics/project-header'
-import { MetricsOverview } from '@/components/analytics/metrics-overview'
+import { EngagementMetrics } from '@/components/analytics/engagement-metrics'
+import { TrafficSources } from '@/components/analytics/traffic-sources'
 import { RevenueAttribution } from '@/components/analytics/revenue-attribution'
-import { TrafficByOrigin } from '@/components/analytics/traffic-by-origin'
-import { TrafficByCountry } from '@/components/analytics/traffic-by-country'
 import { LiveEventStream } from '@/components/analytics/live-event-stream'
 import { VisitorProfileModal } from '@/components/analytics/visitor-profile-modal'
 import { BounceRateCard } from '@/components/analytics/bounce-rate-card'
-import { RetentionMetrics } from '@/components/analytics/retention-metrics'
 import { TopVisitorsTable } from '@/components/analytics/top-visitors-table'
 
 export const Route = createFileRoute('/_protected/projects/$projectId')({
@@ -121,6 +119,7 @@ function ProjectDetailPage() {
         onTimeRangeChange={setTimeRange}
       />
 
+      {/* Chart with key metrics */}
       <div className="mb-8">
         <ChartAreaInteractive
           data={timelineData?.data}
@@ -130,46 +129,35 @@ function ProjectDetailPage() {
         />
       </div>
 
-      <MetricsOverview
-        uniqueVisitors={dashboardData?.unique_visitors}
-        totalSessions={dashboardData?.total_sessions_in_period}
-        bounceRate={dashboardData?.bounce_rate}
-        avgSessionDuration={dashboardData?.avg_session_duration_seconds}
-        avgPagesPerSession={dashboardData?.avg_pages_per_session}
-        dau={activeUsersData?.dau}
-        wau={activeUsersData?.wau}
-        mau={activeUsersData?.mau}
-        isLoading={dashboardLoading || activeUsersLoading}
-      />
-
-      {/* Retention Metrics Section */}
+      {/* Engagement Metrics (Tabbed: Sessions, Activity, Retention) */}
       <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">User Retention</h2>
-        <RetentionMetrics
+        <EngagementMetrics
+          uniqueVisitors={dashboardData?.unique_visitors}
+          totalSessions={dashboardData?.total_sessions_in_period}
+          bounceRate={dashboardData?.bounce_rate}
+          avgSessionDuration={dashboardData?.avg_session_duration_seconds}
+          avgPagesPerSession={dashboardData?.avg_pages_per_session}
+          dau={activeUsersData?.dau}
+          wau={activeUsersData?.wau}
+          mau={activeUsersData?.mau}
           churnData={churnData}
           returnData={returnData}
-          isLoading={churnLoading || returnLoading}
+          isLoading={dashboardLoading || activeUsersLoading || churnLoading || returnLoading}
         />
       </div>
 
-      {/* Bounce Rate Section */}
+      {/* Traffic Sources (Tabbed: Origin, Country) */}
+      <div className="mb-8">
+        <TrafficSources
+          originData={originData?.data}
+          countryData={countryData?.data}
+          isLoading={originLoading || countryLoading}
+        />
+      </div>
+
+      {/* Bounce Rate Analysis */}
       <div className="mb-8">
         <BounceRateCard data={bounceRateData} isLoading={bounceRateLoading} />
-      </div>
-
-      {/* Revenue Attribution (mock data - can be hidden or removed) */}
-      {isDev && (
-        <RevenueAttribution
-          revenueData={revenueBySource}
-          hasData={hasRevenueData}
-          showToggle={isDev}
-          onToggle={() => setHasRevenueData(!hasRevenueData)}
-        />
-      )}
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <TrafficByOrigin data={originData?.data} isLoading={originLoading} />
-        <TrafficByCountry data={countryData?.data} isLoading={countryLoading} />
       </div>
 
       {/* Top Visitors */}
@@ -180,6 +168,18 @@ function ProjectDetailPage() {
           onVisitorClick={handleVisitorClick}
         />
       </div>
+
+      {/* Revenue Attribution (mock data - dev only) */}
+      {isDev && (
+        <div className="mb-8">
+          <RevenueAttribution
+            revenueData={revenueBySource}
+            hasData={hasRevenueData}
+            showToggle={isDev}
+            onToggle={() => setHasRevenueData(!hasRevenueData)}
+          />
+        </div>
+      )}
 
       <LiveEventStream
         events={recentEventsData?.events}
