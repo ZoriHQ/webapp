@@ -7,7 +7,6 @@ import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts'
 import type { ChartConfig } from '@/components/ui/chart'
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
@@ -18,13 +17,6 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import type { TimeRange } from '@/hooks/use-analytics'
 
 export const description = 'An interactive area chart'
@@ -47,14 +39,12 @@ interface ChartAreaInteractiveProps {
   data?: Zoriapi.V1.Analytics.UniqueVisitorsDataPoint[]
   isLoading?: boolean
   timeRange: TimeRange
-  onTimeRangeChange: (range: TimeRange) => void
 }
 
 export function ChartAreaInteractive({
   data,
   isLoading = false,
   timeRange,
-  onTimeRangeChange,
 }: ChartAreaInteractiveProps) {
   // Transform API data to chart format with proper grouping
   const chartData = React.useMemo(() => {
@@ -117,56 +107,18 @@ export function ChartAreaInteractive({
     }
   }, [chartData, hasData])
 
-  const timeRangeLabel = {
-    last_hour: 'Last Hour',
-    today: 'Today',
-    last_7_days: 'Last 7 Days',
-    last_30_days: 'Last 30 Days',
-    last_90_days: 'Last 90 Days',
-  }[timeRange] || 'Last 7 Days'
-
   return (
-    <Card className="@container/card">
+    <Card className="@container/card h-full">
       <CardHeader>
         <div className="flex flex-col gap-3">
-          <div className="flex items-start justify-between">
-            <div>
-              <CardTitle>Unique Visitors</CardTitle>
-              <CardDescription>
-                <span className="hidden @[540px]/card:block">
-                  Desktop and mobile visitors over time
-                </span>
-                <span className="@[540px]/card:hidden">Visitors over time</span>
-              </CardDescription>
-            </div>
-            <CardAction>
-          <Select value={timeRange} onValueChange={(value) => onTimeRangeChange(value as TimeRange)}>
-            <SelectTrigger
-              className="flex w-40 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate"
-              size="sm"
-              aria-label="Select a value"
-            >
-              <SelectValue placeholder={timeRangeLabel} />
-            </SelectTrigger>
-            <SelectContent className="rounded-xl">
-              <SelectItem value="last_90_days" className="rounded-lg">
-                Last 90 Days
-              </SelectItem>
-              <SelectItem value="last_30_days" className="rounded-lg">
-                Last 30 Days
-              </SelectItem>
-              <SelectItem value="last_7_days" className="rounded-lg">
-                Last 7 Days
-              </SelectItem>
-              <SelectItem value="today" className="rounded-lg">
-                Today
-              </SelectItem>
-              <SelectItem value="last_hour" className="rounded-lg">
-                Last Hour
-              </SelectItem>
-            </SelectContent>
-          </Select>
-            </CardAction>
+          <div>
+            <CardTitle>Unique Visitors</CardTitle>
+            <CardDescription>
+              <span className="hidden @[540px]/card:block">
+                Desktop and mobile visitors over time
+              </span>
+              <span className="@[540px]/card:hidden">Visitors over time</span>
+            </CardDescription>
           </div>
           {hasData && !isLoading && (
             <div className="flex flex-wrap gap-4 text-sm">

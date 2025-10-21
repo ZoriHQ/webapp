@@ -21,7 +21,7 @@ export function TrafficSources({ originData, countryData, isLoading = false }: T
   const [showAllCountries, setShowAllCountries] = useState(false)
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
         <CardTitle>Traffic Sources</CardTitle>
       </CardHeader>

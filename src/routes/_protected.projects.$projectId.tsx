@@ -119,13 +119,20 @@ function ProjectDetailPage() {
         onTimeRangeChange={setTimeRange}
       />
 
-      {/* Chart with key metrics */}
-      <div className="mb-8">
+      {/* Chart + Traffic Sources Side-by-Side */}
+      <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6 mb-8">
+        {/* Chart with key metrics */}
         <ChartAreaInteractive
           data={timelineData?.data}
           isLoading={timelineLoading}
           timeRange={timeRange}
-          onTimeRangeChange={setTimeRange}
+        />
+
+        {/* Traffic Sources (Tabbed: Origin, Country) */}
+        <TrafficSources
+          originData={originData?.data}
+          countryData={countryData?.data}
+          isLoading={originLoading || countryLoading}
         />
       </div>
 
@@ -143,15 +150,6 @@ function ProjectDetailPage() {
           churnData={churnData}
           returnData={returnData}
           isLoading={dashboardLoading || activeUsersLoading || churnLoading || returnLoading}
-        />
-      </div>
-
-      {/* Traffic Sources (Tabbed: Origin, Country) */}
-      <div className="mb-8">
-        <TrafficSources
-          originData={originData?.data}
-          countryData={countryData?.data}
-          isLoading={originLoading || countryLoading}
         />
       </div>
 
