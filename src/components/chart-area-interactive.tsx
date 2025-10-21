@@ -56,18 +56,47 @@ export function ChartAreaInteractive({
   timeRange,
   onTimeRangeChange,
 }: ChartAreaInteractiveProps) {
-  // Transform API data to chart format
+  // Transform API data to chart format with proper grouping
   const chartData = React.useMemo(() => {
     if (!data || data.length === 0) {
       return []
     }
 
-    return data.map((item) => ({
-      date: item.timestamp || '',
-      desktop: item.desktop || 0,
-      mobile: item.mobile || 0,
-    }))
-  }, [data])
+    // For hourly data (last_hour, today), don't aggregate - show each data point
+    if (timeRange === 'last_hour' || timeRange === 'today') {
+      return data.map((item) => ({
+        date: item.timestamp || '',
+        desktop: item.desktop || 0,
+        mobile: item.mobile || 0,
+      }))
+    }
+
+    // For multi-day periods (last_7_days, last_30_days, last_90_days), aggregate by day
+    const aggregatedByDay = new Map<string, { desktop: number; mobile: number }>()
+
+    data.forEach((item) => {
+      if (!item.timestamp) return
+
+      // Get the date portion only (YYYY-MM-DD)
+      const date = new Date(item.timestamp)
+      const dateKey = date.toISOString().split('T')[0]
+
+      const existing = aggregatedByDay.get(dateKey) || { desktop: 0, mobile: 0 }
+      aggregatedByDay.set(dateKey, {
+        desktop: existing.desktop + (item.desktop || 0),
+        mobile: existing.mobile + (item.mobile || 0),
+      })
+    })
+
+    // Convert map to array and sort by date
+    return Array.from(aggregatedByDay.entries())
+      .map(([dateKey, values]) => ({
+        date: `${dateKey}T00:00:00Z`, // Use midnight UTC for consistent date display
+        desktop: values.desktop,
+        mobile: values.mobile,
+      }))
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+  }, [data, timeRange])
 
   const hasData = chartData.length > 0
 
