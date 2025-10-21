@@ -2,18 +2,19 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { ChartAreaInteractive } from '@/components/chart-area-interactive'
 import {
-  useRecentEvents,
-  useVisitorsByCountry,
-  useVisitorsByOrigin,
-  useVisitorsTimeline,
-  useDashboardMetrics,
   useActiveUsers,
   useBounceRate,
   useChurnRate,
+  useDashboardMetrics,
+  useRecentEvents,
   useReturnRate,
   useTopVisitors,
+  useVisitorsByCountry,
+  useVisitorsByOrigin,
+  useVisitorsTimeline,
   type TimeRange,
 } from '@/hooks/use-analytics'
+import { useProject } from '@/hooks/use-projects'
 import { ProjectHeader } from '@/components/analytics/project-header'
 import { EngagementMetrics } from '@/components/analytics/engagement-metrics'
 import { TrafficSources } from '@/components/analytics/traffic-sources'
@@ -22,6 +23,7 @@ import { LiveEventStream } from '@/components/analytics/live-event-stream'
 import { VisitorProfileModal } from '@/components/analytics/visitor-profile-modal'
 import { BounceRateCard } from '@/components/analytics/bounce-rate-card'
 import { TopVisitorsTable } from '@/components/analytics/top-visitors-table'
+import { EmptyEventsState } from '@/components/analytics/empty-events-state'
 
 export const Route = createFileRoute('/_protected/projects/$projectId')({
   component: ProjectDetailPage,
@@ -77,7 +79,9 @@ function ProjectDetailPage() {
   const { projectId } = Route.useParams()
   const [timeRange, setTimeRange] = useState<TimeRange>('last_7_days')
   const [hasRevenueData, setHasRevenueData] = useState(true)
-  const [selectedVisitorId, setSelectedVisitorId] = useState<string | null>(null)
+  const [selectedVisitorId, setSelectedVisitorId] = useState<string | null>(
+    null,
+  )
   const [isVisitorModalOpen, setIsVisitorModalOpen] = useState(false)
   const isDev = import.meta.env.DEV
 
@@ -86,104 +90,158 @@ function ProjectDetailPage() {
     setIsVisitorModalOpen(true)
   }
 
+  // Fetch project details
+  const { data: projectData, isLoading: projectLoading } = useProject(projectId)
+
   // Fetch analytics data
-  console.log('[ProjectDetailPage] Component rendered with:', { projectId, timeRange })
-  const { data: recentEventsData, isLoading: eventsLoading } = useRecentEvents(projectId, 15)
-  const { data: countryData, isLoading: countryLoading } = useVisitorsByCountry(projectId, timeRange)
-  const { data: originData, isLoading: originLoading } = useVisitorsByOrigin(projectId, timeRange)
-  const { data: timelineData, isLoading: timelineLoading, error: timelineError, status: timelineStatus } = useVisitorsTimeline(projectId, timeRange)
+  console.log('[ProjectDetailPage] Component rendered with:', {
+    projectId,
+    timeRange,
+  })
+  const { data: recentEventsData, isLoading: eventsLoading } = useRecentEvents(
+    projectId,
+    15,
+  )
+  const { data: countryData, isLoading: countryLoading } = useVisitorsByCountry(
+    projectId,
+    timeRange,
+  )
+  const { data: originData, isLoading: originLoading } = useVisitorsByOrigin(
+    projectId,
+    timeRange,
+  )
+  const {
+    data: timelineData,
+    isLoading: timelineLoading,
+    error: timelineError,
+    status: timelineStatus,
+  } = useVisitorsTimeline(projectId, timeRange)
 
   // New metrics hooks
-  const { data: dashboardData, isLoading: dashboardLoading } = useDashboardMetrics(projectId, timeRange)
-  const { data: activeUsersData, isLoading: activeUsersLoading } = useActiveUsers(projectId)
-  const { data: bounceRateData, isLoading: bounceRateLoading } = useBounceRate(projectId, timeRange, 10)
-  const { data: churnData, isLoading: churnLoading } = useChurnRate(projectId, timeRange)
-  const { data: returnData, isLoading: returnLoading } = useReturnRate(projectId, timeRange)
-  const { data: topVisitorsData, isLoading: topVisitorsLoading } = useTopVisitors(projectId, timeRange, 20)
+  const { data: dashboardData, isLoading: dashboardLoading } =
+    useDashboardMetrics(projectId, timeRange)
+  const { data: activeUsersData, isLoading: activeUsersLoading } =
+    useActiveUsers(projectId)
+  const { data: bounceRateData, isLoading: bounceRateLoading } = useBounceRate(
+    projectId,
+    timeRange,
+    10,
+  )
+  const { data: churnData, isLoading: churnLoading } = useChurnRate(
+    projectId,
+    timeRange,
+  )
+  const { data: returnData, isLoading: returnLoading } = useReturnRate(
+    projectId,
+    timeRange,
+  )
+  const { data: topVisitorsData, isLoading: topVisitorsLoading } =
+    useTopVisitors(projectId, timeRange, 20)
 
   console.log('[ProjectDetailPage] Timeline query state:', {
     timelineData,
     isLoading: timelineLoading,
     error: timelineError,
-    status: timelineStatus
+    status: timelineStatus,
   })
 
   // Mock revenue data - only used for dev demo (can be removed)
   // These are not passed to the new MetricsOverview component
 
+  // Check if project has received any events based on first_event_received_at field
+  const hasNoEvents = !projectData?.first_event_received_at && !projectLoading
+
   return (
     <div className="container mx-auto px-4 py-8">
       <ProjectHeader
-        projectId={projectId}
+        projectName={projectData?.name}
         timeRange={timeRange}
         onTimeRangeChange={setTimeRange}
       />
 
-      {/* Chart + Traffic Sources Side-by-Side */}
-      <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6 mb-8">
-        {/* Chart with key metrics */}
-        <ChartAreaInteractive
-          data={timelineData?.data}
-          isLoading={timelineLoading}
-          timeRange={timeRange}
+      {/* Show empty state if no events have been received */}
+      {hasNoEvents ? (
+        <EmptyEventsState
+          projectId={projectId}
+          projectName={projectData?.name}
         />
+      ) : (
+        <>
+          {/* Chart + Traffic Sources Side-by-Side */}
+          <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6 mb-8">
+            {/* Chart with key metrics */}
+            <ChartAreaInteractive
+              data={timelineData?.data}
+              isLoading={timelineLoading}
+              timeRange={timeRange}
+            />
 
-        {/* Traffic Sources (Tabbed: Origin, Country) */}
-        <TrafficSources
-          originData={originData?.data}
-          countryData={countryData?.data}
-          isLoading={originLoading || countryLoading}
-        />
-      </div>
+            {/* Traffic Sources (Tabbed: Origin, Country) */}
+            <TrafficSources
+              originData={originData?.data}
+              countryData={countryData?.data}
+              isLoading={originLoading || countryLoading}
+            />
+          </div>
 
-      {/* Engagement Metrics (Tabbed: Sessions, Activity, Retention) */}
-      <div className="mb-8">
-        <EngagementMetrics
-          uniqueVisitors={dashboardData?.unique_visitors}
-          totalSessions={dashboardData?.total_sessions_in_period}
-          bounceRate={dashboardData?.bounce_rate}
-          avgSessionDuration={dashboardData?.avg_session_duration_seconds}
-          avgPagesPerSession={dashboardData?.avg_pages_per_session}
-          dau={activeUsersData?.dau}
-          wau={activeUsersData?.wau}
-          mau={activeUsersData?.mau}
-          churnData={churnData}
-          returnData={returnData}
-          isLoading={dashboardLoading || activeUsersLoading || churnLoading || returnLoading}
-        />
-      </div>
+          {/* Engagement Metrics (Tabbed: Sessions, Activity, Retention) */}
+          <div className="mb-8">
+            <EngagementMetrics
+              uniqueVisitors={dashboardData?.unique_visitors}
+              totalSessions={dashboardData?.total_sessions_in_period}
+              bounceRate={dashboardData?.bounce_rate}
+              avgSessionDuration={dashboardData?.avg_session_duration_seconds}
+              avgPagesPerSession={dashboardData?.avg_pages_per_session}
+              dau={activeUsersData?.dau}
+              wau={activeUsersData?.wau}
+              mau={activeUsersData?.mau}
+              churnData={churnData}
+              returnData={returnData}
+              isLoading={
+                dashboardLoading ||
+                activeUsersLoading ||
+                churnLoading ||
+                returnLoading
+              }
+            />
+          </div>
 
-      {/* Bounce Rate Analysis */}
-      <div className="mb-8">
-        <BounceRateCard data={bounceRateData} isLoading={bounceRateLoading} />
-      </div>
+          {/* Bounce Rate Analysis */}
+          <div className="mb-8">
+            <BounceRateCard
+              data={bounceRateData}
+              isLoading={bounceRateLoading}
+            />
+          </div>
 
-      {/* Top Visitors */}
-      <div className="mb-8">
-        <TopVisitorsTable
-          data={topVisitorsData}
-          isLoading={topVisitorsLoading}
-          onVisitorClick={handleVisitorClick}
-        />
-      </div>
+          {/* Top Visitors */}
+          <div className="mb-8">
+            <TopVisitorsTable
+              data={topVisitorsData}
+              isLoading={topVisitorsLoading}
+              onVisitorClick={handleVisitorClick}
+            />
+          </div>
 
-      {/* Revenue Attribution (mock data - dev only) */}
-      {isDev && (
-        <div className="mb-8">
-          <RevenueAttribution
-            revenueData={revenueBySource}
-            hasData={hasRevenueData}
-            showToggle={isDev}
-            onToggle={() => setHasRevenueData(!hasRevenueData)}
+          {/* Revenue Attribution (mock data - dev only) */}
+          {isDev && (
+            <div className="mb-8">
+              <RevenueAttribution
+                revenueData={revenueBySource}
+                hasData={hasRevenueData}
+                showToggle={isDev}
+                onToggle={() => setHasRevenueData(!hasRevenueData)}
+              />
+            </div>
+          )}
+
+          <LiveEventStream
+            events={recentEventsData?.events}
+            isLoading={eventsLoading}
+            onVisitorClick={handleVisitorClick}
           />
-        </div>
+        </>
       )}
-
-      <LiveEventStream
-        events={recentEventsData?.events}
-        isLoading={eventsLoading}
-        onVisitorClick={handleVisitorClick}
-      />
 
       <VisitorProfileModal
         projectId={projectId}

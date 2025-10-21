@@ -1,14 +1,9 @@
 'use client'
 
 import { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
+import { useParams, Link } from '@tanstack/react-router'
 
-import { ChevronDownIcon, ChevronsUpDown, SettingsIcon } from 'lucide-react'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from './ui/breadcrumb'
+import { ChevronDownIcon, SettingsIcon } from 'lucide-react'
 import { Button } from './ui/button'
 import {
   NavigationMenu,
@@ -16,14 +11,6 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
 } from './ui/navigation-menu'
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from './ui/select'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,12 +20,14 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
-import type { SVGProps } from 'lucide-react'
-import type { HTMLAttributes } from 'react'
+import type { HTMLAttributes, SVGAttributes } from 'react'
 import { cn } from '@/lib/utils'
+import { CommandPalette } from './command-palette'
+import { CommandPaletteTrigger } from './command-palette-trigger'
+import { RevenueStatusIndicator } from './revenue-status-indicator'
 
 // Hamburger icon component
-const HamburgerIcon = ({ className, ...props }: SVGProps<SVGElement>) => (
+const HamburgerIcon = ({ className, ...props }: SVGAttributes<SVGElement>) => (
   <svg
     className={cn('pointer-events-none', className)}
     width={16}
@@ -234,7 +223,22 @@ export const Navbar = forwardRef<HTMLElement, NavbarProps>(
     ref,
   ) => {
     const [isMobile, setIsMobile] = useState(false)
+    const [commandOpen, setCommandOpen] = useState(false)
     const containerRef = useRef<HTMLElement>(null)
+    const params = useParams({ strict: false })
+    const projectId = (params as { projectId?: string })?.projectId
+
+    // Keyboard shortcut for command palette
+    useEffect(() => {
+      const down = (e: KeyboardEvent) => {
+        if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+          e.preventDefault()
+          setCommandOpen(true)
+        }
+      }
+      document.addEventListener('keydown', down)
+      return () => document.removeEventListener('keydown', down)
+    }, [])
 
     useEffect(() => {
       const checkWidth = () => {
@@ -277,180 +281,54 @@ export const Navbar = forwardRef<HTMLElement, NavbarProps>(
         )}
         {...props}
       >
-        <div className="container mx-auto flex h-16 max-w-screen-2xl items-center justify-between gap-2">
-          {/* Left side */}
-          <div className="flex items-center gap-2 min-w-0 flex-1">
-            {/* Mobile menu trigger */}
-            {isMobile && (
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    className="group h-8 w-8 hover:bg-accent hover:text-accent-foreground shrink-0"
-                    variant="ghost"
-                    size="icon"
-                  >
-                    <HamburgerIcon />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent align="start" className="w-80 p-2">
-                  <div className="space-y-4">
-                    {/* Context switchers in mobile menu */}
-                    <div className="space-y-2">
-                      <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                        Context
-                      </div>
-                      <div className="space-y-2">
-                        <Select
-                          defaultValue={defaultAccountType}
-                          onValueChange={onAccountTypeChange}
-                        >
-                          <SelectTrigger className="h-9">
-                            <SelectValue placeholder="Select account type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {accountTypes.map((accountType) => (
-                              <SelectItem
-                                key={accountType.value}
-                                value={accountType.value}
-                              >
-                                {accountType.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <Select
-                          defaultValue={defaultProject}
-                          onValueChange={onProjectChange}
-                        >
-                          <SelectTrigger className="h-9">
-                            <SelectValue placeholder="Select project" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {projects.map((project) => (
-                              <SelectItem
-                                key={project.value}
-                                value={project.value}
-                              >
-                                {project.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    {/* Navigation links in mobile menu */}
-                    <div className="space-y-2">
-                      <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                        Navigation
-                      </div>
-                      <NavigationMenu className="max-w-none">
-                        <NavigationMenuList className="flex-col items-start gap-0 w-full">
-                          {navigationLinks.map((link, index) => (
-                            <NavigationMenuItem key={index} className="w-full">
-                              <button
-                                onClick={(e) => {
-                                  e.preventDefault()
-                                  if (onNavItemClick && link.href)
-                                    onNavItemClick(link.href)
-                                }}
-                                className="flex w-full items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer no-underline"
-                              >
-                                {link.label}
-                              </button>
-                            </NavigationMenuItem>
-                          ))}
-                        </NavigationMenuList>
-                      </NavigationMenu>
-                    </div>
-                  </div>
-                </PopoverContent>
-              </Popover>
-            )}
-            {/* Breadcrumb - Hidden on mobile */}
-            {!isMobile && (
-              <Breadcrumb className="min-w-0">
-                <BreadcrumbList className="flex-wrap">
-                  <BreadcrumbItem>
-                    <Select
-                      defaultValue={defaultAccountType}
-                      onValueChange={onAccountTypeChange}
-                    >
-                      <SelectTrigger className="focus-visible:bg-accent text-foreground h-8 p-1.5 focus-visible:ring-0 border-none shadow-none bg-transparent hover:bg-accent max-w-[120px]">
-                        <SelectValue placeholder="Account" />
-                        <ChevronsUpDown
-                          size={14}
-                          className="text-muted-foreground/80 ml-1 shrink-0"
-                        />
-                      </SelectTrigger>
-                      <SelectContent className="[&_*[role=option]]:ps-2 [&_*[role=option]]:pe-8 [&_*[role=option]>span]:start-auto [&_*[role=option]>span]:end-2">
-                        {accountTypes.map((accountType) => (
-                          <SelectItem
-                            key={accountType.value}
-                            value={accountType.value}
-                          >
-                            {accountType.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator className="shrink-0">
-                    {' '}
-                    /{' '}
-                  </BreadcrumbSeparator>
-                  <BreadcrumbItem>
-                    <Select
-                      defaultValue={defaultProject}
-                      onValueChange={onProjectChange}
-                    >
-                      <SelectTrigger className="focus-visible:bg-accent text-foreground h-8 p-1.5 focus-visible:ring-0 border-none shadow-none bg-transparent hover:bg-accent max-w-[140px]">
-                        <SelectValue placeholder="Project" />
-                        <ChevronsUpDown
-                          size={14}
-                          className="text-muted-foreground/80 ml-1 shrink-0"
-                        />
-                      </SelectTrigger>
-                      <SelectContent className="[&_*[role=option]]:ps-2 [&_*[role=option]]:pe-8 [&_*[role=option]>span]:start-auto [&_*[role=option]>span]:end-2">
-                        {projects.map((project) => (
-                          <SelectItem key={project.value} value={project.value}>
-                            {project.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </BreadcrumbItem>
-                </BreadcrumbList>
-              </Breadcrumb>
-            )}
+        <div className="container mx-auto flex h-16 max-w-screen-2xl items-center gap-4">
+          {/* Left side - Brand Name */}
+          <div className="flex items-center gap-2 min-w-0">
+            <Link to="/projects" className="hover:opacity-80 transition-opacity">
+              <h1 className="text-lg font-bold">Zori</h1>
+            </Link>
           </div>
-          {/* Right side */}
+
+          {/* Center - Search */}
+          <div className="flex-1 flex justify-center max-w-2xl mx-auto">
+            <div className="w-full max-w-md">
+              <CommandPaletteTrigger
+                onClick={() => setCommandOpen(true)}
+                isMobile={isMobile}
+              />
+            </div>
+          </div>
+
+          {/* Right side - Docs + Revenue + Settings + User */}
           <div className="flex items-center gap-2 shrink-0">
-            {/* Nav menu - Desktop only */}
+            {/* Docs Link - Desktop only */}
             {!isMobile && (
-              <NavigationMenu className="hidden lg:flex">
-                <NavigationMenuList className="gap-1">
-                  {navigationLinks.map((link, index) => (
-                    <NavigationMenuItem key={index}>
-                      <NavigationMenuLink
-                        href={link.href}
-                        onClick={(e) => {
-                          e.preventDefault()
-                          if (onNavItemClick && link.href)
-                            onNavItemClick(link.href)
-                        }}
-                        className="text-muted-foreground hover:text-primary py-1.5 font-medium transition-colors cursor-pointer group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-3 text-sm focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
-                      >
-                        {link.label}
-                      </NavigationMenuLink>
-                    </NavigationMenuItem>
-                  ))}
+              <NavigationMenu>
+                <NavigationMenuList>
+                  <NavigationMenuItem>
+                    <NavigationMenuLink
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        window.open('https://docs.zori.so', '_blank')
+                      }}
+                      className="text-muted-foreground hover:text-primary py-1.5 font-medium transition-colors cursor-pointer group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-3 text-sm focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
+                    >
+                      Docs
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
                 </NavigationMenuList>
               </NavigationMenu>
             )}
-            {/* Settings - Hidden on small mobile */}
+
+            {/* Revenue Status Indicator - Only on project pages */}
+            {projectId && <RevenueStatusIndicator projectId={projectId} />}
+
+            {/* Settings */}
             <div className="hidden sm:flex">
               <SettingsMenu onItemClick={onSettingsItemClick} />
             </div>
+
             {/* User menu */}
             <UserMenu
               userName={userName}
@@ -460,6 +338,7 @@ export const Navbar = forwardRef<HTMLElement, NavbarProps>(
             />
           </div>
         </div>
+        <CommandPalette open={commandOpen} onOpenChange={setCommandOpen} />
       </header>
     )
   },

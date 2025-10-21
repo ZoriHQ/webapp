@@ -17,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProtectedProjectsRouteImport } from './routes/_protected.projects'
 import { Route as ProtectedProjectsIndexRouteImport } from './routes/_protected.projects.index'
 import { Route as ProtectedProjectsProjectIdRouteImport } from './routes/_protected.projects.$projectId'
+import { Route as ProtectedProjectsProjectIdSettingsRouteImport } from './routes/_protected.projects.$projectId.settings'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -58,6 +59,12 @@ const ProtectedProjectsProjectIdRoute =
     path: '/$projectId',
     getParentRoute: () => ProtectedProjectsRoute,
   } as any)
+const ProtectedProjectsProjectIdSettingsRoute =
+  ProtectedProjectsProjectIdSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => ProtectedProjectsProjectIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -65,16 +72,18 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/projects': typeof ProtectedProjectsRouteWithChildren
-  '/projects/$projectId': typeof ProtectedProjectsProjectIdRoute
+  '/projects/$projectId': typeof ProtectedProjectsProjectIdRouteWithChildren
   '/projects/': typeof ProtectedProjectsIndexRoute
+  '/projects/$projectId/settings': typeof ProtectedProjectsProjectIdSettingsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/projects/$projectId': typeof ProtectedProjectsProjectIdRoute
+  '/projects/$projectId': typeof ProtectedProjectsProjectIdRouteWithChildren
   '/projects': typeof ProtectedProjectsIndexRoute
+  '/projects/$projectId/settings': typeof ProtectedProjectsProjectIdSettingsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -84,8 +93,9 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/_protected/projects': typeof ProtectedProjectsRouteWithChildren
-  '/_protected/projects/$projectId': typeof ProtectedProjectsProjectIdRoute
+  '/_protected/projects/$projectId': typeof ProtectedProjectsProjectIdRouteWithChildren
   '/_protected/projects/': typeof ProtectedProjectsIndexRoute
+  '/_protected/projects/$projectId/settings': typeof ProtectedProjectsProjectIdSettingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -97,6 +107,7 @@ export interface FileRouteTypes {
     | '/projects'
     | '/projects/$projectId'
     | '/projects/'
+    | '/projects/$projectId/settings'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -105,6 +116,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/projects/$projectId'
     | '/projects'
+    | '/projects/$projectId/settings'
   id:
     | '__root__'
     | '/'
@@ -115,6 +127,7 @@ export interface FileRouteTypes {
     | '/_protected/projects'
     | '/_protected/projects/$projectId'
     | '/_protected/projects/'
+    | '/_protected/projects/$projectId/settings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -183,16 +196,38 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedProjectsProjectIdRouteImport
       parentRoute: typeof ProtectedProjectsRoute
     }
+    '/_protected/projects/$projectId/settings': {
+      id: '/_protected/projects/$projectId/settings'
+      path: '/settings'
+      fullPath: '/projects/$projectId/settings'
+      preLoaderRoute: typeof ProtectedProjectsProjectIdSettingsRouteImport
+      parentRoute: typeof ProtectedProjectsProjectIdRoute
+    }
   }
 }
 
+interface ProtectedProjectsProjectIdRouteChildren {
+  ProtectedProjectsProjectIdSettingsRoute: typeof ProtectedProjectsProjectIdSettingsRoute
+}
+
+const ProtectedProjectsProjectIdRouteChildren: ProtectedProjectsProjectIdRouteChildren =
+  {
+    ProtectedProjectsProjectIdSettingsRoute:
+      ProtectedProjectsProjectIdSettingsRoute,
+  }
+
+const ProtectedProjectsProjectIdRouteWithChildren =
+  ProtectedProjectsProjectIdRoute._addFileChildren(
+    ProtectedProjectsProjectIdRouteChildren,
+  )
+
 interface ProtectedProjectsRouteChildren {
-  ProtectedProjectsProjectIdRoute: typeof ProtectedProjectsProjectIdRoute
+  ProtectedProjectsProjectIdRoute: typeof ProtectedProjectsProjectIdRouteWithChildren
   ProtectedProjectsIndexRoute: typeof ProtectedProjectsIndexRoute
 }
 
 const ProtectedProjectsRouteChildren: ProtectedProjectsRouteChildren = {
-  ProtectedProjectsProjectIdRoute: ProtectedProjectsProjectIdRoute,
+  ProtectedProjectsProjectIdRoute: ProtectedProjectsProjectIdRouteWithChildren,
   ProtectedProjectsIndexRoute: ProtectedProjectsIndexRoute,
 }
 

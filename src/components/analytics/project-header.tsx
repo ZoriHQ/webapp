@@ -9,13 +9,13 @@ import {
 import type { TimeRange } from '@/hooks/use-analytics'
 
 interface ProjectHeaderProps {
-  projectId: string
+  projectName?: string
   timeRange: TimeRange
   onTimeRangeChange: (timeRange: TimeRange) => void
 }
 
 export function ProjectHeader({
-  projectId,
+  projectName,
   timeRange,
   onTimeRangeChange,
 }: ProjectHeaderProps) {
@@ -23,9 +23,12 @@ export function ProjectHeader({
     <div className="mb-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold mb-2">Project Analytics</h1>
+          <h1 className="text-3xl font-bold mb-2">
+            {projectName || 'Project Analytics'}
+          </h1>
           <p className="text-muted-foreground">
-            Real-time analytics and insights for project {projectId}
+            Real-time analytics and insights
+            {projectName && ` for ${projectName}`}
           </p>
         </div>
         <div className="flex items-center gap-2">
