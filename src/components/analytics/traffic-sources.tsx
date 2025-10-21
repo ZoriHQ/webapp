@@ -9,6 +9,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { countryCodeToFlag, getCountryName } from '@/lib/country-utils'
+import { getFaviconUrl } from '@/lib/favicon-utils'
+import { Globe } from 'lucide-react'
 
 interface TrafficSourcesProps {
   originData?: Array<Zoriapi.V1.Analytics.OriginDataPoint>
@@ -40,28 +42,52 @@ export function TrafficSources({ originData, countryData, isLoading = false }: T
             ) : originData && originData.length > 0 ? (
               <>
                 <div className="space-y-3">
-                  {(showAllOrigins ? originData : originData.slice(0, 6)).map((source, idx) => (
-                    <div key={idx} className="flex items-center justify-between">
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">
-                          {source.origin || 'Direct'}
-                        </p>
-                        <div className="mt-1 h-2 bg-secondary rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-primary rounded-full transition-all"
-                            style={{
-                              width: `${source.percentage}%`,
-                            }}
-                          />
+                  {(showAllOrigins ? originData : originData.slice(0, 6)).map((source, idx) => {
+                    const isDirect = !source.origin || source.origin === 'Direct'
+                    const faviconUrl = isDirect ? '' : getFaviconUrl(source.origin, 32)
+
+                    return (
+                      <div key={idx} className="flex items-center justify-between">
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          {isDirect ? (
+                            <Globe className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                          ) : (
+                            <img
+                              src={faviconUrl}
+                              alt=""
+                              className="w-5 h-5 rounded flex-shrink-0"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none'
+                                const globe = e.currentTarget.nextElementSibling
+                                if (globe) {
+                                  (globe as HTMLElement).style.display = 'block'
+                                }
+                              }}
+                            />
+                          )}
+                          <Globe className="w-5 h-5 text-muted-foreground flex-shrink-0 hidden" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">
+                              {source.origin || 'Direct'}
+                            </p>
+                            <div className="mt-1 h-2 bg-secondary rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-primary rounded-full transition-all"
+                                style={{
+                                  width: `${source.percentage}%`,
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="ml-4 text-right">
+                          <p className="text-sm font-bold">
+                            {(source.unique_visitors || 0).toLocaleString()}
+                          </p>
                         </div>
                       </div>
-                      <div className="ml-4 text-right">
-                        <p className="text-sm font-bold">
-                          {(source.unique_visitors || 0).toLocaleString()}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
                 {originData.length > 6 && (
                   <Button
