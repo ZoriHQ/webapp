@@ -40,7 +40,7 @@ export function TrafficSources({ originData, countryData, isLoading = false }: T
             ) : originData && originData.length > 0 ? (
               <>
                 <div className="space-y-3">
-                  {(showAllOrigins ? originData : originData.slice(0, 10)).map((source, idx) => (
+                  {(showAllOrigins ? originData : originData.slice(0, 6)).map((source, idx) => (
                     <div key={idx} className="flex items-center justify-between">
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">
@@ -63,14 +63,14 @@ export function TrafficSources({ originData, countryData, isLoading = false }: T
                     </div>
                   ))}
                 </div>
-                {originData.length > 10 && (
+                {originData.length > 6 && (
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setShowAllOrigins(!showAllOrigins)}
                     className="w-full mt-3"
                   >
-                    {showAllOrigins ? 'Show Less' : `Show More (${originData.length - 10} more)`}
+                    {showAllOrigins ? 'Show Less' : `Show More (${originData.length - 6} more)`}
                   </Button>
                 )}
               </>
@@ -89,7 +89,7 @@ export function TrafficSources({ originData, countryData, isLoading = false }: T
             ) : countryData && countryData.length > 0 ? (
               <>
                 <div className="space-y-3">
-                  {(showAllCountries ? countryData : countryData.slice(0, 10)).map((country, idx) => {
+                  {(showAllCountries ? countryData : countryData.slice(0, 6)).map((country, idx) => {
                     const countryCode = country.country_code?.toUpperCase() || ''
                     const countryName = getCountryName(countryCode)
                     const flagEmoji = countryCodeToFlag(countryCode)
@@ -119,14 +119,14 @@ export function TrafficSources({ originData, countryData, isLoading = false }: T
                     )
                   })}
                 </div>
-                {countryData.length > 10 && (
+                {countryData.length > 6 && (
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setShowAllCountries(!showAllCountries)}
                     className="w-full mt-3"
                   >
-                    {showAllCountries ? 'Show Less' : `Show More (${countryData.length - 10} more)`}
+                    {showAllCountries ? 'Show Less' : `Show More (${countryData.length - 6} more)`}
                   </Button>
                 )}
               </>

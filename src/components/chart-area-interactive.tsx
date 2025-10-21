@@ -240,7 +240,7 @@ export function ChartAreaInteractive({
             />
             <Area
               dataKey="mobile"
-              type="natural"
+              type="monotone"
               fill="url(#fillMobile)"
               stroke="var(--color-mobile)"
               strokeWidth={2}
@@ -248,7 +248,7 @@ export function ChartAreaInteractive({
             />
             <Area
               dataKey="desktop"
-              type="natural"
+              type="monotone"
               fill="url(#fillDesktop)"
               stroke="var(--color-desktop)"
               strokeWidth={2}
