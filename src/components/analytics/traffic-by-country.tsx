@@ -36,7 +36,7 @@ export function TrafficByCountry({ data, isLoading }: TrafficByCountryProps) {
         ) : data && data.length > 0 ? (
           <>
             <div className="space-y-3">
-              {(showAll ? data : data.slice(0, 10)).map((country, idx) => {
+              {(showAll ? data : data.slice(0, 6)).map((country, idx) => {
                 const countryCode = country.country_code?.toUpperCase() || ''
                 const countryName = getCountryName(countryCode)
                 const flagEmoji = countryCodeToFlag(countryCode)
@@ -68,14 +68,14 @@ export function TrafficByCountry({ data, isLoading }: TrafficByCountryProps) {
                 )
               })}
             </div>
-            {data.length > 10 && (
+            {data.length > 6 && (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowAll(!showAll)}
                 className="w-full mt-3"
               >
-                {showAll ? 'Show Less' : `Show More (${data.length - 10} more)`}
+                {showAll ? 'Show Less' : `Show More (${data.length - 6} more)`}
               </Button>
             )}
           </>
