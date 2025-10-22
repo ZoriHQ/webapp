@@ -117,13 +117,16 @@ export const auth = {
         throw new Error('No refresh token available')
       }
 
-      const response = await fetch('/api/v1/auth/refresh', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/refresh`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ refresh_token: refreshToken }),
         },
-        body: JSON.stringify({ refresh_token: refreshToken }),
-      })
+      )
 
       if (!response.ok) {
         throw new Error('Failed to refresh token')

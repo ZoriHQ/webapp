@@ -15,6 +15,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { countryCodeToFlag } from '@/lib/country-utils'
+import { IconUserCheck } from '@tabler/icons-react'
 
 interface TopVisitorsTableProps {
   data: Zoriapi.V1.Analytics.TopVisitorsResponse | undefined
@@ -53,7 +54,7 @@ export function TopVisitorsTable({ data, isLoading, onVisitorClick }: TopVisitor
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Visitor ID</TableHead>
+                  <TableHead>Customer</TableHead>
                   <TableHead>Events</TableHead>
                   <TableHead>Location</TableHead>
                   <TableHead>Device</TableHead>
@@ -66,16 +67,43 @@ export function TopVisitorsTable({ data, isLoading, onVisitorClick }: TopVisitor
                 {data.visitors!.map((visitor, idx) => {
                   const countryCode = visitor.location_country_iso?.toUpperCase() || ''
                   const flagEmoji = countryCodeToFlag(countryCode)
+                  const hasIdentity = visitor.user_id || visitor.external_id
 
                   return (
                     <TableRow key={idx}>
-                      <TableCell className="font-mono text-xs">
+                      <TableCell>
                         {visitor.visitor_id ? (
                           <button
                             onClick={() => onVisitorClick?.(visitor.visitor_id!)}
-                            className="hover:text-primary hover:underline cursor-pointer transition-colors"
+                            className="hover:text-primary hover:underline cursor-pointer transition-colors text-left"
                           >
-                            {visitor.visitor_id.substring(0, 12)}
+                            <div className="flex items-center gap-2">
+                              {hasIdentity && (
+                                <IconUserCheck className="h-4 w-4 text-green-600 flex-shrink-0" />
+                              )}
+                              <div className="flex flex-col min-w-0">
+                                {visitor.user_id ? (
+                                  <>
+                                    <span className="text-sm font-medium truncate">
+                                      {visitor.user_id}
+                                    </span>
+                                    {visitor.external_id && (
+                                      <span className="text-xs text-muted-foreground font-mono truncate">
+                                        {visitor.external_id}
+                                      </span>
+                                    )}
+                                  </>
+                                ) : visitor.external_id ? (
+                                  <span className="text-sm font-medium font-mono truncate">
+                                    {visitor.external_id}
+                                  </span>
+                                ) : (
+                                  <span className="text-xs font-mono text-muted-foreground truncate">
+                                    {visitor.visitor_id.substring(0, 12)}...
+                                  </span>
+                                )}
+                              </div>
+                            </div>
                           </button>
                         ) : (
                           'N/A'

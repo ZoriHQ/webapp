@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import type Zoriapi from 'zorihq'
 import { useApiClient } from '@/lib/api-client'
 
@@ -236,5 +236,32 @@ export function useTopVisitors(projectId: string, timeRange: TimeRange, limit?: 
         limit,
       }),
     enabled: !!projectId,
+  })
+}
+
+export function useIdentifyVisitor(projectId: string) {
+  const zClient = useApiClient()
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    Zoriapi.V1.Analytics.ManualIdentifyResponse,
+    Error,
+    Omit<Zoriapi.V1.Analytics.ManualIdentifyRequest, 'project_id'>
+  >({
+    mutationFn: (data) =>
+      zClient.v1.analytics.visitors.identify({
+        project_id: projectId,
+        ...data,
+      }),
+    onSuccess: (_, variables) => {
+      // Invalidate the visitor profile query to refetch updated data
+      queryClient.invalidateQueries({
+        queryKey: ['analytics', 'visitors', 'profile', projectId, variables.visitor_id],
+      })
+      // Also invalidate top visitors list in case it needs to update
+      queryClient.invalidateQueries({
+        queryKey: ['analytics', 'visitors', 'top', projectId],
+      })
+    },
   })
 }
