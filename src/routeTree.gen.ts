@@ -17,7 +17,12 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProtectedProjectsRouteImport } from './routes/_protected.projects'
 import { Route as ProtectedProjectsIndexRouteImport } from './routes/_protected.projects.index'
 import { Route as ProtectedProjectsProjectIdRouteImport } from './routes/_protected.projects.$projectId'
+import { Route as ProtectedProjectsProjectIdIndexRouteImport } from './routes/_protected.projects.$projectId.index'
 import { Route as ProtectedProjectsProjectIdSettingsRouteImport } from './routes/_protected.projects.$projectId.settings'
+import { Route as ProtectedProjectsProjectIdLlmTracesRouteImport } from './routes/_protected.projects.$projectId.llm-traces'
+import { Route as ProtectedProjectsProjectIdGoalsRouteImport } from './routes/_protected.projects.$projectId.goals'
+import { Route as ProtectedProjectsProjectIdEventsRouteImport } from './routes/_protected.projects.$projectId.events'
+import { Route as ProtectedProjectsProjectIdAnalyticsRouteImport } from './routes/_protected.projects.$projectId.analytics'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -59,10 +64,40 @@ const ProtectedProjectsProjectIdRoute =
     path: '/$projectId',
     getParentRoute: () => ProtectedProjectsRoute,
   } as any)
+const ProtectedProjectsProjectIdIndexRoute =
+  ProtectedProjectsProjectIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => ProtectedProjectsProjectIdRoute,
+  } as any)
 const ProtectedProjectsProjectIdSettingsRoute =
   ProtectedProjectsProjectIdSettingsRouteImport.update({
     id: '/settings',
     path: '/settings',
+    getParentRoute: () => ProtectedProjectsProjectIdRoute,
+  } as any)
+const ProtectedProjectsProjectIdLlmTracesRoute =
+  ProtectedProjectsProjectIdLlmTracesRouteImport.update({
+    id: '/llm-traces',
+    path: '/llm-traces',
+    getParentRoute: () => ProtectedProjectsProjectIdRoute,
+  } as any)
+const ProtectedProjectsProjectIdGoalsRoute =
+  ProtectedProjectsProjectIdGoalsRouteImport.update({
+    id: '/goals',
+    path: '/goals',
+    getParentRoute: () => ProtectedProjectsProjectIdRoute,
+  } as any)
+const ProtectedProjectsProjectIdEventsRoute =
+  ProtectedProjectsProjectIdEventsRouteImport.update({
+    id: '/events',
+    path: '/events',
+    getParentRoute: () => ProtectedProjectsProjectIdRoute,
+  } as any)
+const ProtectedProjectsProjectIdAnalyticsRoute =
+  ProtectedProjectsProjectIdAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
     getParentRoute: () => ProtectedProjectsProjectIdRoute,
   } as any)
 
@@ -74,16 +109,25 @@ export interface FileRoutesByFullPath {
   '/projects': typeof ProtectedProjectsRouteWithChildren
   '/projects/$projectId': typeof ProtectedProjectsProjectIdRouteWithChildren
   '/projects/': typeof ProtectedProjectsIndexRoute
+  '/projects/$projectId/analytics': typeof ProtectedProjectsProjectIdAnalyticsRoute
+  '/projects/$projectId/events': typeof ProtectedProjectsProjectIdEventsRoute
+  '/projects/$projectId/goals': typeof ProtectedProjectsProjectIdGoalsRoute
+  '/projects/$projectId/llm-traces': typeof ProtectedProjectsProjectIdLlmTracesRoute
   '/projects/$projectId/settings': typeof ProtectedProjectsProjectIdSettingsRoute
+  '/projects/$projectId/': typeof ProtectedProjectsProjectIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/projects/$projectId': typeof ProtectedProjectsProjectIdRouteWithChildren
   '/projects': typeof ProtectedProjectsIndexRoute
+  '/projects/$projectId/analytics': typeof ProtectedProjectsProjectIdAnalyticsRoute
+  '/projects/$projectId/events': typeof ProtectedProjectsProjectIdEventsRoute
+  '/projects/$projectId/goals': typeof ProtectedProjectsProjectIdGoalsRoute
+  '/projects/$projectId/llm-traces': typeof ProtectedProjectsProjectIdLlmTracesRoute
   '/projects/$projectId/settings': typeof ProtectedProjectsProjectIdSettingsRoute
+  '/projects/$projectId': typeof ProtectedProjectsProjectIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -95,7 +139,12 @@ export interface FileRoutesById {
   '/_protected/projects': typeof ProtectedProjectsRouteWithChildren
   '/_protected/projects/$projectId': typeof ProtectedProjectsProjectIdRouteWithChildren
   '/_protected/projects/': typeof ProtectedProjectsIndexRoute
+  '/_protected/projects/$projectId/analytics': typeof ProtectedProjectsProjectIdAnalyticsRoute
+  '/_protected/projects/$projectId/events': typeof ProtectedProjectsProjectIdEventsRoute
+  '/_protected/projects/$projectId/goals': typeof ProtectedProjectsProjectIdGoalsRoute
+  '/_protected/projects/$projectId/llm-traces': typeof ProtectedProjectsProjectIdLlmTracesRoute
   '/_protected/projects/$projectId/settings': typeof ProtectedProjectsProjectIdSettingsRoute
+  '/_protected/projects/$projectId/': typeof ProtectedProjectsProjectIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -107,16 +156,25 @@ export interface FileRouteTypes {
     | '/projects'
     | '/projects/$projectId'
     | '/projects/'
+    | '/projects/$projectId/analytics'
+    | '/projects/$projectId/events'
+    | '/projects/$projectId/goals'
+    | '/projects/$projectId/llm-traces'
     | '/projects/$projectId/settings'
+    | '/projects/$projectId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/login'
     | '/register'
-    | '/projects/$projectId'
     | '/projects'
+    | '/projects/$projectId/analytics'
+    | '/projects/$projectId/events'
+    | '/projects/$projectId/goals'
+    | '/projects/$projectId/llm-traces'
     | '/projects/$projectId/settings'
+    | '/projects/$projectId'
   id:
     | '__root__'
     | '/'
@@ -127,7 +185,12 @@ export interface FileRouteTypes {
     | '/_protected/projects'
     | '/_protected/projects/$projectId'
     | '/_protected/projects/'
+    | '/_protected/projects/$projectId/analytics'
+    | '/_protected/projects/$projectId/events'
+    | '/_protected/projects/$projectId/goals'
+    | '/_protected/projects/$projectId/llm-traces'
     | '/_protected/projects/$projectId/settings'
+    | '/_protected/projects/$projectId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -196,6 +259,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedProjectsProjectIdRouteImport
       parentRoute: typeof ProtectedProjectsRoute
     }
+    '/_protected/projects/$projectId/': {
+      id: '/_protected/projects/$projectId/'
+      path: '/'
+      fullPath: '/projects/$projectId/'
+      preLoaderRoute: typeof ProtectedProjectsProjectIdIndexRouteImport
+      parentRoute: typeof ProtectedProjectsProjectIdRoute
+    }
     '/_protected/projects/$projectId/settings': {
       id: '/_protected/projects/$projectId/settings'
       path: '/settings'
@@ -203,17 +273,58 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedProjectsProjectIdSettingsRouteImport
       parentRoute: typeof ProtectedProjectsProjectIdRoute
     }
+    '/_protected/projects/$projectId/llm-traces': {
+      id: '/_protected/projects/$projectId/llm-traces'
+      path: '/llm-traces'
+      fullPath: '/projects/$projectId/llm-traces'
+      preLoaderRoute: typeof ProtectedProjectsProjectIdLlmTracesRouteImport
+      parentRoute: typeof ProtectedProjectsProjectIdRoute
+    }
+    '/_protected/projects/$projectId/goals': {
+      id: '/_protected/projects/$projectId/goals'
+      path: '/goals'
+      fullPath: '/projects/$projectId/goals'
+      preLoaderRoute: typeof ProtectedProjectsProjectIdGoalsRouteImport
+      parentRoute: typeof ProtectedProjectsProjectIdRoute
+    }
+    '/_protected/projects/$projectId/events': {
+      id: '/_protected/projects/$projectId/events'
+      path: '/events'
+      fullPath: '/projects/$projectId/events'
+      preLoaderRoute: typeof ProtectedProjectsProjectIdEventsRouteImport
+      parentRoute: typeof ProtectedProjectsProjectIdRoute
+    }
+    '/_protected/projects/$projectId/analytics': {
+      id: '/_protected/projects/$projectId/analytics'
+      path: '/analytics'
+      fullPath: '/projects/$projectId/analytics'
+      preLoaderRoute: typeof ProtectedProjectsProjectIdAnalyticsRouteImport
+      parentRoute: typeof ProtectedProjectsProjectIdRoute
+    }
   }
 }
 
 interface ProtectedProjectsProjectIdRouteChildren {
+  ProtectedProjectsProjectIdAnalyticsRoute: typeof ProtectedProjectsProjectIdAnalyticsRoute
+  ProtectedProjectsProjectIdEventsRoute: typeof ProtectedProjectsProjectIdEventsRoute
+  ProtectedProjectsProjectIdGoalsRoute: typeof ProtectedProjectsProjectIdGoalsRoute
+  ProtectedProjectsProjectIdLlmTracesRoute: typeof ProtectedProjectsProjectIdLlmTracesRoute
   ProtectedProjectsProjectIdSettingsRoute: typeof ProtectedProjectsProjectIdSettingsRoute
+  ProtectedProjectsProjectIdIndexRoute: typeof ProtectedProjectsProjectIdIndexRoute
 }
 
 const ProtectedProjectsProjectIdRouteChildren: ProtectedProjectsProjectIdRouteChildren =
   {
+    ProtectedProjectsProjectIdAnalyticsRoute:
+      ProtectedProjectsProjectIdAnalyticsRoute,
+    ProtectedProjectsProjectIdEventsRoute:
+      ProtectedProjectsProjectIdEventsRoute,
+    ProtectedProjectsProjectIdGoalsRoute: ProtectedProjectsProjectIdGoalsRoute,
+    ProtectedProjectsProjectIdLlmTracesRoute:
+      ProtectedProjectsProjectIdLlmTracesRoute,
     ProtectedProjectsProjectIdSettingsRoute:
       ProtectedProjectsProjectIdSettingsRoute,
+    ProtectedProjectsProjectIdIndexRoute: ProtectedProjectsProjectIdIndexRoute,
   }
 
 const ProtectedProjectsProjectIdRouteWithChildren =

@@ -1,55 +1,87 @@
-import { IconCirclePlusFilled, IconMail } from '@tabler/icons-react'
-import type { Icon } from '@tabler/icons-react'
+import {
+  IconHome,
+  IconChartBar,
+  IconCalendarEvent,
+  IconTarget,
+  IconBrain,
+} from '@tabler/icons-react'
+import { useNavigate, useParams, useLocation } from '@tanstack/react-router'
 
-import { Button } from '@/components/ui/button'
 import {
   SidebarGroup,
+  SidebarGroupLabel,
   SidebarGroupContent,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
 
-export function NavMain({
-  items,
-}: {
-  items: Array<{
-    title: string
-    url: string
-    icon?: Icon
-  }>
-}) {
+export function NavMain() {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const params = useParams({ strict: false })
+  const projectId = (params as { projectId?: string })?.projectId
+
+  const insightsItems = [
+    {
+      title: 'Overview',
+      icon: IconHome,
+      url: projectId ? `/projects/${projectId}` : '#',
+      matchPath: `/projects/${projectId}`,
+    },
+    {
+      title: 'Analytics',
+      icon: IconChartBar,
+      url: projectId ? `/projects/${projectId}/analytics` : '#',
+      matchPath: `/projects/${projectId}/analytics`,
+    },
+    {
+      title: 'Events',
+      icon: IconCalendarEvent,
+      url: projectId ? `/projects/${projectId}/events` : '#',
+      matchPath: `/projects/${projectId}/events`,
+    },
+    {
+      title: 'Goals',
+      icon: IconTarget,
+      url: projectId ? `/projects/${projectId}/goals` : '#',
+      matchPath: `/projects/${projectId}/goals`,
+    },
+    {
+      title: 'LLM Traces',
+      icon: IconBrain,
+      url: projectId ? `/projects/${projectId}/llm-traces` : '#',
+      matchPath: `/projects/${projectId}/llm-traces`,
+    },
+  ]
+
+  const handleNavigation = (url: string) => {
+    if (url !== '#') {
+      navigate({ to: url as any })
+    }
+  }
+
   return (
     <SidebarGroup>
-      <SidebarGroupContent className="flex flex-col gap-2">
+      <SidebarGroupLabel>Insights</SidebarGroupLabel>
+      <SidebarGroupContent>
         <SidebarMenu>
-          <SidebarMenuItem className="flex items-center gap-2">
-            <SidebarMenuButton
-              tooltip="Quick Create"
-              className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
-            >
-              <IconCirclePlusFilled />
-              <span>Quick Create</span>
-            </SidebarMenuButton>
-            <Button
-              size="icon"
-              className="size-8 group-data-[collapsible=icon]:opacity-0"
-              variant="outline"
-            >
-              <IconMail />
-              <span className="sr-only">Inbox</span>
-            </Button>
-          </SidebarMenuItem>
-        </SidebarMenu>
-        <SidebarMenu>
-          {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton tooltip={item.title}>
-                {item.icon && <item.icon />}
-                <span>{item.title}</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+          {insightsItems.map((item) => {
+            const isActive = location.pathname === item.matchPath
+            return (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton
+                  tooltip={item.title}
+                  onClick={() => handleNavigation(item.url)}
+                  disabled={item.url === '#'}
+                  isActive={isActive}
+                >
+                  {item.icon && <item.icon />}
+                  <span>{item.title}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )
+          })}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>

@@ -17,12 +17,19 @@ const config = defineConfig({
     // React plugin
     viteReact(),
   ],
+  optimizeDeps: {
+    include: ['mapbox-gl', 'react-map-gl/mapbox'],
+    esbuildOptions: {
+      target: 'es2020',
+    },
+  },
   build: {
     rollupOptions: {
       output: {
         manualChunks: {
           'react-vendor': ['react', 'react-dom'],
           'router-vendor': ['@tanstack/react-router', '@tanstack/react-query'],
+          'mapbox': ['mapbox-gl', 'react-map-gl/mapbox'],
         },
       },
     },

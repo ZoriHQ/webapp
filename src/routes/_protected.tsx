@@ -1,7 +1,16 @@
 // eslint-disable-next-line
-import { createFileRoute, Link, Outlet } from '@tanstack/react-router'
+import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { useState } from 'react'
 import { requireAuthAndOrg } from '@/lib/route-guards'
-import { Navbar } from '@/components/navbar'
+import { AppSidebar } from '@/components/app-sidebar'
+import { CommandPalette } from '@/components/command-palette'
+import { CommandPaletteTrigger } from '@/components/command-palette-trigger'
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from '@/components/ui/sidebar'
+import { Separator } from '@/components/ui/separator'
 
 export const Route = createFileRoute('/_protected')({
   beforeLoad: async ({ context, location }) => {
@@ -16,35 +25,32 @@ export const Route = createFileRoute('/_protected')({
 })
 
 function ProtectedLayout() {
+  const [commandOpen, setCommandOpen] = useState(false)
+
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-
-      <main className="container mx-auto px-4 py-6">
-        <Outlet />
-      </main>
-
-      <footer className="mt-auto border-t">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
-            <p>© 2024 ZoriHQ. All rights reserved.</p>
-            <div className="flex gap-4">
-              <Link
-                to="/about"
-                className="hover:text-foreground transition-colors"
-              >
-                About
-              </Link>
-              <Link to="/" className="hover:text-foreground transition-colors">
-                Privacy
-              </Link>
-              <Link to="/" className="hover:text-foreground transition-colors">
-                Terms
-              </Link>
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full bg-sidebar">
+        <AppSidebar />
+        <SidebarInset className="flex flex-1 flex-col">
+          <div className="flex flex-col h-full p-4">
+            <div className="flex flex-col flex-1 bg-background rounded-xl shadow-md border">
+              <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-4 px-6 border-b bg-background rounded-t-xl">
+                <SidebarTrigger className="-ml-1" />
+                <Separator orientation="vertical" className="mr-2 h-4" />
+                <div className="flex flex-1 items-center justify-center">
+                  <div className="w-full max-w-md">
+                    <CommandPaletteTrigger onClick={() => setCommandOpen(true)} />
+                  </div>
+                </div>
+              </header>
+              <main className="flex flex-1 flex-col p-6 overflow-auto">
+                <Outlet />
+              </main>
             </div>
           </div>
-        </div>
-      </footer>
-    </div>
+        </SidebarInset>
+        <CommandPalette open={commandOpen} onOpenChange={setCommandOpen} />
+      </div>
+    </SidebarProvider>
   )
 }
