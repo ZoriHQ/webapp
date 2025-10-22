@@ -27,22 +27,14 @@ function OverviewPage() {
     projectId,
     timeRange,
   )
-  const { data: timelineData, isLoading: timelineLoading } = useVisitorsTimeline(
-    projectId,
-    timeRange,
-  )
+  const { data: timelineData, isLoading: timelineLoading } =
+    useVisitorsTimeline(projectId, timeRange)
 
   // Check if project has received any events
   const hasNoEvents = !projectData?.first_event_received_at && !projectLoading
 
   return (
     <>
-      <ProjectHeader
-        projectName={projectData?.name}
-        timeRange={timeRange}
-        onTimeRangeChange={setTimeRange}
-      />
-
       {/* Show empty state if no events have been received */}
       {hasNoEvents ? (
         <EmptyEventsState
@@ -53,17 +45,16 @@ function OverviewPage() {
         <div className="space-y-6">
           {/* Globe + Timeline Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-6">
-            {/* Globe Visualization */}
-            <GlobeVisualization
-              countryData={countryData?.data}
-              isLoading={countryLoading}
-            />
-
             {/* Visitor Timeline */}
             <VisitorTimeline
               data={timelineData?.data}
               isLoading={timelineLoading}
               timeRange={timeRange}
+            />
+            {/* Globe Visualization */}
+            <GlobeVisualization
+              countryData={countryData?.data}
+              isLoading={countryLoading}
             />
           </div>
         </div>

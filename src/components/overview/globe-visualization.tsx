@@ -1,255 +1,148 @@
 'use client'
 
-import { useEffect, useRef, useState, useMemo } from 'react'
-import Map, { type MapRef, Layer, Source } from 'react-map-gl/mapbox'
+import { useRef, useMemo, useEffect, useState } from 'react'
+import Globe from 'react-globe.gl'
 import type Zoriapi from 'zorihq'
 import { useTheme } from 'next-themes'
 import { getCountryCoordinates } from '@/lib/country-coordinates'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import 'mapbox-gl/dist/mapbox-gl.css'
+import { Card, CardContent } from '@/components/ui/card'
 
 interface GlobeVisualizationProps {
   countryData: Array<Zoriapi.V1.Analytics.CountryDataPoint> | undefined
   isLoading: boolean
 }
 
-// Use free tier Mapbox token - will need to be replaced with actual token
-const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || ''
+interface PointData {
+  lat: number
+  lng: number
+  size: number
+  color: string
+  label: string
+  visitors: number
+}
 
 export function GlobeVisualization({
   countryData,
   isLoading,
 }: GlobeVisualizationProps) {
-  const mapRef = useRef<MapRef>(null)
-  const { theme, resolvedTheme } = useTheme()
-  const [isRotating, setIsRotating] = useState(true)
+  const globeEl = useRef<any>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
+  const [countries, setCountries] = useState({ features: [] })
+  const [dimensions, setDimensions] = useState({ width: 600, height: 600 })
+  const [isGlobeReady, setIsGlobeReady] = useState(false)
 
-  // Determine effective theme (dark or light)
-  const effectiveTheme = resolvedTheme || theme || 'light'
-  const isDark = effectiveTheme === 'dark'
+  const globeContainerRef = useRef<any>(null)
 
-  // Map style based on theme
-  const mapStyle = !isDark
-    ? 'mapbox://styles/mapbox/dark-v11'
-    : 'mapbox://styles/mapbox/light-v11'
+  const [width, setWidth] = useState(0)
+  const [height, setHeight] = useState(0)
+  useEffect(() => {
+    if (!globeContainerRef.current) {
+      return
+    }
+    const { offsetWidth, offsetHeight } = globeContainerRef.current
+    setWidth(offsetWidth)
+    setHeight(offsetHeight)
+  }, [globeContainerRef.current])
 
-  // Convert country data to GeoJSON features
-  const geoJsonData = useMemo(() => {
-    if (!countryData || countryData.length === 0) {
-      return {
-        type: 'FeatureCollection' as const,
-        features: [],
+  // Load country GeoJSON data
+  useEffect(() => {
+    fetch(
+      'https://raw.githubusercontent.com/vasturiano/react-globe.gl/master/example/datasets/ne_110m_admin_0_countries.geojson',
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setCountries(data)
+        setIsGlobeReady(true)
+      })
+  }, [])
+
+  // Measure container dimensions on mount
+  useEffect(() => {
+    if (containerRef.current) {
+      const updateDimensions = () => {
+        const width = containerRef.current?.clientWidth || 600
+        const height = width // Keep it square
+        setDimensions({ width, height })
       }
+
+      // Initial measurement
+      updateDimensions()
+
+      // Update on window resize
+      window.addEventListener('resize', updateDimensions)
+      return () => window.removeEventListener('resize', updateDimensions)
+    }
+  }, [])
+
+  // Convert country data to points with coordinates
+  const pointsData = useMemo<PointData[]>(() => {
+    if (!countryData || countryData.length === 0) {
+      return []
     }
 
-    const features = countryData
+    return countryData
       .map((country) => {
         const coords = getCountryCoordinates(country.country_code || '')
         if (!coords) return null
 
+        const visitors = country.unique_visitors || 0
+
+        // Size based on visitor count (min 0.1, max 1.5)
+        const size = Math.min(1.5, Math.max(1, Math.log(visitors + 1) / 10))
+
+        // Monotone color - white/light gray with varying opacity based on visitor count
+        const opacity = Math.min(1, Math.max(0.7, Math.log(visitors + 1) / 12))
+        const color = isDark
+          ? `rgba(255, 0, 0, ${opacity})`
+          : `rgba(255, 0, 0, ${opacity})`
+
         return {
-          type: 'Feature' as const,
-          geometry: {
-            type: 'Point' as const,
-            coordinates: [coords.lng, coords.lat],
-          },
-          properties: {
-            countryCode: country.country_code,
-            countryName: coords.name,
-            visitors: country.unique_visitors || 0,
-            percentage: country.percentage || 0,
-          },
+          lat: coords.lat,
+          lng: coords.lng,
+          size,
+          color,
+          label: `${coords.name}: ${visitors.toLocaleString()} visitors`,
+          visitors,
         }
       })
-      .filter((f): f is NonNullable<typeof f> => f !== null)
+      .filter((p): p is PointData => p !== null)
+  }, [countryData, isDark])
 
-    return {
-      type: 'FeatureCollection' as const,
-      features,
-    }
-  }, [countryData])
-
-  // Auto-rotate globe
+  // Auto-rotate globe slowly - only after globe is ready
   useEffect(() => {
-    if (!mapRef.current || !isRotating) return
-
-    const map = mapRef.current.getMap()
-    const secondsPerRevolution = 120
-    const maxSpinZoom = 5
-    const slowSpinZoom = 3
-
-    let userInteracting = false
-    let spinEnabled = true
-
-    function spinGlobe() {
-      if (!spinEnabled || userInteracting) return
-
-      const zoom = map.getZoom()
-      if (zoom < maxSpinZoom) {
-        let distancePerSecond = 360 / secondsPerRevolution
-        if (zoom > slowSpinZoom) {
-          const zoomDif = (maxSpinZoom - zoom) / (maxSpinZoom - slowSpinZoom)
-          distancePerSecond *= zoomDif
+    if (isGlobeReady && globeEl.current) {
+      // Small delay to ensure globe is fully initialized
+      const timer = setTimeout(() => {
+        const controls = globeEl.current?.controls()
+        if (controls) {
+          controls.autoRotate = true
+          controls.autoRotateSpeed = 0.2 // Slower rotation
         }
-        const center = map.getCenter()
-        center.lng -= distancePerSecond / 60 // Rotate 1/60th of a second
-        map.easeTo({ center, duration: 1000 / 60, easing: (n) => n })
-      }
+      }, 100)
+      return () => clearTimeout(timer)
     }
+  }, [isGlobeReady])
 
-    map.on('mousedown', () => {
-      userInteracting = true
-    })
-    map.on('dragstart', () => {
-      userInteracting = true
-    })
-    map.on('mouseup', () => {
-      userInteracting = false
-      spinGlobe()
-    })
-    map.on('dragend', () => {
-      userInteracting = false
-      spinGlobe()
-    })
-
-    const interval = setInterval(spinGlobe, 1000 / 60)
-
-    return () => {
-      clearInterval(interval)
-      map.off('mousedown')
-      map.off('dragstart')
-      map.off('mouseup')
-      map.off('dragend')
-    }
-  }, [isRotating])
-
-  // Layer configurations for visitor markers
-  const heatmapLayer = {
-    id: 'visitors-heat',
-    type: 'heatmap' as const,
-    paint: {
-      'heatmap-weight': [
-        'interpolate',
-        ['linear'],
-        ['get', 'visitors'],
-        0,
-        0,
-        1000,
-        1,
-      ],
-      'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 0, 1, 9, 3],
-      'heatmap-color': [
-        'interpolate',
-        ['linear'],
-        ['heatmap-density'],
-        0,
-        'rgba(33,102,172,0)',
-        0.2,
-        'rgb(103,169,207)',
-        0.4,
-        'rgb(209,229,240)',
-        0.6,
-        'rgb(253,219,199)',
-        0.8,
-        'rgb(239,138,98)',
-        1,
-        'rgb(178,24,43)',
-      ],
-      'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 0, 2, 9, 20],
-      'heatmap-opacity': ['interpolate', ['linear'], ['zoom'], 7, 1, 9, 0],
-    },
-  }
-
-  const circleLayer = {
-    id: 'visitors-point',
-    type: 'circle' as const,
-    paint: {
-      'circle-radius': [
-        'interpolate',
-        ['linear'],
-        ['get', 'visitors'],
-        1,
-        4,
-        100,
-        8,
-        1000,
-        12,
-        10000,
-        20,
-      ],
-      'circle-color': [
-        'interpolate',
-        ['linear'],
-        ['get', 'visitors'],
-        1,
-        isDark ? 'rgb(103,169,207)' : 'rgb(33,102,172)',
-        100,
-        isDark ? 'rgb(209,229,240)' : 'rgb(103,169,207)',
-        1000,
-        isDark ? 'rgb(253,219,199)' : 'rgb(209,229,240)',
-        10000,
-        isDark ? 'rgb(239,138,98)' : 'rgb(253,219,199)',
-      ],
-      'circle-opacity': 0.8,
-      'circle-stroke-width': 2,
-      'circle-stroke-color': isDark ? '#ffffff' : '#000000',
-      'circle-stroke-opacity': 0.4,
-    },
-  }
-
-  if (!MAPBOX_TOKEN) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Visitor Locations</CardTitle>
-          <CardDescription>
-            Global distribution of your visitors
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center h-[400px] bg-muted rounded-lg">
-            <p className="text-sm text-muted-foreground">
-              Mapbox token not configured. Please set VITE_MAPBOX_ACCESS_TOKEN
-              in your environment.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    )
-  }
+  // Theme colors - minimal monotone
+  const backgroundColor = 'rgba(0,0,0,0)' // Fully transparent
+  const globeColor = isDark ? '#0a0a0a' : '#ffffff' // Globe base (ocean)
+  const atmosphereColor = isDark ? '#333333' : '#cccccc'
+  const landColor = isDark ? '#1a1a1a' : '#f5f5f5' // Land color
+  const borderColor = isDark ? '#ffffff' : '#000000' // Border color (opposite)
 
   return (
-    <Card className="bg-transparent! border-none">
-      <CardHeader className="bg-transparent! border-none">
-        <div className="bg-transparent! border-none flex items-center justify-between">
-          <div>
-            <CardTitle>Visitor Locations</CardTitle>
-            <CardDescription>
-              Global distribution of your visitors
-            </CardDescription>
-          </div>
-          {geoJsonData.features.length > 0 && (
-            <div className="text-sm text-muted-foreground">
-              {geoJsonData.features.length} countries
-            </div>
-          )}
-        </div>
-      </CardHeader>
+    <Card className="overflow-hidden border-0 bg-transparent shadow-none">
       <CardContent>
         {isLoading ? (
-          <div className="flex items-center justify-center h-[400px] bg-muted rounded-lg animate-pulse">
+          <div className="flex items-center justify-center h-[500px] bg-muted/10 rounded-lg animate-pulse">
             <p className="text-sm text-muted-foreground">
               Loading visitor locations...
             </p>
           </div>
-        ) : geoJsonData.features.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-[400px] bg-muted rounded-lg">
+        ) : pointsData.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-[500px] bg-muted/10 rounded-lg">
             <p className="text-sm text-muted-foreground">
               No visitor location data available
             </p>
@@ -257,40 +150,51 @@ export function GlobeVisualization({
               Visitor locations will appear here once you receive traffic
             </p>
           </div>
+        ) : !isGlobeReady ? (
+          <div className="flex items-center justify-center h-[500px] bg-muted/10 rounded-lg">
+            <p className="text-sm text-muted-foreground">Preparing globe...</p>
+          </div>
         ) : (
-          <div className="relative h-[400px] w-full overflow-hidden rounded-lg">
-            <Map
-              ref={mapRef}
-              initialViewState={{
-                longitude: 0,
-                latitude: 20,
-                zoom: 1.5,
-              }}
-              style={{ width: '100%', height: '100%' }}
-              onLoad={(event) => {
-                const map = event.target
-
-                // Set to your page's background color
-                map.setPaintProperty(
-                  'background',
-                  'background-color',
-                  '#1a1a1a',
-                ) // or whatever your color is
-              }}
-              mapStyle={mapStyle}
-              mapboxAccessToken={MAPBOX_TOKEN}
-              projection={{ name: 'globe' }}
-              interactive={true}
-              onMouseDown={() => setIsRotating(false)}
-              onMouseUp={() => setIsRotating(true)}
-              onTouchStart={() => setIsRotating(false)}
-              onTouchEnd={() => setIsRotating(true)}
-            >
-              <Source id="visitors" type="geojson" data={geoJsonData}>
-                <Layer {...heatmapLayer} />
-                <Layer {...circleLayer} />
-              </Source>
-            </Map>
+          <div
+            className="relative w-full overflow-hidden rounded-lg"
+            ref={globeContainerRef}
+            style={{ width: '100%', alignContent: 'center' }}
+          >
+            <Globe
+              ref={globeEl}
+              width={dimensions.width}
+              height={dimensions.height}
+              backgroundColor={backgroundColor}
+              globeMaterial={
+                {
+                  color: globeColor,
+                  emissive: globeColor,
+                  emissiveIntensity: 0.05,
+                  shininess: 0.1,
+                } as any
+              }
+              backgroundImageUrl={null}
+              showAtmosphere={false}
+              atmosphereColor={atmosphereColor}
+              atmosphereAltitude={0.15}
+              polygonsData={countries.features}
+              polygonCapColor={() => landColor}
+              polygonSideColor={() => landColor}
+              polygonStrokeColor={() => borderColor}
+              polygonAltitude={0.001}
+              polygonsTransitionDuration={300}
+              pointsData={pointsData}
+              pointLat="lat"
+              pointLng="lng"
+              pointColor="color"
+              pointAltitude={0.01}
+              onZoom={() => {}}
+              pointRadius="size"
+              pointLabel="label"
+              pointsMerge={false}
+              enablePointerInteraction={false}
+              animateIn={true}
+            />
           </div>
         )}
       </CardContent>

@@ -18,7 +18,7 @@ const config = defineConfig({
     viteReact(),
   ],
   optimizeDeps: {
-    include: ['mapbox-gl', 'react-map-gl/mapbox'],
+    include: ['three', 'react-globe.gl'],
     esbuildOptions: {
       target: 'es2020',
     },
@@ -29,7 +29,7 @@ const config = defineConfig({
         manualChunks: {
           'react-vendor': ['react', 'react-dom'],
           'router-vendor': ['@tanstack/react-router', '@tanstack/react-query'],
-          'mapbox': ['mapbox-gl', 'react-map-gl/mapbox'],
+          'globe': ['three', 'react-globe.gl'],
         },
       },
     },
