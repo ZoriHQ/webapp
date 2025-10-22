@@ -167,24 +167,7 @@ function ProjectDetailPage() {
         />
       ) : (
         <>
-          {/* Chart + Traffic Sources Side-by-Side */}
-          <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6 mb-8">
-            {/* Chart with key metrics */}
-            <ChartAreaInteractive
-              data={timelineData?.data}
-              isLoading={timelineLoading}
-              timeRange={timeRange}
-            />
-
-            {/* Traffic Sources (Tabbed: Origin, Country) */}
-            <TrafficSources
-              originData={originData?.data}
-              countryData={countryData?.data}
-              isLoading={originLoading || countryLoading}
-            />
-          </div>
-
-          {/* Engagement Metrics (Tabbed: Sessions, Activity, Retention) */}
+          {/* Engagement Metrics Cards */}
           <div className="mb-8">
             <EngagementMetrics
               uniqueVisitors={dashboardData?.unique_visitors}
@@ -203,6 +186,23 @@ function ProjectDetailPage() {
                 churnLoading ||
                 returnLoading
               }
+            />
+          </div>
+
+          {/* Chart + Traffic Sources Side-by-Side */}
+          <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6 mb-8">
+            {/* Chart with key metrics */}
+            <ChartAreaInteractive
+              data={timelineData?.data}
+              isLoading={timelineLoading}
+              timeRange={timeRange}
+            />
+
+            {/* Traffic Sources (Tabbed: Origin, Country) */}
+            <TrafficSources
+              originData={originData?.data}
+              countryData={countryData?.data}
+              isLoading={originLoading || countryLoading}
             />
           </div>
 

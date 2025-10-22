@@ -1,4 +1,5 @@
 import type Zoriapi from 'zorihq'
+import { useState, useEffect } from 'react'
 import {
   IconUsers,
   IconActivity,
@@ -8,9 +9,26 @@ import {
   IconUserCheck,
   IconArrowBackUp,
   IconUserMinus,
+  IconSettings,
+  IconCheck,
 } from '@tabler/icons-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuCheckboxItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
+  AVAILABLE_METRICS,
+  loadMetricsPreferences,
+  saveMetricsPreferences,
+  resetMetricsPreferences,
+  type MetricType,
+} from '@/lib/metrics-config'
 
 interface EngagementMetricsProps {
   // Session-based metrics
@@ -115,186 +133,267 @@ export function EngagementMetrics({
   returnData,
   isLoading = false,
 }: EngagementMetricsProps) {
+  const [enabledMetrics, setEnabledMetrics] = useState<MetricType[]>([])
+
+  useEffect(() => {
+    setEnabledMetrics(loadMetricsPreferences())
+  }, [])
+
+  const handleToggleMetric = (metricId: MetricType) => {
+    const newMetrics = enabledMetrics.includes(metricId)
+      ? enabledMetrics.filter(id => id !== metricId)
+      : [...enabledMetrics, metricId]
+
+    setEnabledMetrics(newMetrics)
+    saveMetricsPreferences(newMetrics)
+  }
+
+  const handleReset = () => {
+    resetMetricsPreferences()
+    setEnabledMetrics(loadMetricsPreferences())
+  }
+
+  const isEnabled = (metricId: MetricType) => enabledMetrics.includes(metricId)
+
+  // Check if metric has data before displaying
+  const hasData = (metricId: MetricType): boolean => {
+    switch (metricId) {
+      case 'uniqueVisitors':
+        return uniqueVisitors !== undefined
+      case 'totalSessions':
+        return totalSessions !== undefined
+      case 'bounceRate':
+        return bounceRate !== undefined
+      case 'avgSessionDuration':
+        return avgSessionDuration !== undefined
+      case 'avgPagesPerSession':
+        return avgPagesPerSession !== undefined
+      case 'dau':
+        return dau !== undefined
+      case 'wau':
+        return wau !== undefined
+      case 'mau':
+        return mau !== undefined
+      case 'churnRate':
+        return churnData !== undefined
+      case 'returnRate':
+        return returnData !== undefined
+      case 'avgTimeBetweenVisits':
+        return returnData?.avg_time_between_sessions_hours !== undefined
+      default:
+        return false
+    }
+  }
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Engagement Metrics</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Tabs defaultValue="sessions" className="w-full">
-          <TabsList className="w-full justify-start">
-            <TabsTrigger value="sessions">Sessions</TabsTrigger>
-            <TabsTrigger value="activity">Activity</TabsTrigger>
-            <TabsTrigger value="retention">Retention</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="sessions" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {uniqueVisitors !== undefined && (
-                <MetricCard
-                  title="Unique Visitors"
-                  icon={IconUsers}
-                  value={uniqueVisitors.toLocaleString()}
-                  subtitle="Unique visitors in period"
-                  isLoading={isLoading}
-                />
-              )}
-
-              {totalSessions !== undefined && (
-                <MetricCard
-                  title="Total Sessions"
-                  icon={IconActivity}
-                  value={totalSessions.toLocaleString()}
-                  subtitle="Total sessions tracked"
-                  isLoading={isLoading}
-                />
-              )}
-
-              {bounceRate !== undefined && (
-                <MetricCard
-                  title="Bounce Rate"
-                  icon={IconPercentage}
-                  value={`${bounceRate.toFixed(1)}%`}
-                  subtitle="Single-page sessions"
-                  isLoading={isLoading}
-                />
-              )}
-
-              {avgSessionDuration !== undefined && (
-                <MetricCard
-                  title="Avg Session Duration"
-                  icon={IconClock}
-                  value={formatDuration(avgSessionDuration)}
-                  subtitle="Average time on site"
-                  isLoading={isLoading}
-                />
-              )}
-
-              {avgPagesPerSession !== undefined && (
-                <MetricCard
-                  title="Pages / Session"
-                  icon={IconFileText}
-                  value={avgPagesPerSession.toFixed(1)}
-                  subtitle="Average pages viewed"
-                  isLoading={isLoading}
-                />
-              )}
+    <div className="space-y-4">
+      {/* Header with Settings Button */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold">Key Metrics</h2>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm">
+              <IconSettings className="h-4 w-4 mr-2" />
+              Configure Metrics
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-72">
+            <DropdownMenuLabel>Visible Metrics</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <div className="max-h-[400px] overflow-y-auto">
+              {AVAILABLE_METRICS.map(metric => (
+                <DropdownMenuCheckboxItem
+                  key={metric.id}
+                  checked={isEnabled(metric.id)}
+                  onCheckedChange={() => handleToggleMetric(metric.id)}
+                  disabled={!hasData(metric.id)}
+                >
+                  <div className="flex flex-col">
+                    <span className="font-medium">{metric.label}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {metric.description}
+                    </span>
+                  </div>
+                </DropdownMenuCheckboxItem>
+              ))}
             </div>
-          </TabsContent>
-
-          <TabsContent value="activity" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {dau !== undefined && (
-                <MetricCard
-                  title="Daily Active Users"
-                  icon={IconUserCheck}
-                  value={dau.toLocaleString()}
-                  subtitle="Unique users today"
-                  isLoading={isLoading}
-                />
-              )}
-
-              {wau !== undefined && (
-                <MetricCard
-                  title="Weekly Active Users"
-                  icon={IconUserCheck}
-                  value={wau.toLocaleString()}
-                  subtitle="Unique users this week"
-                  isLoading={isLoading}
-                />
-              )}
-
-              {mau !== undefined && (
-                <MetricCard
-                  title="Monthly Active Users"
-                  icon={IconUserCheck}
-                  value={mau.toLocaleString()}
-                  subtitle="Unique users this month"
-                  isLoading={isLoading}
-                />
-              )}
+            <DropdownMenuSeparator />
+            <div className="p-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleReset}
+                className="w-full"
+              >
+                Reset to Defaults
+              </Button>
             </div>
-          </TabsContent>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
 
-          <TabsContent value="retention" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Churn Rate</CardTitle>
-                  <IconUserMinus className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  {isLoading ? (
-                    <div className="text-2xl font-bold text-muted-foreground">Loading...</div>
-                  ) : churnData ? (
-                    <>
-                      <div className="text-2xl font-bold text-red-600 dark:text-red-400">
-                        {churnData.churn_rate_percent?.toFixed(1) || 0}%
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {churnData.churned_users?.toLocaleString() || 0} of{' '}
-                        {churnData.total_users?.toLocaleString() || 0} users churned
-                      </p>
-                      {churnData.churn_threshold_days && (
-                        <p className="text-xs text-muted-foreground mt-1">
-                          ({churnData.churn_threshold_days} days inactivity)
-                        </p>
-                      )}
-                    </>
-                  ) : (
-                    <div className="text-sm text-muted-foreground">No data</div>
-                  )}
-                </CardContent>
-              </Card>
+      {/* Metrics Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {/* Unique Visitors */}
+        {isEnabled('uniqueVisitors') && uniqueVisitors !== undefined && (
+          <MetricCard
+            title="Unique Visitors"
+            icon={IconUsers}
+            value={uniqueVisitors.toLocaleString()}
+            subtitle="Unique visitors in period"
+            isLoading={isLoading}
+          />
+        )}
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Return Rate</CardTitle>
-                  <IconArrowBackUp className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  {isLoading ? (
-                    <div className="text-2xl font-bold text-muted-foreground">Loading...</div>
-                  ) : returnData ? (
-                    <>
-                      <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                        {returnData.return_rate_percent?.toFixed(1) || 0}%
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {returnData.returning_users?.toLocaleString() || 0} of{' '}
-                        {returnData.total_users?.toLocaleString() || 0} users return
-                      </p>
-                    </>
-                  ) : (
-                    <div className="text-sm text-muted-foreground">No data</div>
-                  )}
-                </CardContent>
-              </Card>
+        {/* Total Sessions */}
+        {isEnabled('totalSessions') && totalSessions !== undefined && (
+          <MetricCard
+            title="Total Sessions"
+            icon={IconActivity}
+            value={totalSessions.toLocaleString()}
+            subtitle="Total sessions tracked"
+            isLoading={isLoading}
+          />
+        )}
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Avg Time Between Visits</CardTitle>
-                  <IconClock className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  {isLoading ? (
-                    <div className="text-2xl font-bold text-muted-foreground">Loading...</div>
-                  ) : returnData?.avg_time_between_sessions_hours !== undefined ? (
-                    <>
-                      <div className="text-2xl font-bold">
-                        {formatHours(returnData.avg_time_between_sessions_hours)}
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1">Average return interval</p>
-                    </>
-                  ) : (
-                    <div className="text-sm text-muted-foreground">No data</div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
+        {/* Bounce Rate */}
+        {isEnabled('bounceRate') && bounceRate !== undefined && (
+          <MetricCard
+            title="Bounce Rate"
+            icon={IconPercentage}
+            value={`${bounceRate.toFixed(1)}%`}
+            subtitle="Single-page sessions"
+            isLoading={isLoading}
+          />
+        )}
+
+        {/* Avg Session Duration */}
+        {isEnabled('avgSessionDuration') && avgSessionDuration !== undefined && (
+          <MetricCard
+            title="Avg Session Duration"
+            icon={IconClock}
+            value={formatDuration(avgSessionDuration)}
+            subtitle="Average time on site"
+            isLoading={isLoading}
+          />
+        )}
+
+        {/* Pages per Session */}
+        {isEnabled('avgPagesPerSession') && avgPagesPerSession !== undefined && (
+          <MetricCard
+            title="Pages / Session"
+            icon={IconFileText}
+            value={avgPagesPerSession.toFixed(1)}
+            subtitle="Average pages viewed"
+            isLoading={isLoading}
+          />
+        )}
+
+        {/* Daily Active Users */}
+        {isEnabled('dau') && dau !== undefined && (
+          <MetricCard
+            title="Daily Active Users"
+            icon={IconUserCheck}
+            value={dau.toLocaleString()}
+            subtitle="Unique users today"
+            isLoading={isLoading}
+          />
+        )}
+
+        {/* Weekly Active Users */}
+        {isEnabled('wau') && wau !== undefined && (
+          <MetricCard
+            title="Weekly Active Users"
+            icon={IconUserCheck}
+            value={wau.toLocaleString()}
+            subtitle="Unique users this week"
+            isLoading={isLoading}
+          />
+        )}
+
+        {/* Monthly Active Users */}
+        {isEnabled('mau') && mau !== undefined && (
+          <MetricCard
+            title="Monthly Active Users"
+            icon={IconUserCheck}
+            value={mau.toLocaleString()}
+            subtitle="Unique users this month"
+            isLoading={isLoading}
+          />
+        )}
+
+        {/* Churn Rate */}
+        {isEnabled('churnRate') && churnData && (
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Churn Rate</CardTitle>
+              <IconUserMinus className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <div className="text-2xl font-bold text-muted-foreground">Loading...</div>
+              ) : (
+                <>
+                  <div className="text-2xl font-bold text-red-600 dark:text-red-400">
+                    {churnData.churn_rate_percent?.toFixed(1) || 0}%
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {churnData.churned_users?.toLocaleString() || 0} of{' '}
+                    {churnData.total_users?.toLocaleString() || 0} users churned
+                  </p>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Return Rate */}
+        {isEnabled('returnRate') && returnData && (
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Return Rate</CardTitle>
+              <IconArrowBackUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <div className="text-2xl font-bold text-muted-foreground">Loading...</div>
+              ) : (
+                <>
+                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                    {returnData.return_rate_percent?.toFixed(1) || 0}%
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {returnData.returning_users?.toLocaleString() || 0} of{' '}
+                    {returnData.total_users?.toLocaleString() || 0} users return
+                  </p>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Avg Time Between Visits */}
+        {isEnabled('avgTimeBetweenVisits') && returnData?.avg_time_between_sessions_hours !== undefined && (
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Avg Time Between Visits</CardTitle>
+              <IconClock className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <div className="text-2xl font-bold text-muted-foreground">Loading...</div>
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">
+                    {formatHours(returnData.avg_time_between_sessions_hours)}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">Average return interval</p>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </div>
   )
 }
