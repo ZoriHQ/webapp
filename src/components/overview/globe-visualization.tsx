@@ -30,7 +30,7 @@ export function GlobeVisualization({
   const { resolvedTheme } = useTheme()
   const isDark = resolvedTheme === 'dark'
   const [countries, setCountries] = useState({ features: [] })
-  const [dimensions, setDimensions] = useState({ width: 600, height: 600 })
+  const [dimensions, setDimensions] = useState({ width: 600, height: 500 })
   const [isGlobeReady, setIsGlobeReady] = useState(false)
 
   const globeContainerRef = useRef<any>(null)
@@ -62,22 +62,19 @@ export function GlobeVisualization({
   useEffect(() => {
     if (containerRef.current) {
       const updateDimensions = () => {
-        const width = containerRef.current?.clientWidth || 600
+        const width = containerRef.current?.clientWidth || 500
         const height = width // Keep it square
         setDimensions({ width, height })
       }
 
-      // Initial measurement
       updateDimensions()
 
-      // Update on window resize
       window.addEventListener('resize', updateDimensions)
       return () => window.removeEventListener('resize', updateDimensions)
     }
   }, [])
 
-  // Convert country data to points with coordinates
-  const pointsData = useMemo<PointData[]>(() => {
+  const pointsData = useMemo<Array<PointData>>(() => {
     if (!countryData || countryData.length === 0) {
       return []
     }
@@ -89,10 +86,7 @@ export function GlobeVisualization({
 
         const visitors = country.unique_visitors || 0
 
-        // Size based on visitor count (min 0.1, max 1.5)
         const size = Math.min(1.5, Math.max(1, Math.log(visitors + 1) / 10))
-
-        // Monotone color - white/light gray with varying opacity based on visitor count
         const opacity = Math.min(1, Math.max(0.7, Math.log(visitors + 1) / 12))
         const color = isDark
           ? `rgba(255, 0, 0, ${opacity})`
@@ -118,7 +112,9 @@ export function GlobeVisualization({
         const controls = globeEl.current?.controls()
         if (controls) {
           controls.autoRotate = true
-          controls.autoRotateSpeed = 0.2 // Slower rotation
+          controls.autoRotateSpeed = 0.3 // Slow rotation
+          controls.enableZoom = false // Disable zoom/scroll
+          controls.enablePan = false // Disable panning
         }
       }, 100)
       return () => clearTimeout(timer)
@@ -136,13 +132,13 @@ export function GlobeVisualization({
     <Card className="overflow-hidden border-0 bg-transparent shadow-none">
       <CardContent>
         {isLoading ? (
-          <div className="flex items-center justify-center h-[500px] bg-muted/10 rounded-lg animate-pulse">
+          <div className="flex items-center justify-center h-[500px] rounded-lg animate-pulse">
             <p className="text-sm text-muted-foreground">
               Loading visitor locations...
             </p>
           </div>
         ) : pointsData.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-[500px] bg-muted/10 rounded-lg">
+          <div className="flex flex-col items-center justify-center h-[400px] rounded-lg">
             <p className="text-sm text-muted-foreground">
               No visitor location data available
             </p>
@@ -151,14 +147,19 @@ export function GlobeVisualization({
             </p>
           </div>
         ) : !isGlobeReady ? (
-          <div className="flex items-center justify-center h-[500px] bg-muted/10 rounded-lg">
+          <div className="flex items-center justify-center h-[400px] rounded-lg">
             <p className="text-sm text-muted-foreground">Preparing globe...</p>
           </div>
         ) : (
           <div
             className="relative w-full overflow-hidden rounded-lg"
             ref={globeContainerRef}
-            style={{ width: '100%', alignContent: 'center' }}
+            style={{
+              width: '100%',
+              alignContent: 'center',
+              pointerEvents: 'none',
+            }}
+            onWheel={(e) => e.stopPropagation()}
           >
             <Globe
               ref={globeEl}

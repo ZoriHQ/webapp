@@ -1,10 +1,11 @@
 // eslint-disable-next-line
-import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { createFileRoute, Outlet, useParams } from '@tanstack/react-router'
 import { useState } from 'react'
 import { requireAuthAndOrg } from '@/lib/route-guards'
 import { AppSidebar } from '@/components/app-sidebar'
 import { CommandPalette } from '@/components/command-palette'
 import { CommandPaletteTrigger } from '@/components/command-palette-trigger'
+import { RevenueStatusIndicator } from '@/components/revenue-status-indicator'
 import {
   SidebarInset,
   SidebarProvider,
@@ -26,6 +27,8 @@ export const Route = createFileRoute('/_protected')({
 
 function ProtectedLayout() {
   const [commandOpen, setCommandOpen] = useState(false)
+  const params = useParams({ strict: false })
+  const projectId = (params as { projectId?: string })?.projectId
 
   return (
     <SidebarProvider>
@@ -42,6 +45,10 @@ function ProtectedLayout() {
                     <CommandPaletteTrigger onClick={() => setCommandOpen(true)} />
                   </div>
                 </div>
+                {/* Revenue Status Indicator - Only on project pages */}
+                {projectId && (
+                  <RevenueStatusIndicator projectId={projectId} />
+                )}
               </header>
               <main className="flex flex-1 flex-col p-6 overflow-auto">
                 <Outlet />
