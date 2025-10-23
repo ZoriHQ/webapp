@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { IconCode, IconCopy, IconPlus, IconWorld } from '@tabler/icons-react'
+import { IconCode, IconCopy, IconWorld } from '@tabler/icons-react'
 import { toast } from 'sonner'
+import { useNavigate } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
@@ -12,7 +13,6 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from '@/components/ui/sheet'
 import { useCreateProject } from '@/hooks/use-projects'
 
@@ -41,6 +41,7 @@ export function CreateProjectSheet({
   } | null>(null)
 
   const createProjectMutation = useCreateProject()
+  const navigate = useNavigate()
 
   const handleCreateProject = () => {
     createProjectMutation.mutate(
@@ -95,9 +96,10 @@ export function CreateProjectSheet({
   }
 
   return (
-    <Sheet open={open} onOpenChange={handleOpenChange}>
-      {trigger && <SheetTrigger asChild>{trigger}</SheetTrigger>}
-      <SheetContent className="sm:max-w-[525px]">
+    <>
+      {trigger}
+      <Sheet open={open} onOpenChange={handleOpenChange}>
+        <SheetContent className="sm:max-w-[525px]">
         {createStep === 'form' ? (
           <>
             <SheetHeader>
@@ -278,11 +280,24 @@ export function CreateProjectSheet({
               >
                 Create Another
               </Button>
-              <Button onClick={() => handleOpenChange(false)}>Done</Button>
+              <Button
+                onClick={() => {
+                  if (createdProject?.id) {
+                    navigate({
+                      to: '/projects/$projectId',
+                      params: { projectId: createdProject.id },
+                    })
+                  }
+                  handleOpenChange(false)
+                }}
+              >
+                Go to Project
+              </Button>
             </SheetFooter>
           </>
         )}
-      </SheetContent>
-    </Sheet>
+        </SheetContent>
+      </Sheet>
+    </>
   )
 }

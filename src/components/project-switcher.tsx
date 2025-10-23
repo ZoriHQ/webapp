@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { IconChevronDown, IconPlus } from '@tabler/icons-react'
-import { useNavigate, useParams } from '@tanstack/react-router'
+import { useNavigate, useParams, useLocation } from '@tanstack/react-router'
 import { useProjects } from '@/hooks/use-projects'
 import {
   DropdownMenu,
@@ -20,6 +20,7 @@ import {
 
 export function ProjectSwitcher() {
   const navigate = useNavigate()
+  const location = useLocation()
   const params = useParams({ strict: false })
   const projectId = (params as { projectId?: string })?.projectId
 
@@ -38,20 +39,23 @@ export function ProjectSwitcher() {
   }
 
   const handleCreateNew = () => {
-    // TODO: Open create project dialog
-    console.log('Create new project')
+    navigate({ to: '/projects/new' })
   }
 
   // Auto-select first project if none selected
+  // But don't redirect if user is on specific pages like /projects/new
   React.useEffect(() => {
-    if (!projectId && projects.length > 0 && !isLoading) {
+    const isOnProjectCreationPage = location.pathname === '/projects/new'
+    const isOnProjectsListPage = location.pathname === '/projects'
+
+    if (!projectId && projects.length > 0 && !isLoading && !isOnProjectCreationPage && !isOnProjectsListPage) {
       const firstProjectId = projects[0]?.id
       if (firstProjectId) {
         handleProjectSwitch(firstProjectId)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projectId, projects, isLoading])
+  }, [projectId, projects, isLoading, location.pathname])
 
   if (isLoading) {
     return (

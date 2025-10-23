@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import {
   IconPlus,
@@ -8,7 +8,6 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { useDeleteProject, useProjects } from '@/hooks/use-projects'
 import {
-  CreateProjectSheet,
   DeleteProjectDialog,
   ProjectCard,
   ProjectOnboarding,
@@ -24,7 +23,6 @@ function ProjectsIndexPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [selectedProjects, setSelectedProjects] = useState<Array<string>>([])
-  const [isCreateSheetOpen, setIsCreateSheetOpen] = useState(false)
   const [deleteDialog, setDeleteDialog] = useState<{
     open: boolean
     projectId: string
@@ -142,16 +140,12 @@ function ProjectsIndexPage() {
               Track and analyze your website performance with Zori Analytics
             </p>
           </div>
-          <CreateProjectSheet
-            open={isCreateSheetOpen}
-            onOpenChange={setIsCreateSheetOpen}
-            trigger={
-              <Button>
-                <IconPlus className="mr-2 h-4 w-4" />
-                New Project
-              </Button>
-            }
-          />
+          <Link to="/projects/new">
+            <Button>
+              <IconPlus className="mr-2 h-4 w-4" />
+              New Project
+            </Button>
+          </Link>
         </div>
       </div>
 

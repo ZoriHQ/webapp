@@ -1,15 +1,19 @@
 'use client'
 
-import { useRef, useMemo, useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useTheme } from 'next-themes'
 import Globe from 'react-globe.gl'
 import type Zoriapi from 'zorihq'
-import { useTheme } from 'next-themes'
 import { getCountryCoordinates } from '@/lib/country-coordinates'
 import { Card, CardContent } from '@/components/ui/card'
 
 interface GlobeVisualizationProps {
   countryData: Array<Zoriapi.V1.Analytics.CountryDataPoint> | undefined
   isLoading: boolean
+  highlightPoint?: {
+    lat: number
+    lng: number
+  } | null
 }
 
 interface PointData {
@@ -24,27 +28,15 @@ interface PointData {
 export function GlobeVisualization({
   countryData,
   isLoading,
+  highlightPoint,
 }: GlobeVisualizationProps) {
   const globeEl = useRef<any>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
+  const globeContainerRef = useRef<HTMLDivElement>(null)
   const { resolvedTheme } = useTheme()
   const isDark = resolvedTheme === 'dark'
   const [countries, setCountries] = useState({ features: [] })
   const [dimensions, setDimensions] = useState({ width: 600, height: 500 })
   const [isGlobeReady, setIsGlobeReady] = useState(false)
-
-  const globeContainerRef = useRef<any>(null)
-
-  const [width, setWidth] = useState(0)
-  const [height, setHeight] = useState(0)
-  useEffect(() => {
-    if (!globeContainerRef.current) {
-      return
-    }
-    const { offsetWidth, offsetHeight } = globeContainerRef.current
-    setWidth(offsetWidth)
-    setHeight(offsetHeight)
-  }, [globeContainerRef.current])
 
   // Load country GeoJSON data
   useEffect(() => {
@@ -60,9 +52,9 @@ export function GlobeVisualization({
 
   // Measure container dimensions on mount
   useEffect(() => {
-    if (containerRef.current) {
+    if (globeContainerRef.current) {
       const updateDimensions = () => {
-        const width = containerRef.current?.clientWidth || 500
+        const width = globeContainerRef.current?.clientWidth || 500
         const height = width // Keep it square
         setDimensions({ width, height })
       }
@@ -72,54 +64,96 @@ export function GlobeVisualization({
       window.addEventListener('resize', updateDimensions)
       return () => window.removeEventListener('resize', updateDimensions)
     }
-  }, [])
+  }, [isGlobeReady])
 
   const pointsData = useMemo<Array<PointData>>(() => {
-    if (!countryData || countryData.length === 0) {
-      return []
+    const points: PointData[] = []
+
+    // Add highlight point if provided (for onboarding)
+    if (highlightPoint && highlightPoint.lat !== 0 && highlightPoint.lng !== 0) {
+      points.push({
+        lat: highlightPoint.lat,
+        lng: highlightPoint.lng,
+        size: 1.5,
+        color: 'rgba(255, 0, 0, 0.9)',
+        label: 'First visitor!',
+        visitors: 1,
+      })
     }
 
-    return countryData
-      .map((country) => {
-        const coords = getCountryCoordinates(country.country_code || '')
-        if (!coords) return null
+    // Add country data points
+    if (countryData && countryData.length > 0) {
+      const countryPoints = countryData
+        .map((country) => {
+          const coords = getCountryCoordinates(country.country_code || '')
+          if (!coords) return null
 
-        const visitors = country.unique_visitors || 0
+          const visitors = country.unique_visitors || 0
 
-        const size = Math.min(1.5, Math.max(1, Math.log(visitors + 1) / 10))
-        const opacity = Math.min(1, Math.max(0.7, Math.log(visitors + 1) / 12))
-        const color = isDark
-          ? `rgba(255, 0, 0, ${opacity})`
-          : `rgba(255, 0, 0, ${opacity})`
+          const size = Math.min(1.5, Math.max(1, Math.log(visitors + 1) / 10))
+          const opacity = Math.min(1, Math.max(0.7, Math.log(visitors + 1) / 12))
+          const color = isDark
+            ? `rgba(255, 0, 0, ${opacity})`
+            : `rgba(255, 0, 0, ${opacity})`
 
-        return {
-          lat: coords.lat,
-          lng: coords.lng,
-          size,
-          color,
-          label: `${coords.name}: ${visitors.toLocaleString()} visitors`,
-          visitors,
-        }
-      })
-      .filter((p): p is PointData => p !== null)
-  }, [countryData, isDark])
+          return {
+            lat: coords.lat,
+            lng: coords.lng,
+            size,
+            color,
+            label: `${coords.name}: ${visitors.toLocaleString()} visitors`,
+            visitors,
+          }
+        })
+        .filter((p): p is PointData => p !== null)
 
-  // Auto-rotate globe slowly - only after globe is ready
+      points.push(...countryPoints)
+    }
+
+    return points
+  }, [countryData, isDark, highlightPoint])
+
+  // Rotate globe to highlight point when set
+  useEffect(() => {
+    if (
+      isGlobeReady &&
+      globeEl.current &&
+      highlightPoint &&
+      highlightPoint.lat !== 0 &&
+      highlightPoint.lng !== 0
+    ) {
+      const timer = setTimeout(() => {
+        globeEl.current?.pointOfView(
+          {
+            lat: highlightPoint.lat,
+            lng: highlightPoint.lng,
+            altitude: 2.5,
+          },
+          1500,
+        ) // Smooth transition over 1.5 seconds
+      }, 300)
+      return () => clearTimeout(timer)
+    }
+  }, [isGlobeReady, highlightPoint])
+
+  // Auto-rotate globe slowly - only after globe is ready and no highlight point
   useEffect(() => {
     if (isGlobeReady && globeEl.current) {
       // Small delay to ensure globe is fully initialized
       const timer = setTimeout(() => {
         const controls = globeEl.current?.controls()
         if (controls) {
-          controls.autoRotate = true
+          // Disable auto-rotate if we have a highlight point
+          controls.autoRotate =
+            !highlightPoint || (highlightPoint.lat === 0 && highlightPoint.lng === 0)
           controls.autoRotateSpeed = 0.3 // Slow rotation
           controls.enableZoom = false // Disable zoom/scroll
           controls.enablePan = false // Disable panning
         }
-      }, 100)
+      }, 500)
       return () => clearTimeout(timer)
     }
-  }, [isGlobeReady])
+  }, [isGlobeReady, highlightPoint])
 
   // Theme colors - minimal monotone
   const backgroundColor = 'rgba(0,0,0,0)' // Fully transparent
@@ -135,15 +169,6 @@ export function GlobeVisualization({
           <div className="flex items-center justify-center h-[500px] rounded-lg animate-pulse">
             <p className="text-sm text-muted-foreground">
               Loading visitor locations...
-            </p>
-          </div>
-        ) : pointsData.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-[400px] rounded-lg">
-            <p className="text-sm text-muted-foreground">
-              No visitor location data available
-            </p>
-            <p className="text-xs text-muted-foreground mt-2">
-              Visitor locations will appear here once you receive traffic
             </p>
           </div>
         ) : !isGlobeReady ? (
@@ -195,6 +220,45 @@ export function GlobeVisualization({
               pointsMerge={false}
               enablePointerInteraction={false}
               animateIn={true}
+              htmlElementsData={
+                highlightPoint &&
+                highlightPoint.lat !== 0 &&
+                highlightPoint.lng !== 0
+                  ? [highlightPoint]
+                  : []
+              }
+              htmlLat="lat"
+              htmlLng="lng"
+              htmlElement={() => {
+                const el = document.createElement('div')
+                el.style.cssText = `
+                  width: 12px;
+                  height: 12px;
+                  background: rgba(255, 0, 0, 0.9);
+                  border-radius: 50%;
+                  box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+                  animation: pulse 2s ease-in-out infinite;
+                `
+                // Add keyframes animation if not already present
+                if (!document.getElementById('globe-pulse-animation')) {
+                  const style = document.createElement('style')
+                  style.id = 'globe-pulse-animation'
+                  style.textContent = `
+                    @keyframes pulse {
+                      0%, 100% {
+                        transform: scale(1);
+                        opacity: 1;
+                      }
+                      50% {
+                        transform: scale(1.5);
+                        opacity: 0.7;
+                      }
+                    }
+                  `
+                  document.head.appendChild(style)
+                }
+                return el
+              }}
             />
           </div>
         )}

@@ -11,7 +11,7 @@ import {
   type TimeRange,
 } from '@/hooks/use-analytics'
 import { usePaymentProviders } from '@/hooks/use-payment-providers'
-import { EmptyEventsState } from '@/components/analytics/empty-events-state'
+import { ProjectOnboardingState } from '@/components/analytics/project-onboarding-state'
 import { GlobeVisualization } from '@/components/overview/globe-visualization'
 import { VisitorTimeline } from '@/components/overview/visitor-timeline'
 import { TrafficSources } from '@/components/analytics/traffic-sources'
@@ -88,9 +88,9 @@ function OverviewPage() {
     <>
       {/* Show empty state if no events have been received */}
       {hasNoEvents ? (
-        <EmptyEventsState
+        <ProjectOnboardingState
           projectId={projectId}
-          projectName={projectData?.name}
+          projectToken={projectData?.project_token}
         />
       ) : (
         <div className="space-y-6">

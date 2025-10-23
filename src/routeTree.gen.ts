@@ -16,6 +16,7 @@ import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProtectedProjectsRouteImport } from './routes/_protected.projects'
 import { Route as ProtectedProjectsIndexRouteImport } from './routes/_protected.projects.index'
+import { Route as ProtectedProjectsNewRouteImport } from './routes/_protected.projects.new'
 import { Route as ProtectedProjectsProjectIdRouteImport } from './routes/_protected.projects.$projectId'
 import { Route as ProtectedProjectsProjectIdIndexRouteImport } from './routes/_protected.projects.$projectId.index'
 import { Route as ProtectedProjectsProjectIdSettingsRouteImport } from './routes/_protected.projects.$projectId.settings'
@@ -56,6 +57,11 @@ const ProtectedProjectsRoute = ProtectedProjectsRouteImport.update({
 const ProtectedProjectsIndexRoute = ProtectedProjectsIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => ProtectedProjectsRoute,
+} as any)
+const ProtectedProjectsNewRoute = ProtectedProjectsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
   getParentRoute: () => ProtectedProjectsRoute,
 } as any)
 const ProtectedProjectsProjectIdRoute =
@@ -108,6 +114,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/projects': typeof ProtectedProjectsRouteWithChildren
   '/projects/$projectId': typeof ProtectedProjectsProjectIdRouteWithChildren
+  '/projects/new': typeof ProtectedProjectsNewRoute
   '/projects/': typeof ProtectedProjectsIndexRoute
   '/projects/$projectId/analytics': typeof ProtectedProjectsProjectIdAnalyticsRoute
   '/projects/$projectId/events': typeof ProtectedProjectsProjectIdEventsRoute
@@ -121,6 +128,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/projects/new': typeof ProtectedProjectsNewRoute
   '/projects': typeof ProtectedProjectsIndexRoute
   '/projects/$projectId/analytics': typeof ProtectedProjectsProjectIdAnalyticsRoute
   '/projects/$projectId/events': typeof ProtectedProjectsProjectIdEventsRoute
@@ -138,6 +146,7 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/_protected/projects': typeof ProtectedProjectsRouteWithChildren
   '/_protected/projects/$projectId': typeof ProtectedProjectsProjectIdRouteWithChildren
+  '/_protected/projects/new': typeof ProtectedProjectsNewRoute
   '/_protected/projects/': typeof ProtectedProjectsIndexRoute
   '/_protected/projects/$projectId/analytics': typeof ProtectedProjectsProjectIdAnalyticsRoute
   '/_protected/projects/$projectId/events': typeof ProtectedProjectsProjectIdEventsRoute
@@ -155,6 +164,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/projects'
     | '/projects/$projectId'
+    | '/projects/new'
     | '/projects/'
     | '/projects/$projectId/analytics'
     | '/projects/$projectId/events'
@@ -168,6 +178,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/login'
     | '/register'
+    | '/projects/new'
     | '/projects'
     | '/projects/$projectId/analytics'
     | '/projects/$projectId/events'
@@ -184,6 +195,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/_protected/projects'
     | '/_protected/projects/$projectId'
+    | '/_protected/projects/new'
     | '/_protected/projects/'
     | '/_protected/projects/$projectId/analytics'
     | '/_protected/projects/$projectId/events'
@@ -250,6 +262,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/projects/'
       preLoaderRoute: typeof ProtectedProjectsIndexRouteImport
+      parentRoute: typeof ProtectedProjectsRoute
+    }
+    '/_protected/projects/new': {
+      id: '/_protected/projects/new'
+      path: '/new'
+      fullPath: '/projects/new'
+      preLoaderRoute: typeof ProtectedProjectsNewRouteImport
       parentRoute: typeof ProtectedProjectsRoute
     }
     '/_protected/projects/$projectId': {
@@ -334,11 +353,13 @@ const ProtectedProjectsProjectIdRouteWithChildren =
 
 interface ProtectedProjectsRouteChildren {
   ProtectedProjectsProjectIdRoute: typeof ProtectedProjectsProjectIdRouteWithChildren
+  ProtectedProjectsNewRoute: typeof ProtectedProjectsNewRoute
   ProtectedProjectsIndexRoute: typeof ProtectedProjectsIndexRoute
 }
 
 const ProtectedProjectsRouteChildren: ProtectedProjectsRouteChildren = {
   ProtectedProjectsProjectIdRoute: ProtectedProjectsProjectIdRouteWithChildren,
+  ProtectedProjectsNewRoute: ProtectedProjectsNewRoute,
   ProtectedProjectsIndexRoute: ProtectedProjectsIndexRoute,
 }
 

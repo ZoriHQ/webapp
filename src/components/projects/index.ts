@@ -1,4 +1,3 @@
-export { CreateProjectSheet } from './create-project-sheet'
 export { DeleteProjectDialog } from './delete-project-dialog'
 export { EmptyProjectsState } from './empty-projects-state'
 export { ProjectCard } from './project-card'
