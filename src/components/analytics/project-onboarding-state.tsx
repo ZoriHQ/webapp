@@ -19,6 +19,8 @@ interface EventData {
   [key: string]: any
 }
 
+const wsURL = import.meta.env.VITE_API_BASE_URL.replace('https://', 'wss://')
+
 export function ProjectOnboardingState({
   projectId,
   projectToken,
@@ -30,38 +32,33 @@ export function ProjectOnboardingState({
     lng: number
   } | null>(null)
   const { accessToken } = useAuth()
-  const socketUrl =
-    'ws://localhost:1323/events/stream?id=' +
-    projectId +
-    '&token=' +
-    accessToken
+  const socketUrl = `${wsURL}/events/stream?id=${projectId}&token=${accessToken}`
 
-  const { lastMessage, lastJsonMessage, readyState, getWebSocket } =
-    useWebSocket(socketUrl, {
-      onOpen: () => console.log('opened'),
-      onMessage: (event) => {
-        console.log('message', event.data)
-        try {
-          const data: EventData = JSON.parse(event.data)
-          if (data.event_name && !firstEventReceived) {
-            setFirstEventReceived(true)
-            // Set location if available
-            if (
-              data.location_latitude !== undefined &&
-              data.location_longitude !== undefined
-            ) {
-              setEventLocation({
-                lat: data.location_latitude,
-                lng: data.location_longitude,
-              })
-            }
+  const { lastMessage } = useWebSocket(socketUrl, {
+    onOpen: () => console.log('opened'),
+    onMessage: (event) => {
+      console.log('message', event.data)
+      try {
+        const data: EventData = JSON.parse(event.data)
+        if (data.event_name && !firstEventReceived) {
+          setFirstEventReceived(true)
+          // Set location if available
+          if (
+            data.location_latitude !== undefined &&
+            data.location_longitude !== undefined
+          ) {
+            setEventLocation({
+              lat: data.location_latitude,
+              lng: data.location_longitude,
+            })
           }
-        } catch (error) {
-          console.error('Failed to parse event data:', error)
         }
-      },
-      shouldReconnect: (closeEvent) => true,
-    })
+      } catch (error) {
+        console.error('Failed to parse event data:', error)
+      }
+    },
+    shouldReconnect: (closeEvent) => true,
+  })
 
   useEffect(() => {
     console.log('Last message: ', lastMessage)
