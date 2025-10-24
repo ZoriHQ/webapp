@@ -1,7 +1,7 @@
 'use client'
 
 import { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
-import { useParams, Link } from '@tanstack/react-router'
+import { Link, useParams } from '@tanstack/react-router'
 
 import { ChevronDownIcon, SettingsIcon } from 'lucide-react'
 import { Button } from './ui/button'
@@ -20,11 +20,12 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
-import type { HTMLAttributes, SVGAttributes } from 'react'
-import { cn } from '@/lib/utils'
+
 import { CommandPalette } from './command-palette'
 import { CommandPaletteTrigger } from './command-palette-trigger'
 import { RevenueStatusIndicator } from './revenue-status-indicator'
+import type { HTMLAttributes, SVGAttributes } from 'react'
+import { cn } from '@/lib/utils'
 
 // Hamburger icon component
 const HamburgerIcon = ({ className, ...props }: SVGAttributes<SVGElement>) => (
@@ -226,7 +227,7 @@ export const Navbar = forwardRef<HTMLElement, NavbarProps>(
     const [commandOpen, setCommandOpen] = useState(false)
     const containerRef = useRef<HTMLElement>(null)
     const params = useParams({ strict: false })
-    const projectId = (params as { projectId?: string })?.projectId
+    const projectId = (params as { projectId?: string }).projectId
 
     // Keyboard shortcut for command palette
     useEffect(() => {
@@ -284,7 +285,10 @@ export const Navbar = forwardRef<HTMLElement, NavbarProps>(
         <div className="container mx-auto flex h-16 max-w-screen-2xl items-center gap-4">
           {/* Left side - Brand Name */}
           <div className="flex items-center gap-2 min-w-0">
-            <Link to="/projects" className="hover:opacity-80 transition-opacity">
+            <Link
+              to="/projects"
+              className="hover:opacity-80 transition-opacity"
+            >
               <h1 className="text-lg font-bold">Zori</h1>
             </Link>
           </div>

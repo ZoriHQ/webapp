@@ -9,13 +9,43 @@ export type TimeRange =
   | 'last_30_days'
   | 'last_90_days'
 
-export function useRecentEvents(projectId: string, limit?: number) {
+export interface EventFilters {
+  visitor_id?: string
+  user_id?: string
+  external_id?: string
+  traffic_origin?: string
+  page_path?: string
+  limit?: number
+  offset?: number
+}
+
+export function useRecentEvents(
+  projectId: string,
+  filters?: EventFilters,
+) {
   const zClient = useApiClient()
 
   return useQuery<Zoriapi.V1.Analytics.RecentEventsResponse>({
-    queryKey: ['analytics', 'events', 'recent', projectId, limit],
+    queryKey: ['analytics', 'events', 'recent', projectId, filters],
     queryFn: () =>
-      zClient.v1.analytics.events.recent({ project_id: projectId, limit }),
+      zClient.v1.analytics.events.recent({
+        project_id: projectId,
+        ...filters,
+      }),
+    enabled: !!projectId,
+  })
+}
+
+export function useEventFilterOptions(projectId: string, timeRange?: TimeRange) {
+  const zClient = useApiClient()
+
+  return useQuery<Zoriapi.V1.Analytics.EventFilterOptionsResponse>({
+    queryKey: ['analytics', 'events', 'filterOptions', projectId, timeRange],
+    queryFn: () =>
+      zClient.v1.analytics.events.filterOptions({
+        project_id: projectId,
+        time_range: timeRange,
+      }),
     enabled: !!projectId,
   })
 }

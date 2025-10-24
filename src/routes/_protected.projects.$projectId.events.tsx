@@ -1,30 +1,82 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useProject } from '@/hooks/use-projects'
-import { useRecentEvents } from '@/hooks/use-analytics'
+import { useRecentEvents, useEventFilterOptions } from '@/hooks/use-analytics'
 import { LiveEventStream } from '@/components/analytics/live-event-stream'
 import { useState } from 'react'
 import { VisitorProfileModal } from '@/components/analytics/visitor-profile-modal'
+import { EventsFilterBar, type EventFiltersState } from '@/components/analytics/events-filter-bar'
+import { z } from 'zod'
+
+const eventsSearchSchema = z.object({
+  pages: z.array(z.string()).optional().catch([]),
+  origins: z.array(z.string()).optional().catch([]),
+  visitor_id: z.string().optional().catch(undefined),
+  limit: z.number().optional().catch(100),
+  offset: z.number().optional().catch(0),
+})
 
 export const Route = createFileRoute('/_protected/projects/$projectId/events')({
   component: EventsPage,
+  validateSearch: eventsSearchSchema,
 })
 
 function EventsPage() {
   const { projectId } = Route.useParams()
+  const navigate = Route.useNavigate()
+  const searchParams = Route.useSearch()
+
   const [selectedVisitorId, setSelectedVisitorId] = useState<string | null>(
     null,
   )
   const [isVisitorModalOpen, setIsVisitorModalOpen] = useState(false)
 
   const { data: projectData, isLoading: projectLoading } = useProject(projectId)
+
+  // Fetch available filter options
+  const { data: filterOptionsData, isLoading: filterOptionsLoading } =
+    useEventFilterOptions(projectId, 'last_7_days')
+
+  // Build filter object from URL params
+  const eventFilters = {
+    limit: searchParams.limit || 100,
+    offset: searchParams.offset || 0,
+    ...(searchParams.visitor_id && {
+      visitor_id: searchParams.visitor_id,
+    }),
+    ...(searchParams.pages && searchParams.pages.length > 0 && {
+      page_path: searchParams.pages.join(','),
+    }),
+    ...(searchParams.origins && searchParams.origins.length > 0 && {
+      traffic_origin: searchParams.origins.join(','),
+    }),
+  }
+
   const { data: recentEventsData, isLoading: eventsLoading } = useRecentEvents(
     projectId,
-    100, // Load more events for the events page
+    eventFilters,
   )
 
   const handleVisitorClick = (visitorId: string) => {
     setSelectedVisitorId(visitorId)
     setIsVisitorModalOpen(true)
+  }
+
+  const handleFiltersChange = (filters: EventFiltersState) => {
+    navigate({
+      to: '.',
+      search: (prev) => ({
+        ...prev,
+        visitor_id: filters.visitor_id || undefined,
+        pages: filters.pages.length > 0 ? filters.pages : undefined,
+        origins: filters.traffic_origins.length > 0 ? filters.traffic_origins : undefined,
+      }),
+    })
+  }
+
+  const currentFilters: EventFiltersState = {
+    visitor_id: searchParams.visitor_id,
+    pages: searchParams.pages || [],
+    traffic_origins: searchParams.origins || [],
   }
 
   return (
@@ -38,10 +90,22 @@ function EventsPage() {
         </div>
       </div>
 
+      {/* Filter Bar */}
+      <EventsFilterBar
+        filters={currentFilters}
+        availablePages={filterOptionsData?.pages || []}
+        availableOrigins={filterOptionsData?.traffic_origins || []}
+        onFiltersChange={handleFiltersChange}
+        isLoadingOptions={filterOptionsLoading}
+      />
+
       <LiveEventStream
         events={recentEventsData?.events}
         isLoading={eventsLoading}
         onVisitorClick={handleVisitorClick}
+        total={recentEventsData?.total}
+        limit={eventFilters.limit}
+        offset={eventFilters.offset}
       />
 
       <VisitorProfileModal

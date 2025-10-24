@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import {
+  IconFileText,
   IconFolder,
   IconPlus,
-  IconSettings,
-  IconFileText,
-  IconApi,
   IconSearch,
+  IconSettings,
 } from '@tabler/icons-react'
 import {
   CommandDialog,

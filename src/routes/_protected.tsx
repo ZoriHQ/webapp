@@ -14,7 +14,7 @@ import {
 import { Separator } from '@/components/ui/separator'
 
 export const Route = createFileRoute('/_protected')({
-  beforeLoad: async ({ context, location }) => {
+  beforeLoad: async ({ location }) => {
     const authState = await requireAuthAndOrg({ location })
 
     return {
@@ -28,7 +28,7 @@ export const Route = createFileRoute('/_protected')({
 function ProtectedLayout() {
   const [commandOpen, setCommandOpen] = useState(false)
   const params = useParams({ strict: false })
-  const projectId = (params as { projectId?: string })?.projectId
+  const projectId = (params as { projectId?: string }).projectId
 
   return (
     <SidebarProvider>
@@ -42,13 +42,13 @@ function ProtectedLayout() {
                 <Separator orientation="vertical" className="mr-2 h-4" />
                 <div className="flex flex-1 items-center justify-center">
                   <div className="w-full max-w-md">
-                    <CommandPaletteTrigger onClick={() => setCommandOpen(true)} />
+                    <CommandPaletteTrigger
+                      onClick={() => setCommandOpen(true)}
+                    />
                   </div>
                 </div>
                 {/* Revenue Status Indicator - Only on project pages */}
-                {projectId && (
-                  <RevenueStatusIndicator projectId={projectId} />
-                )}
+                {projectId && <RevenueStatusIndicator projectId={projectId} />}
               </header>
               <main className="flex flex-1 flex-col p-6 overflow-auto">
                 <Outlet />

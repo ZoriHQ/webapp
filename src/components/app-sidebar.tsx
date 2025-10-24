@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { IconSettings, IconHelp } from '@tabler/icons-react'
+import { IconHelp, IconSettings } from '@tabler/icons-react'
 
 import { NavMain } from '@/components/nav-main'
 import { NavSecondary } from '@/components/nav-secondary'

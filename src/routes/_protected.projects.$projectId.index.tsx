@@ -17,7 +17,14 @@ import { VisitorTimeline } from '@/components/overview/visitor-timeline'
 import { TrafficSources } from '@/components/analytics/traffic-sources'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
-import { AlertCircle, TrendingUp, TrendingDown, DollarSign, Users, Activity } from 'lucide-react'
+import {
+  AlertCircle,
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  Users,
+  Activity,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Link } from '@tanstack/react-router'
 
@@ -61,7 +68,10 @@ function OverviewPage() {
   const hasNoEvents = !projectData?.first_event_received_at && !projectLoading
 
   // Get user name
-  const userName = (account as any)?.name?.split(' ')[0] || account?.email?.split('@')[0] || 'there'
+  const userName =
+    (account as any)?.name?.split(' ')[0] ||
+    account?.email?.split('@')[0] ||
+    'there'
 
   // Get current time for greeting
   const currentHour = new Date().getHours()
