@@ -141,7 +141,7 @@ export function VisitorProfileModal({
             {profile?.is_identified ? (
               <span>Identified customer information and activity</span>
             ) : (
-              <span>Detailed information and activity for visitor {visitorId?.substring(0, 12)}</span>
+              <span className="font-mono text-xs select-all">Visitor ID: {visitorId}</span>
             )}
           </DialogDescription>
         </DialogHeader>
@@ -197,7 +197,7 @@ export function VisitorProfileModal({
                       <IconId className="h-4 w-4 text-green-600 mt-0.5" />
                       <div className="flex-1">
                         <p className="text-xs text-green-700 dark:text-green-300">User ID</p>
-                        <p className="text-sm font-medium font-mono text-green-900 dark:text-green-100">{profile.user_id}</p>
+                        <p className="text-sm font-medium font-mono text-green-900 dark:text-green-100 select-all">{profile.user_id}</p>
                       </div>
                     </div>
                   )}
@@ -206,7 +206,7 @@ export function VisitorProfileModal({
                       <IconId className="h-4 w-4 text-green-600 mt-0.5" />
                       <div className="flex-1">
                         <p className="text-xs text-green-700 dark:text-green-300">External ID</p>
-                        <p className="text-sm font-medium font-mono text-green-900 dark:text-green-100">{profile.external_id}</p>
+                        <p className="text-sm font-medium font-mono text-green-900 dark:text-green-100 select-all">{profile.external_id}</p>
                       </div>
                     </div>
                   )}
@@ -310,7 +310,7 @@ export function VisitorProfileModal({
                       <IconUser className="h-4 w-4 text-muted-foreground mt-0.5" />
                       <div className="flex-1">
                         <p className="text-xs text-muted-foreground">Visitor ID</p>
-                        <p className="text-sm font-mono">{profile.visitor_id}</p>
+                        <p className="text-sm font-mono select-all">{profile.visitor_id}</p>
                       </div>
                     </div>
 

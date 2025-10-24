@@ -5,6 +5,7 @@ import { LiveEventStream } from '@/components/analytics/live-event-stream'
 import { useState } from 'react'
 import { VisitorProfileModal } from '@/components/analytics/visitor-profile-modal'
 import { EventsFilterBar, type EventFiltersState } from '@/components/analytics/events-filter-bar'
+import { useQueryClient } from '@tanstack/react-query'
 import { z } from 'zod'
 
 const eventsSearchSchema = z.object({
@@ -24,6 +25,7 @@ function EventsPage() {
   const { projectId } = Route.useParams()
   const navigate = Route.useNavigate()
   const searchParams = Route.useSearch()
+  const queryClient = useQueryClient()
 
   const [selectedVisitorId, setSelectedVisitorId] = useState<string | null>(
     null,
@@ -61,6 +63,16 @@ function EventsPage() {
     setIsVisitorModalOpen(true)
   }
 
+  const handleFilterByVisitor = (visitorId: string) => {
+    navigate({
+      to: '.',
+      search: (prev) => ({
+        ...prev,
+        visitor_id: visitorId,
+      }),
+    })
+  }
+
   const handleFiltersChange = (filters: EventFiltersState) => {
     navigate({
       to: '.',
@@ -77,6 +89,17 @@ function EventsPage() {
     visitor_id: searchParams.visitor_id,
     pages: searchParams.pages || [],
     traffic_origins: searchParams.origins || [],
+  }
+
+  const handleRefresh = () => {
+    // Invalidate the events query to refetch
+    queryClient.invalidateQueries({
+      queryKey: ['analytics', 'events', 'recent', projectId],
+    })
+    // Also invalidate filter options
+    queryClient.invalidateQueries({
+      queryKey: ['analytics', 'events', 'filterOptions', projectId],
+    })
   }
 
   return (
@@ -96,6 +119,7 @@ function EventsPage() {
         availablePages={filterOptionsData?.pages || []}
         availableOrigins={filterOptionsData?.traffic_origins || []}
         onFiltersChange={handleFiltersChange}
+        onRefresh={handleRefresh}
         isLoadingOptions={filterOptionsLoading}
       />
 
@@ -103,6 +127,7 @@ function EventsPage() {
         events={recentEventsData?.events}
         isLoading={eventsLoading}
         onVisitorClick={handleVisitorClick}
+        onFilterByVisitor={handleFilterByVisitor}
         total={recentEventsData?.total}
         limit={eventFilters.limit}
         offset={eventFilters.offset}

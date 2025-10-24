@@ -15,7 +15,7 @@ import {
   CommandList,
 } from '@/components/ui/command'
 import { FilterChip } from './filter-chip'
-import { Check, Plus, Search } from 'lucide-react'
+import { Check, Plus, Search, RefreshCw } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export interface EventFiltersState {
@@ -29,6 +29,7 @@ interface EventsFilterBarProps {
   availablePages?: string[]
   availableOrigins?: string[]
   onFiltersChange: (filters: EventFiltersState) => void
+  onRefresh?: () => void
   isLoadingOptions?: boolean
 }
 
@@ -37,6 +38,7 @@ export function EventsFilterBar({
   availablePages = [],
   availableOrigins = [],
   onFiltersChange,
+  onRefresh,
   isLoadingOptions = false,
 }: EventsFilterBarProps) {
   const [openPopover, setOpenPopover] = useState<
@@ -244,6 +246,21 @@ export function EventsFilterBar({
           className="h-8 px-2 text-xs"
         >
           Clear all
+        </Button>
+      )}
+
+      {/* Spacer to push refresh button to the right */}
+      <div className="flex-1" />
+
+      {/* Refresh Button */}
+      {onRefresh && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onRefresh}
+          className="h-8 w-8 p-0"
+        >
+          <RefreshCw className="h-4 w-4" />
         </Button>
       )}
     </div>
