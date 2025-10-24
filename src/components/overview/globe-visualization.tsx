@@ -67,10 +67,13 @@ export function GlobeVisualization({
   }, [isGlobeReady])
 
   const pointsData = useMemo<Array<PointData>>(() => {
-    const points: PointData[] = []
+    const points: Array<PointData> = []
 
-    // Add highlight point if provided (for onboarding)
-    if (highlightPoint && highlightPoint.lat !== 0 && highlightPoint.lng !== 0) {
+    if (
+      highlightPoint &&
+      highlightPoint.lat !== 0 &&
+      highlightPoint.lng !== 0
+    ) {
       points.push({
         lat: highlightPoint.lat,
         lng: highlightPoint.lng,
@@ -81,7 +84,6 @@ export function GlobeVisualization({
       })
     }
 
-    // Add country data points
     if (countryData && countryData.length > 0) {
       const countryPoints = countryData
         .map((country) => {
@@ -91,7 +93,10 @@ export function GlobeVisualization({
           const visitors = country.unique_visitors || 0
 
           const size = Math.min(1.5, Math.max(1, Math.log(visitors + 1) / 10))
-          const opacity = Math.min(1, Math.max(0.7, Math.log(visitors + 1) / 12))
+          const opacity = Math.min(
+            1,
+            Math.max(0.7, Math.log(visitors + 1) / 12),
+          )
           const color = isDark
             ? `rgba(255, 0, 0, ${opacity})`
             : `rgba(255, 0, 0, ${opacity})`
@@ -145,7 +150,8 @@ export function GlobeVisualization({
         if (controls) {
           // Disable auto-rotate if we have a highlight point
           controls.autoRotate =
-            !highlightPoint || (highlightPoint.lat === 0 && highlightPoint.lng === 0)
+            !highlightPoint ||
+            (highlightPoint.lat === 0 && highlightPoint.lng === 0)
           controls.autoRotateSpeed = 0.3 // Slow rotation
           controls.enableZoom = false // Disable zoom/scroll
           controls.enablePan = false // Disable panning
@@ -155,7 +161,6 @@ export function GlobeVisualization({
     }
   }, [isGlobeReady, highlightPoint])
 
-  // Theme colors - minimal monotone
   const backgroundColor = 'rgba(0,0,0,0)' // Fully transparent
   const globeColor = isDark ? '#0a0a0a' : '#ffffff' // Globe base (ocean)
   const atmosphereColor = isDark ? '#333333' : '#cccccc'

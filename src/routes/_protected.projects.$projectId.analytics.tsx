@@ -21,6 +21,7 @@ import { RevenueAttribution } from '@/components/analytics/revenue-attribution'
 import { BounceRateCard } from '@/components/analytics/bounce-rate-card'
 import { TopVisitorsTable } from '@/components/analytics/top-visitors-table'
 import { EmptyEventsState } from '@/components/analytics/empty-events-state'
+import { VisitorProfileModal } from '@/components/analytics/visitor-profile-modal'
 
 export const Route = createFileRoute('/_protected/projects/$projectId/analytics')({
   component: ProjectDetailPage,
@@ -76,6 +77,10 @@ function ProjectDetailPage() {
   const { projectId } = Route.useParams()
   const [timeRange, setTimeRange] = useState<TimeRange>('last_7_days')
   const [hasRevenueData, setHasRevenueData] = useState(true)
+  const [selectedVisitorId, setSelectedVisitorId] = useState<string | null>(
+    null,
+  )
+  const [isVisitorModalOpen, setIsVisitorModalOpen] = useState(false)
   const isDev = import.meta.env.DEV
 
   // Fetch project details
@@ -134,6 +139,11 @@ function ProjectDetailPage() {
 
   // Check if project has received any events based on first_event_received_at field
   const hasNoEvents = !projectData?.first_event_received_at && !projectLoading
+
+  const handleVisitorClick = (visitorId: string) => {
+    setSelectedVisitorId(visitorId)
+    setIsVisitorModalOpen(true)
+  }
 
   return (
     <>
@@ -203,6 +213,7 @@ function ProjectDetailPage() {
             <TopVisitorsTable
               data={topVisitorsData}
               isLoading={topVisitorsLoading}
+              onVisitorClick={handleVisitorClick}
             />
           </div>
 
@@ -219,6 +230,13 @@ function ProjectDetailPage() {
           )}
         </>
       )}
+
+      <VisitorProfileModal
+        projectId={projectId}
+        visitorId={selectedVisitorId}
+        open={isVisitorModalOpen}
+        onOpenChange={setIsVisitorModalOpen}
+      />
     </>
   )
 }

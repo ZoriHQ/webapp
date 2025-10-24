@@ -37,7 +37,9 @@ function formatTimestamp(timestamp: string) {
   return `${diffDays}d ago`
 }
 
-function getEventBadgeVariant(eventName: string | undefined): 'default' | 'secondary' | 'destructive' | 'outline' {
+function getEventBadgeVariant(
+  eventName: string | undefined,
+): 'default' | 'secondary' | 'destructive' | 'outline' {
   switch (eventName) {
     case 'page_view':
       return 'default'
@@ -50,13 +52,13 @@ function getEventBadgeVariant(eventName: string | undefined): 'default' | 'secon
   }
 }
 
-export function LiveEventStream({ events, isLoading, onVisitorClick }: LiveEventStreamProps) {
+export function LiveEventStream({
+  events,
+  isLoading,
+  onVisitorClick,
+}: LiveEventStreamProps) {
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Live Event Stream</CardTitle>
-        <CardDescription>Real-time visitor activity on your site</CardDescription>
-      </CardHeader>
       <CardContent>
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
@@ -78,7 +80,8 @@ export function LiveEventStream({ events, isLoading, onVisitorClick }: LiveEvent
               </TableHeader>
               <TableBody>
                 {events.map((event, idx) => {
-                  const countryCode = event.location_country_iso?.toUpperCase() || ''
+                  const countryCode =
+                    event.location_country_iso?.toUpperCase() || ''
                   const flagEmoji = countryCodeToFlag(countryCode)
 
                   return (
