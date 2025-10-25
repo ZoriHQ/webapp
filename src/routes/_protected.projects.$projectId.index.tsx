@@ -109,9 +109,9 @@ function OverviewPage() {
       ) : (
         <div className="space-y-6">
           {/* Hero Section with Globe */}
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-8 items-start">
+          <div className="flex flex-col lg:flex-row gap-8 items-start">
             {/* Left side - Welcome and Stats */}
-            <div className="space-y-8 pt-20">
+            <div className="w-full lg:w-1/2 space-y-8 pt-20 lg:pl-12 xl:pl-16">
               {/* Greeting */}
               <div className="space-y-3">
                 <h1 className="text-4xl font-bold tracking-tight">
@@ -222,7 +222,7 @@ function OverviewPage() {
             </div>
 
             {/* Right side - Globe */}
-            <div className="lg:sticky lg:top-6">
+            <div className="w-full lg:w-1/2 lg:sticky lg:top-6">
               <GlobeVisualization
                 countryData={countryData?.data}
                 isLoading={countryLoading}
