@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { IconHelp, IconSettings } from '@tabler/icons-react'
+import { useParams } from '@tanstack/react-router'
 
 import { NavMain } from '@/components/nav-main'
 import { NavSecondary } from '@/components/nav-secondary'
@@ -13,24 +14,26 @@ import {
   SidebarHeader,
 } from '@/components/ui/sidebar'
 
-const secondaryItems = [
-  {
-    title: 'Settings',
-    url: '#',
-    icon: IconSettings,
-  },
-  {
-    title: 'Get Help',
-    url: '#',
-    icon: IconHelp,
-  },
-]
-
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { account } = useAuth()
+  const params = useParams({ strict: false })
+  const projectId = (params as { projectId?: string })?.projectId
 
   const userName = (account as any)?.name || account?.email || 'User'
   const userAvatar = (account as any)?.avatar_url || ''
+
+  const secondaryItems = [
+    {
+      title: 'Settings',
+      url: projectId ? `/projects/${projectId}/settings` : '#',
+      icon: IconSettings,
+    },
+    {
+      title: 'Get Help',
+      url: '#',
+      icon: IconHelp,
+    },
+  ]
 
   return (
     <Sidebar collapsible="icon" {...props}>

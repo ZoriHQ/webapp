@@ -4,6 +4,7 @@ import {
   IconCalendarEvent,
   IconTarget,
   IconBrain,
+  IconCurrencyDollar,
 } from '@tabler/icons-react'
 import { useNavigate, useParams, useLocation } from '@tanstack/react-router'
 
@@ -34,6 +35,12 @@ export function NavMain() {
       icon: IconChartBar,
       url: projectId ? `/projects/${projectId}/analytics` : '#',
       matchPath: `/projects/${projectId}/analytics`,
+    },
+    {
+      title: 'Revenue',
+      icon: IconCurrencyDollar,
+      url: projectId ? `/projects/${projectId}/revenue` : '#',
+      matchPath: `/projects/${projectId}/revenue`,
     },
     {
       title: 'Events',

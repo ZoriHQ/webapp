@@ -13,7 +13,7 @@ function ProjectSettings() {
   const { data: project } = useProject(projectId)
 
   return (
-    <div className="container mx-auto py-6 px-4 max-w-5xl">
+    <div className="container mx-auto py-6 px-4 max-w-7xl">
       <div className="mb-6">
         <h1 className="text-3xl font-bold mb-2">Project Settings</h1>
         <p className="text-muted-foreground">
@@ -21,19 +21,25 @@ function ProjectSettings() {
         </p>
       </div>
 
-      <Tabs defaultValue="general" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 max-w-md">
-          <TabsTrigger value="general">General</TabsTrigger>
-          <TabsTrigger value="integrations">Integrations</TabsTrigger>
+      <Tabs defaultValue="general" className="flex flex-row gap-6 w-full">
+        <TabsList className="flex flex-col h-fit w-48 items-stretch p-1 gap-1">
+          <TabsTrigger value="general" className="justify-start">
+            General
+          </TabsTrigger>
+          <TabsTrigger value="integrations" className="justify-start">
+            Integrations
+          </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="general" className="mt-6">
-          <GeneralSettingsTab projectId={projectId} />
-        </TabsContent>
+        <div className="flex-1 min-w-0">
+          <TabsContent value="general" className="mt-0">
+            <GeneralSettingsTab projectId={projectId} />
+          </TabsContent>
 
-        <TabsContent value="integrations" className="mt-6">
-          <IntegrationsTab projectId={projectId} />
-        </TabsContent>
+          <TabsContent value="integrations" className="mt-0">
+            <IntegrationsTab projectId={projectId} />
+          </TabsContent>
+        </div>
       </Tabs>
     </div>
   )

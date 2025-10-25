@@ -13,11 +13,13 @@ import {
   useVisitorsTimeline,
   type TimeRange,
 } from '@/hooks/use-analytics'
+import { useRevenueByOrigin } from '@/hooks/use-revenue'
 import { useProject } from '@/hooks/use-projects'
+import { usePaymentProviders } from '@/hooks/use-payment-providers'
 import { ProjectHeader } from '@/components/analytics/project-header'
 import { EngagementMetrics } from '@/components/analytics/engagement-metrics'
 import { TrafficSources } from '@/components/analytics/traffic-sources'
-import { RevenueAttribution } from '@/components/analytics/revenue-attribution'
+import { RevenueAttributionByOrigin } from '@/components/revenue/revenue-attribution-by-origin'
 import { BounceRateCard } from '@/components/analytics/bounce-rate-card'
 import { TopVisitorsTable } from '@/components/analytics/top-visitors-table'
 import { EmptyEventsState } from '@/components/analytics/empty-events-state'
@@ -27,61 +29,13 @@ export const Route = createFileRoute('/_protected/projects/$projectId/analytics'
   component: ProjectDetailPage,
 })
 
-// Mock data for revenue attribution (will be replaced with real API later)
-const revenueBySource = [
-  {
-    source: 'Google Organic',
-    visitors: 2341,
-    conversions: 156,
-    revenue: 12450,
-    averageValue: 79.81,
-  },
-  {
-    source: 'Reddit - r/programming',
-    visitors: 1245,
-    conversions: 89,
-    revenue: 8900,
-    averageValue: 100.0,
-  },
-  {
-    source: 'Twitter',
-    visitors: 1567,
-    conversions: 67,
-    revenue: 5360,
-    averageValue: 80.0,
-  },
-  {
-    source: 'Direct Traffic',
-    visitors: 3245,
-    conversions: 134,
-    revenue: 10720,
-    averageValue: 80.0,
-  },
-  {
-    source: 'Google Ads',
-    visitors: 892,
-    conversions: 71,
-    revenue: 5680,
-    averageValue: 80.0,
-  },
-  {
-    source: 'Reddit - r/webdev',
-    visitors: 892,
-    conversions: 34,
-    revenue: 2720,
-    averageValue: 80.0,
-  },
-]
-
 function ProjectDetailPage() {
   const { projectId } = Route.useParams()
   const [timeRange, setTimeRange] = useState<TimeRange>('last_7_days')
-  const [hasRevenueData, setHasRevenueData] = useState(true)
   const [selectedVisitorId, setSelectedVisitorId] = useState<string | null>(
     null,
   )
   const [isVisitorModalOpen, setIsVisitorModalOpen] = useState(false)
-  const isDev = import.meta.env.DEV
 
   // Fetch project details
   const { data: projectData, isLoading: projectLoading } = useProject(projectId)
@@ -127,15 +81,20 @@ function ProjectDetailPage() {
   const { data: topVisitorsData, isLoading: topVisitorsLoading } =
     useTopVisitors(projectId, timeRange, 20)
 
+  // Revenue data
+  const { data: revenueByOriginData, isLoading: revenueLoading } =
+    useRevenueByOrigin(projectId, timeRange)
+
+  // Payment provider data
+  const { data: providersData } = usePaymentProviders(projectId)
+  const hasPaymentProvider = (providersData?.providers?.length || 0) > 0
+
   console.log('[ProjectDetailPage] Timeline query state:', {
     timelineData,
     isLoading: timelineLoading,
     error: timelineError,
     status: timelineStatus,
   })
-
-  // Mock revenue data - only used for dev demo (can be removed)
-  // These are not passed to the new MetricsOverview component
 
   // Check if project has received any events based on first_event_received_at field
   const hasNoEvents = !projectData?.first_event_received_at && !projectLoading
@@ -192,11 +151,13 @@ function ProjectDetailPage() {
               timeRange={timeRange}
             />
 
-            {/* Traffic Sources (Tabbed: Origin, Country) */}
+            {/* Traffic Sources (Tabbed: Origin, Country) with Revenue */}
             <TrafficSources
               originData={originData?.data}
               countryData={countryData?.data}
+              revenueByOrigin={revenueByOriginData?.data}
               isLoading={originLoading || countryLoading}
+              showRevenue={hasPaymentProvider}
             />
           </div>
 
@@ -217,14 +178,12 @@ function ProjectDetailPage() {
             />
           </div>
 
-          {/* Revenue Attribution (mock data - dev only) */}
-          {isDev && (
+          {/* Revenue Attribution (only show if payment provider is connected) */}
+          {hasPaymentProvider && (
             <div className="mb-8">
-              <RevenueAttribution
-                revenueData={revenueBySource}
-                hasData={hasRevenueData}
-                showToggle={isDev}
-                onToggle={() => setHasRevenueData(!hasRevenueData)}
+              <RevenueAttributionByOrigin
+                data={revenueByOriginData}
+                isLoading={revenueLoading}
               />
             </div>
           )}

@@ -20,6 +20,7 @@ import { Route as ProtectedProjectsNewRouteImport } from './routes/_protected.pr
 import { Route as ProtectedProjectsProjectIdRouteImport } from './routes/_protected.projects.$projectId'
 import { Route as ProtectedProjectsProjectIdIndexRouteImport } from './routes/_protected.projects.$projectId.index'
 import { Route as ProtectedProjectsProjectIdSettingsRouteImport } from './routes/_protected.projects.$projectId.settings'
+import { Route as ProtectedProjectsProjectIdRevenueRouteImport } from './routes/_protected.projects.$projectId.revenue'
 import { Route as ProtectedProjectsProjectIdLlmTracesRouteImport } from './routes/_protected.projects.$projectId.llm-traces'
 import { Route as ProtectedProjectsProjectIdGoalsRouteImport } from './routes/_protected.projects.$projectId.goals'
 import { Route as ProtectedProjectsProjectIdEventsRouteImport } from './routes/_protected.projects.$projectId.events'
@@ -82,6 +83,12 @@ const ProtectedProjectsProjectIdSettingsRoute =
     path: '/settings',
     getParentRoute: () => ProtectedProjectsProjectIdRoute,
   } as any)
+const ProtectedProjectsProjectIdRevenueRoute =
+  ProtectedProjectsProjectIdRevenueRouteImport.update({
+    id: '/revenue',
+    path: '/revenue',
+    getParentRoute: () => ProtectedProjectsProjectIdRoute,
+  } as any)
 const ProtectedProjectsProjectIdLlmTracesRoute =
   ProtectedProjectsProjectIdLlmTracesRouteImport.update({
     id: '/llm-traces',
@@ -120,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/projects/$projectId/events': typeof ProtectedProjectsProjectIdEventsRoute
   '/projects/$projectId/goals': typeof ProtectedProjectsProjectIdGoalsRoute
   '/projects/$projectId/llm-traces': typeof ProtectedProjectsProjectIdLlmTracesRoute
+  '/projects/$projectId/revenue': typeof ProtectedProjectsProjectIdRevenueRoute
   '/projects/$projectId/settings': typeof ProtectedProjectsProjectIdSettingsRoute
   '/projects/$projectId/': typeof ProtectedProjectsProjectIdIndexRoute
 }
@@ -134,6 +142,7 @@ export interface FileRoutesByTo {
   '/projects/$projectId/events': typeof ProtectedProjectsProjectIdEventsRoute
   '/projects/$projectId/goals': typeof ProtectedProjectsProjectIdGoalsRoute
   '/projects/$projectId/llm-traces': typeof ProtectedProjectsProjectIdLlmTracesRoute
+  '/projects/$projectId/revenue': typeof ProtectedProjectsProjectIdRevenueRoute
   '/projects/$projectId/settings': typeof ProtectedProjectsProjectIdSettingsRoute
   '/projects/$projectId': typeof ProtectedProjectsProjectIdIndexRoute
 }
@@ -152,6 +161,7 @@ export interface FileRoutesById {
   '/_protected/projects/$projectId/events': typeof ProtectedProjectsProjectIdEventsRoute
   '/_protected/projects/$projectId/goals': typeof ProtectedProjectsProjectIdGoalsRoute
   '/_protected/projects/$projectId/llm-traces': typeof ProtectedProjectsProjectIdLlmTracesRoute
+  '/_protected/projects/$projectId/revenue': typeof ProtectedProjectsProjectIdRevenueRoute
   '/_protected/projects/$projectId/settings': typeof ProtectedProjectsProjectIdSettingsRoute
   '/_protected/projects/$projectId/': typeof ProtectedProjectsProjectIdIndexRoute
 }
@@ -170,6 +180,7 @@ export interface FileRouteTypes {
     | '/projects/$projectId/events'
     | '/projects/$projectId/goals'
     | '/projects/$projectId/llm-traces'
+    | '/projects/$projectId/revenue'
     | '/projects/$projectId/settings'
     | '/projects/$projectId/'
   fileRoutesByTo: FileRoutesByTo
@@ -184,6 +195,7 @@ export interface FileRouteTypes {
     | '/projects/$projectId/events'
     | '/projects/$projectId/goals'
     | '/projects/$projectId/llm-traces'
+    | '/projects/$projectId/revenue'
     | '/projects/$projectId/settings'
     | '/projects/$projectId'
   id:
@@ -201,6 +213,7 @@ export interface FileRouteTypes {
     | '/_protected/projects/$projectId/events'
     | '/_protected/projects/$projectId/goals'
     | '/_protected/projects/$projectId/llm-traces'
+    | '/_protected/projects/$projectId/revenue'
     | '/_protected/projects/$projectId/settings'
     | '/_protected/projects/$projectId/'
   fileRoutesById: FileRoutesById
@@ -292,6 +305,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedProjectsProjectIdSettingsRouteImport
       parentRoute: typeof ProtectedProjectsProjectIdRoute
     }
+    '/_protected/projects/$projectId/revenue': {
+      id: '/_protected/projects/$projectId/revenue'
+      path: '/revenue'
+      fullPath: '/projects/$projectId/revenue'
+      preLoaderRoute: typeof ProtectedProjectsProjectIdRevenueRouteImport
+      parentRoute: typeof ProtectedProjectsProjectIdRoute
+    }
     '/_protected/projects/$projectId/llm-traces': {
       id: '/_protected/projects/$projectId/llm-traces'
       path: '/llm-traces'
@@ -328,6 +348,7 @@ interface ProtectedProjectsProjectIdRouteChildren {
   ProtectedProjectsProjectIdEventsRoute: typeof ProtectedProjectsProjectIdEventsRoute
   ProtectedProjectsProjectIdGoalsRoute: typeof ProtectedProjectsProjectIdGoalsRoute
   ProtectedProjectsProjectIdLlmTracesRoute: typeof ProtectedProjectsProjectIdLlmTracesRoute
+  ProtectedProjectsProjectIdRevenueRoute: typeof ProtectedProjectsProjectIdRevenueRoute
   ProtectedProjectsProjectIdSettingsRoute: typeof ProtectedProjectsProjectIdSettingsRoute
   ProtectedProjectsProjectIdIndexRoute: typeof ProtectedProjectsProjectIdIndexRoute
 }
@@ -341,6 +362,8 @@ const ProtectedProjectsProjectIdRouteChildren: ProtectedProjectsProjectIdRouteCh
     ProtectedProjectsProjectIdGoalsRoute: ProtectedProjectsProjectIdGoalsRoute,
     ProtectedProjectsProjectIdLlmTracesRoute:
       ProtectedProjectsProjectIdLlmTracesRoute,
+    ProtectedProjectsProjectIdRevenueRoute:
+      ProtectedProjectsProjectIdRevenueRoute,
     ProtectedProjectsProjectIdSettingsRoute:
       ProtectedProjectsProjectIdSettingsRoute,
     ProtectedProjectsProjectIdIndexRoute: ProtectedProjectsProjectIdIndexRoute,

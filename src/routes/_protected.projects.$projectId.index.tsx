@@ -10,6 +10,7 @@ import {
   useChurnRate,
   type TimeRange,
 } from '@/hooks/use-analytics'
+import { useRevenueByOrigin } from '@/hooks/use-revenue'
 import { usePaymentProviders } from '@/hooks/use-payment-providers'
 import { ProjectOnboardingState } from '@/components/analytics/project-onboarding-state'
 import { GlobeVisualization } from '@/components/overview/globe-visualization'
@@ -59,6 +60,9 @@ function OverviewPage() {
     projectId,
     timeRange,
   )
+
+  // Revenue data
+  const { data: revenueByOriginData } = useRevenueByOrigin(projectId, timeRange)
 
   // Payment provider data
   const { data: providersData } = usePaymentProviders(projectId)
@@ -189,7 +193,7 @@ function OverviewPage() {
 
                 {hasPaymentProvider && (
                   <Link
-                    to="/projects/$projectId/analytics"
+                    to="/projects/$projectId/revenue"
                     params={{ projectId }}
                   >
                     <Button
@@ -236,7 +240,9 @@ function OverviewPage() {
             <TrafficSources
               originData={originData?.data}
               countryData={countryData?.data}
+              revenueByOrigin={revenueByOriginData?.data}
               isLoading={originLoading || countryLoading}
+              showRevenue={hasPaymentProvider}
             />
           </div>
         </div>

@@ -19,10 +19,14 @@ import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Card, CardContent } from '@/components/ui/card'
 import { useVisitorProfile, useIdentifyVisitor } from '@/hooks/use-analytics'
+import { useCustomerProfile } from '@/hooks/use-revenue'
 import { countryCodeToFlag, getCountryName } from '@/lib/country-utils'
 import { IconUser, IconClock, IconWorld, IconLink, IconActivity, IconUserCheck, IconUserPlus, IconMail, IconPhone, IconId } from '@tabler/icons-react'
+import { DollarSign, ShoppingCart, TrendingUp } from 'lucide-react'
 import { toast } from 'sonner'
+import { format } from 'date-fns'
 
 interface VisitorProfileModalProps {
   projectId: string
@@ -75,7 +79,11 @@ export function VisitorProfileModal({
   onOpenChange,
 }: VisitorProfileModalProps) {
   const { data: profile, isLoading } = useVisitorProfile(projectId, visitorId)
+  const { data: customerProfile, isLoading: isLoadingRevenue } = useCustomerProfile(projectId, visitorId)
   const identifyVisitor = useIdentifyVisitor(projectId)
+
+  console.log('[VisitorProfileModal] Customer profile data:', customerProfile)
+  console.log('[VisitorProfileModal] Has payments:', customerProfile?.payment_count)
 
   const [showIdentifyForm, setShowIdentifyForm] = useState(false)
   const [identifyData, setIdentifyData] = useState({
@@ -295,6 +303,197 @@ export function VisitorProfileModal({
                     >
                       {identifyVisitor.isPending ? 'Saving...' : 'Save Customer Information'}
                     </Button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Revenue Information - Always show, even if $0 */}
+            {!isLoadingRevenue && (
+              <div className="rounded-lg border border-green-200 bg-green-50 dark:bg-green-950 dark:border-green-900 p-4">
+                <h3 className="text-sm font-semibold mb-4 text-green-900 dark:text-green-100">Revenue Summary</h3>
+                <div className="grid gap-4 sm:grid-cols-3 mb-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/50">
+                        <DollarSign className="h-4 w-4 text-green-700 dark:text-green-400" />
+                      </div>
+                      <span className="text-xs text-green-700 dark:text-green-300">
+                        Total Revenue
+                      </span>
+                    </div>
+                    <p className="text-2xl font-bold text-green-900 dark:text-green-100">
+                      ${((customerProfile.total_revenue || 0) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/50">
+                        <ShoppingCart className="h-4 w-4 text-green-700 dark:text-green-400" />
+                      </div>
+                      <span className="text-xs text-green-700 dark:text-green-300">
+                        Payment Count
+                      </span>
+                    </div>
+                    <p className="text-2xl font-bold text-green-900 dark:text-green-100">{customerProfile.payment_count || 0}</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/50">
+                        <TrendingUp className="h-4 w-4 text-green-700 dark:text-green-400" />
+                      </div>
+                      <span className="text-xs text-green-700 dark:text-green-300">
+                        Avg Order Value
+                      </span>
+                    </div>
+                    <p className="text-2xl font-bold text-green-900 dark:text-green-100">
+                      ${((customerProfile.avg_order_value || 0) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
+                  </div>
+                </div>
+
+                <Separator className="my-4 bg-green-200 dark:bg-green-900" />
+
+                {/* Revenue Attribution */}
+                {(customerProfile?.payment_count ?? 0) > 0 && (
+                  <div className="space-y-3">
+                    <h4 className="text-sm font-semibold text-green-900 dark:text-green-100">Revenue Attribution</h4>
+                    <div className="space-y-3 rounded-lg border border-green-200 dark:border-green-900 bg-background p-4">
+                      {customerProfile?.first_payment_date && (
+                        <>
+                          <div className="flex items-start gap-3">
+                            <IconClock className="h-4 w-4 text-muted-foreground mt-0.5" />
+                            <div className="flex-1">
+                              <p className="text-xs text-muted-foreground">First Payment</p>
+                              <p className="text-sm font-medium">
+                                {format(new Date(customerProfile.first_payment_date), 'MMM d, yyyy HH:mm')}
+                              </p>
+                            </div>
+                          </div>
+                          <Separator />
+                        </>
+                      )}
+
+                      {customerProfile?.last_payment_date && (
+                        <>
+                          <div className="flex items-start gap-3">
+                            <IconClock className="h-4 w-4 text-muted-foreground mt-0.5" />
+                            <div className="flex-1">
+                              <p className="text-xs text-muted-foreground">Last Payment</p>
+                              <p className="text-sm font-medium">
+                                {format(new Date(customerProfile.last_payment_date), 'MMM d, yyyy HH:mm')}
+                              </p>
+                            </div>
+                          </div>
+                          <Separator />
+                        </>
+                      )}
+
+                      <div className="flex items-start gap-3">
+                        <IconLink className="h-4 w-4 text-muted-foreground mt-0.5" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-muted-foreground">Traffic Origin (First Touch)</p>
+                          <p className="text-sm font-medium truncate">
+                            {customerProfile?.first_traffic_origin || 'Direct'}
+                          </p>
+                        </div>
+                      </div>
+
+                      {customerProfile?.first_utm_source && (
+                        <>
+                          <Separator />
+                          <div className="flex items-start gap-3">
+                            <IconLink className="h-4 w-4 text-muted-foreground mt-0.5" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs text-muted-foreground">UTM Source</p>
+                              <p className="text-sm font-medium truncate">{customerProfile.first_utm_source}</p>
+                            </div>
+                          </div>
+                        </>
+                      )}
+
+                      {customerProfile?.first_utm_medium && (
+                        <>
+                          <Separator />
+                          <div className="flex items-start gap-3">
+                            <IconLink className="h-4 w-4 text-muted-foreground mt-0.5" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs text-muted-foreground">UTM Medium</p>
+                              <p className="text-sm font-medium truncate">{customerProfile.first_utm_medium}</p>
+                            </div>
+                          </div>
+                        </>
+                      )}
+
+                      {customerProfile?.first_utm_campaign && (
+                        <>
+                          <Separator />
+                          <div className="flex items-start gap-3">
+                            <IconLink className="h-4 w-4 text-muted-foreground mt-0.5" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs text-muted-foreground">UTM Campaign</p>
+                              <p className="text-sm font-medium truncate">{customerProfile.first_utm_campaign}</p>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Payment History */}
+                {customerProfile?.payments && customerProfile.payments.length > 0 && (
+                  <div className="mt-4">
+                    <h4 className="text-sm font-semibold mb-2 text-green-900 dark:text-green-100">Payment History</h4>
+                    <div className="rounded-md border border-green-200 dark:border-green-900 max-h-[300px] overflow-y-auto">
+                      <Table>
+                        <TableHeader className="sticky top-0 bg-background z-10">
+                          <TableRow>
+                            <TableHead>Date</TableHead>
+                            <TableHead>Product</TableHead>
+                            <TableHead>Provider</TableHead>
+                            <TableHead className="text-right">Amount</TableHead>
+                            <TableHead>Status</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {customerProfile.payments.map((payment, idx) => (
+                            <TableRow key={idx}>
+                              <TableCell className="text-xs">
+                                {payment.payment_timestamp
+                                  ? format(
+                                      new Date(payment.payment_timestamp),
+                                      'MMM d, yyyy HH:mm',
+                                    )
+                                  : 'N/A'}
+                              </TableCell>
+                              <TableCell className="text-sm">
+                                {payment.product_name || 'N/A'}
+                              </TableCell>
+                              <TableCell className="text-xs">
+                                {payment.provider_type || 'N/A'}
+                              </TableCell>
+                              <TableCell className="text-right font-semibold text-green-600 dark:text-green-400">
+                                ${((payment.amount || 0) / 100).toFixed(2)}
+                              </TableCell>
+                              <TableCell>
+                                <Badge
+                                  variant={
+                                    payment.status === 'succeeded'
+                                      ? 'default'
+                                      : 'secondary'
+                                  }
+                                >
+                                  {payment.status}
+                                </Badge>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
                   </div>
                 )}
               </div>
