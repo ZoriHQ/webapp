@@ -1,8 +1,6 @@
 'use client'
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { useEffect } from 'react'
-import { setupTokenRefresh } from '@/lib/auth'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -28,14 +26,6 @@ const queryClient = new QueryClient({
 })
 
 export function RootLayout({ children }: { children: React.ReactNode }) {
-  useEffect(() => {
-    // Set up automatic token refresh
-    const cleanup = setupTokenRefresh()
-
-    // Clean up on unmount
-    return cleanup
-  }, [])
-
   return (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   )

@@ -4,9 +4,9 @@ import ReactDOM, { type Container } from 'react-dom/client'
 import { RouterProvider } from '@tanstack/react-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { StackProvider, StackTheme } from '@stackframe/react'
 import { createAppRouter } from './router'
-import { getAuthState } from './lib/auth-context'
-import { auth } from './lib/auth'
+import { stackClientApp } from './lib/stack-client'
 import { ThemeProvider } from '@/components/theme-provider'
 import './index.css'
 
@@ -36,36 +36,17 @@ const router = createAppRouter(queryClient)
 
 function RootApp() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-        <RouterProvider router={router} />
-      </ThemeProvider>
-      {import.meta.env.DEV && <ReactQueryDevtools />}
-    </QueryClientProvider>
+    <StackProvider app={stackClientApp}>
+      <StackTheme>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+            <RouterProvider router={router} />
+          </ThemeProvider>
+          {import.meta.env.DEV && <ReactQueryDevtools />}
+        </QueryClientProvider>
+      </StackTheme>
+    </StackProvider>
   )
-}
-
-function setupTokenRefresh() {
-  const checkAndRefreshToken = async () => {
-    const expiry = localStorage.getItem('token_expiry')
-    if (!expiry) return
-
-    const expiryTime = parseInt(expiry, 10)
-    const currentTime = Date.now()
-    const timeUntilExpiry = expiryTime - currentTime
-
-    const refreshThreshold = 5 * 60 * 1000 // 5 minutes
-
-    if (timeUntilExpiry > 0 && timeUntilExpiry <= refreshThreshold) {
-      await auth.refreshAccessToken()
-    }
-  }
-
-  const intervalId = setInterval(checkAndRefreshToken, 60 * 1000)
-
-  checkAndRefreshToken()
-
-  return () => clearInterval(intervalId)
 }
 
 const rootElement = document.getElementById('root')
@@ -74,21 +55,6 @@ if (!rootElement) {
 }
 
 async function initApp() {
-  const cleanup = setupTokenRefresh()
-
-  const authState = await getAuthState()
-
-  router.update({
-    context: {
-      ...router.options.context,
-      auth: authState,
-    },
-  })
-
-  window.addEventListener('beforeunload', () => {
-    cleanup()
-  })
-
   await router.load()
 
   ReactDOM.createRoot(rootElement as Container).render(

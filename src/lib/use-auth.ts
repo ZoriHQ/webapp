@@ -1,80 +1,22 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect } from 'react'
+import { useUser } from '@stackframe/react'
 import { useRouter } from '@tanstack/react-router'
-import { auth } from './auth'
-
-import type Zoriapi from 'zorihq'
+import { useEffect } from 'react'
 
 export interface AuthState {
   isAuthenticated: boolean
   isLoading: boolean
-  account: Zoriapi.V1.Auth.Account | null
-  organization: Zoriapi.V1.Auth.Organization | null
-  accessToken: string | null
+  user: any | null
 }
 
 export function useAuth() {
+  const user = useUser()
   const router = useRouter()
-  const queryClient = useQueryClient()
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['auth-status'],
-    queryFn: async (): Promise<AuthState> => {
-      const token = auth.getAccessToken()
-
-      if (!token) {
-        return {
-          isAuthenticated: false,
-          isLoading: false,
-          account: null,
-          organization: null,
-          accessToken: null,
-        }
-      }
-
-      if (auth.isTokenExpired()) {
-        const refreshedData = await auth.refreshAccessToken()
-
-        if (refreshedData) {
-          return {
-            isAuthenticated: true,
-            isLoading: false,
-            account: refreshedData.account || auth.getAccount(),
-            organization: refreshedData.organization || auth.getOrganization(),
-            accessToken: refreshedData.access_token!,
-          }
-        } else {
-          return {
-            isAuthenticated: false,
-            isLoading: false,
-            account: null,
-            organization: null,
-            accessToken: null,
-          }
-        }
-      }
-
-      return {
-        isAuthenticated: true,
-        isLoading: false,
-        account: auth.getAccount(),
-        organization: auth.getOrganization(),
-        accessToken: token,
-      }
-    },
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 10,
-    refetchInterval: 1000 * 60 * 5,
-    refetchOnWindowFocus: true,
-    retry: false,
-  })
-
-  const invalidateAuth = () => {
-    queryClient.invalidateQueries({ queryKey: ['auth-status'] })
-  }
+  const isAuthenticated = !!user
+  const isLoading = false // Stack manages loading state internally
 
   const checkAuth = () => {
-    return data?.isAuthenticated ?? false
+    return isAuthenticated
   }
 
   const requireAuth = () => {
@@ -86,24 +28,24 @@ export function useAuth() {
   }
 
   const getUser = () => {
-    return data?.account ?? null
+    return user
   }
 
   const getOrganization = () => {
-    return data?.organization ?? null
+    // Stack handles organizations differently - adjust based on your setup
+    return (user as any)?.selectedTeam ?? null
   }
 
   return {
-    isAuthenticated: data?.isAuthenticated ?? false,
+    isAuthenticated,
     isLoading,
-    account: data?.account ?? null,
-    organization: data?.organization ?? null,
-    accessToken: data?.accessToken ?? null,
+    account: user,
+    organization: getOrganization(),
+    user,
     checkAuth,
     requireAuth,
     getUser,
     getOrganization,
-    invalidateAuth,
   }
 }
 

@@ -15,11 +15,7 @@ import { Separator } from '@/components/ui/separator'
 
 export const Route = createFileRoute('/_protected')({
   beforeLoad: async ({ location }) => {
-    const authState = await requireAuthAndOrg({ location })
-
-    return {
-      auth: authState,
-    }
+    await requireAuthAndOrg({ location })
   },
 
   component: ProtectedLayout,

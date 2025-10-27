@@ -2,6 +2,8 @@
 
 import { Loader2Icon } from 'lucide-react'
 import { useAuth, useAuthGuard } from '@/lib/use-auth'
+import { useUser } from '@stackframe/react'
+import { useNavigate } from '@tanstack/react-router'
 import {
   Card,
   CardContent,
@@ -10,7 +12,6 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { useLogout } from '@/lib/use-logout'
 
 export function ProtectedPage() {
   // Protect this page - redirects to login if not authenticated
@@ -18,9 +19,13 @@ export function ProtectedPage() {
 
   // Get auth data
   const { account, organization, isAuthenticated } = useAuth()
+  const stackUser = useUser()
+  const navigate = useNavigate()
 
-  // Logout mutation
-  const logoutMutation = useLogout()
+  const handleLogout = async () => {
+    await stackUser?.signOut()
+    navigate({ to: '/login' })
+  }
 
   // Show loading while checking auth
   if (authLoading) {
@@ -36,27 +41,12 @@ export function ProtectedPage() {
     return null
   }
 
-  const handleLogout = () => {
-    logoutMutation.mutate()
-  }
-
   return (
     <div className="container mx-auto p-6 max-w-4xl">
       <div className="mb-8 flex justify-between items-center">
         <h1 className="text-3xl font-bold">Protected Dashboard</h1>
-        <Button
-          onClick={handleLogout}
-          variant="outline"
-          disabled={logoutMutation.isPending}
-        >
-          {logoutMutation.isPending ? (
-            <>
-              <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-              Logging out...
-            </>
-          ) : (
-            'Logout'
-          )}
+        <Button onClick={handleLogout} variant="outline">
+          Logout
         </Button>
       </div>
 
@@ -71,24 +61,26 @@ export function ProtectedPage() {
             <div>
               <span className="font-medium">Name:</span>{' '}
               <span className="text-muted-foreground">
-                {account?.first_name} {account?.last_name}
+                {(account as any)?.displayName || 'N/A'}
               </span>
             </div>
             <div>
               <span className="font-medium">Email:</span>{' '}
-              <span className="text-muted-foreground">{account?.email}</span>
+              <span className="text-muted-foreground">
+                {(account as any)?.primaryEmail || 'N/A'}
+              </span>
             </div>
             <div>
               <span className="font-medium">Account ID:</span>{' '}
               <span className="text-muted-foreground font-mono text-xs">
-                {account?.id}
+                {account?.id || 'N/A'}
               </span>
             </div>
             <div>
               <span className="font-medium">Created:</span>{' '}
               <span className="text-muted-foreground">
-                {account?.created_at
-                  ? new Date(account.created_at).toLocaleDateString()
+                {(account as any)?.createdAt
+                  ? new Date((account as any).createdAt).toLocaleDateString()
                   : 'N/A'}
               </span>
             </div>

@@ -2,15 +2,12 @@ import { createRouter } from '@tanstack/react-router'
 // eslint-disable-next-line
 import { type QueryClient } from '@tanstack/react-query'
 import { routeTree } from './routeTree.gen'
-// eslint-disable-next-line
-import { type AuthContextState, getAuthState } from './lib/auth-context'
 
 export function createAppRouter(queryClient: QueryClient) {
   const router = createRouter({
     routeTree,
     context: {
       queryClient,
-      auth: undefined as AuthContextState | undefined,
     },
     defaultPreload: 'intent',
     defaultPendingComponent: () => (
@@ -55,15 +52,6 @@ export function createAppRouter(queryClient: QueryClient) {
     },
   })
 
-  getAuthState().then((authState) => {
-    router.update({
-      context: {
-        ...router.options.context,
-        auth: authState,
-      },
-    })
-  })
-
   return router
 }
 
@@ -79,6 +67,5 @@ declare module '@tanstack/react-router' {
   // Define the context that will be available in all routes
   interface RouterContext {
     queryClient: QueryClient
-    auth: AuthContextState | undefined
   }
 }

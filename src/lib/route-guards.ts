@@ -1,10 +1,11 @@
 import { redirect } from '@tanstack/react-router'
-import { getAuthState } from './auth-context'
+import { stackClientApp } from './stack-client'
 
 export async function requireAuth({ location }: { location: any }) {
-  const authState = await getAuthState()
+  // Wait for Stack to be ready
+  const user = await stackClientApp.getUser({ or: 'redirect', to: '/login' })
 
-  if (!authState.isAuthenticated) {
+  if (!user) {
     // Store the attempted location for redirecting after login
     const redirectTo = location.href
     throw redirect({
@@ -15,36 +16,37 @@ export async function requireAuth({ location }: { location: any }) {
     })
   }
 
-  return authState
+  return user
 }
 
 export async function requireGuest({ location }: { location: any }) {
-  const authState = await getAuthState()
+  const user = await stackClientApp.getUser({ or: 'return-null' })
 
-  if (authState.isAuthenticated) {
+  if (user) {
     throw redirect({
-      to: '/',
+      to: '/projects',
     })
   }
 
-  return authState
+  return null
 }
 
 export async function optionalAuth() {
-  const authState = await getAuthState()
-  return authState
+  const user = await stackClientApp.getUser({ or: 'return-null' })
+  return user
 }
 
 export async function requireRole(role: string) {
-  const authState = await getAuthState()
+  const user = await stackClientApp.getUser({ or: 'redirect', to: '/login' })
 
-  if (!authState.isAuthenticated) {
+  if (!user) {
     throw redirect({
       to: '/login',
     })
   }
 
-  const userRole = (authState.account as any)?.role
+  // Stack Auth stores roles differently - adjust based on your setup
+  const userRole = (user as any)?.clientMetadata?.role
 
   if (userRole !== role) {
     throw redirect({
@@ -53,25 +55,25 @@ export async function requireRole(role: string) {
     })
   }
 
-  return authState
+  return user
 }
 
 export async function requireOrganization() {
-  const authState = await getAuthState()
+  const user = await stackClientApp.getUser({ or: 'redirect', to: '/login' })
 
-  if (!authState.isAuthenticated) {
+  if (!user) {
     throw redirect({
       to: '/login',
     })
   }
 
-  return authState
+  return user
 }
 
 export async function requireAuthAndOrg({ location }: { location: any }) {
-  const authState = await getAuthState()
+  const user = await stackClientApp.getUser({ or: 'redirect', to: '/login' })
 
-  if (!authState.isAuthenticated) {
+  if (!user) {
     const redirectTo = location.href
     throw redirect({
       to: '/login',
@@ -81,7 +83,19 @@ export async function requireAuthAndOrg({ location }: { location: any }) {
     })
   }
 
-  return authState
+  // Check if user has a selected team (organization context)
+  if (!user.selectedTeam) {
+    // Redirect to team selection page if no team is selected
+    const redirectTo = location.href
+    throw redirect({
+      to: '/select-team',
+      search: {
+        redirect: redirectTo,
+      },
+    })
+  }
+
+  return user
 }
 
 export function getPostLoginRedirect(search: Record<string, any>): string {

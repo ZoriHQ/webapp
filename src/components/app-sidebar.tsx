@@ -19,8 +19,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const params = useParams({ strict: false })
   const projectId = (params as { projectId?: string })?.projectId
 
-  const userName = (account as any)?.name || account?.email || 'User'
-  const userAvatar = (account as any)?.avatar_url || ''
+  const userName = (account as any)?.displayName || (account as any)?.primaryEmail || 'User'
+  const userAvatar = (account as any)?.profileImageUrl || ''
 
   const secondaryItems = [
     {
@@ -48,7 +48,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavUser
           user={{
             name: userName,
-            email: account?.email || '',
+            email: (account as any)?.primaryEmail || '',
             avatar: userAvatar,
           }}
         />

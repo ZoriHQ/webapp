@@ -34,7 +34,10 @@ export function ProjectSwitcher() {
 
   const handleProjectSwitch = (newProjectId: string) => {
     if (newProjectId) {
-      navigate({ to: `/projects/$projectId`, params: { projectId: newProjectId } })
+      navigate({
+        to: `/projects/$projectId`,
+        params: { projectId: newProjectId },
+      })
     }
   }
 
@@ -48,7 +51,13 @@ export function ProjectSwitcher() {
     const isOnProjectCreationPage = location.pathname === '/projects/new'
     const isOnProjectsListPage = location.pathname === '/projects'
 
-    if (!projectId && projects.length > 0 && !isLoading && !isOnProjectCreationPage && !isOnProjectsListPage) {
+    if (
+      !projectId &&
+      projects.length > 0 &&
+      !isLoading &&
+      !isOnProjectCreationPage &&
+      !isOnProjectsListPage
+    ) {
       const firstProjectId = projects[0]?.id
       if (firstProjectId) {
         handleProjectSwitch(firstProjectId)
@@ -77,9 +86,6 @@ export function ProjectSwitcher() {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <div className="px-2 pb-2">
-          <span className="text-xs font-medium text-muted-foreground">Project</span>
-        </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
@@ -96,7 +102,8 @@ export function ProjectSwitcher() {
                   {currentProject?.name || 'No Project'}
                 </span>
                 <span className="text-muted-foreground truncate text-xs">
-                  {projects.length} {projects.length === 1 ? 'project' : 'projects'}
+                  {projects.length}{' '}
+                  {projects.length === 1 ? 'project' : 'projects'}
                 </span>
               </div>
               <IconChevronDown className="ml-auto size-4" />
