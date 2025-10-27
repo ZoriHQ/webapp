@@ -33,11 +33,14 @@ function NewProjectPage() {
       {
         onSuccess: (data) => {
           toast.success('Project created successfully!')
-          // Navigate to the new project's page
+          // Navigate to the new project's overview page
           if (data.id) {
             navigate({
               to: '/projects/$projectId',
               params: { projectId: data.id },
+            }).then(() => {
+              // Force a page reload to ensure the project data is loaded
+              window.location.reload()
             })
           }
         },

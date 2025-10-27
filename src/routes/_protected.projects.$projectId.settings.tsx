@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { GeneralSettingsTab } from '@/components/settings/general-settings-tab'
 import { IntegrationsTab } from '@/components/settings/integrations-tab'
+import { InstallationTab } from '@/components/settings/installation-tab'
 import { useProject } from '@/hooks/use-projects'
 
 export const Route = createFileRoute('/_protected/projects/$projectId/settings')({
@@ -26,6 +27,9 @@ function ProjectSettings() {
           <TabsTrigger value="general" className="justify-start">
             General
           </TabsTrigger>
+          <TabsTrigger value="installation" className="justify-start">
+            Installation
+          </TabsTrigger>
           <TabsTrigger value="integrations" className="justify-start">
             Integrations
           </TabsTrigger>
@@ -34,6 +38,12 @@ function ProjectSettings() {
         <div className="flex-1 min-w-0">
           <TabsContent value="general" className="mt-0">
             <GeneralSettingsTab projectId={projectId} />
+          </TabsContent>
+
+          <TabsContent value="installation" className="mt-0">
+            {project?.project_token && (
+              <InstallationTab projectToken={project.project_token} />
+            )}
           </TabsContent>
 
           <TabsContent value="integrations" className="mt-0">
