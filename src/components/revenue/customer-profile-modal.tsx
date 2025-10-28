@@ -41,7 +41,7 @@ export function CustomerProfileModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Customer Revenue Profile</DialogTitle>
           <DialogDescription>
@@ -82,14 +82,16 @@ export function CustomerProfileModal({
                 {data.external_id && (
                   <div>
                     <span className="text-muted-foreground">External ID:</span>{' '}
-                    <span className="font-mono text-xs">{data.external_id}</span>
+                    <span className="font-mono text-xs">
+                      {data.external_id}
+                    </span>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Revenue Metrics */}
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
               <Card>
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-2">
@@ -101,7 +103,11 @@ export function CustomerProfileModal({
                     </span>
                   </div>
                   <p className="text-xl font-bold">
-                    ${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    $
+                    {totalRevenue.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
                   </p>
                 </CardContent>
               </Card>
@@ -131,7 +137,11 @@ export function CustomerProfileModal({
                     </span>
                   </div>
                   <p className="text-xl font-bold">
-                    ${avgOrderValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    $
+                    {avgOrderValue.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
                   </p>
                 </CardContent>
               </Card>
