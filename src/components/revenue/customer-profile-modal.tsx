@@ -1,3 +1,5 @@
+import { Calendar, DollarSign, ShoppingCart, TrendingUp } from 'lucide-react'
+import { format } from 'date-fns'
 import { useCustomerProfile } from '@/hooks/use-revenue'
 import {
   Dialog,
@@ -16,8 +18,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { DollarSign, ShoppingCart, Calendar, TrendingUp } from 'lucide-react'
-import { format } from 'date-fns'
 
 interface CustomerProfileModalProps {
   projectId: string

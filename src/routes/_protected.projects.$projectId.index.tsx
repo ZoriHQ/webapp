@@ -1,33 +1,32 @@
-import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
+import {
+  Activity,
+  AlertCircle,
+  DollarSign,
+  TrendingDown,
+  TrendingUp,
+  Users,
+} from 'lucide-react'
+import { Link, createFileRoute } from '@tanstack/react-router'
 import { useProject } from '@/hooks/use-projects'
 import { useAuth } from '@/lib/use-auth'
 import {
-  useVisitorsByCountry,
-  useVisitorsTimeline,
-  useVisitorsByOrigin,
-  useDashboardMetrics,
   useChurnRate,
+  useDashboardMetrics,
+  useVisitorsByCountry,
+  useVisitorsByOrigin,
+  useVisitorsTimeline,
+  // eslint-disable-next-line
   type TimeRange,
 } from '@/hooks/use-analytics'
-import { useRevenueByOrigin } from '@/hooks/use-revenue'
+import { useRevenueByOrigin, useRevenueDashboard } from '@/hooks/use-revenue'
 import { usePaymentProviders } from '@/hooks/use-payment-providers'
 import { ProjectOnboardingState } from '@/components/analytics/project-onboarding-state'
 import { GlobeVisualization } from '@/components/overview/globe-visualization'
 import { VisitorTimeline } from '@/components/overview/visitor-timeline'
 import { TrafficSources } from '@/components/analytics/traffic-sources'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
-import {
-  AlertCircle,
-  TrendingUp,
-  TrendingDown,
-  DollarSign,
-  Users,
-  Activity,
-} from 'lucide-react'
+
 import { Button } from '@/components/ui/button'
-import { Link } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_protected/projects/$projectId/')({
   component: OverviewPage,
@@ -61,23 +60,19 @@ function OverviewPage() {
     timeRange,
   )
 
-  // Revenue data
+  const { data: revenueDashboardData } = useRevenueDashboard(
+    projectId,
+    timeRange,
+  )
+
   const { data: revenueByOriginData } = useRevenueByOrigin(projectId, timeRange)
 
-  // Payment provider data
   const { data: providersData } = usePaymentProviders(projectId)
   const hasPaymentProvider = (providersData?.providers?.length || 0) > 0
 
-  // Check if project has received any events
   const hasNoEvents = !projectData?.first_event_received_at && !projectLoading
 
-  // Get user name
-  const userName =
-    (account as any)?.name?.split(' ')[0] ||
-    account?.email?.split('@')[0] ||
-    'there'
-
-  // Get current time for greeting
+  const userName = (account as any)?.name?.split(' ')[0] || 'there'
   const currentHour = new Date().getHours()
   let greeting = 'Good evening'
   if (currentHour < 12) {
@@ -86,21 +81,18 @@ function OverviewPage() {
     greeting = 'Good afternoon'
   }
 
-  // Get current time
   const currentTime = new Date().toLocaleTimeString('en-US', {
     hour: 'numeric',
     minute: '2-digit',
     hour12: true,
   })
 
-  // Calculate today's metrics
   const todayVisits = metricsData?.unique_visitors || 0
-  const todayRevenue = metricsData?.revenue || 0
-  const churnRate = churnData?.churn_rate || 0
+  const todayRevenue = revenueDashboardData?.total_revenue || 0
+  const churnRate = churnData?.churn_rate_percent || 0
 
   return (
     <>
-      {/* Show empty state if no events have been received */}
       {hasNoEvents ? (
         <ProjectOnboardingState
           projectId={projectId}
@@ -108,11 +100,8 @@ function OverviewPage() {
         />
       ) : (
         <div className="space-y-6">
-          {/* Hero Section with Globe */}
           <div className="flex flex-col lg:flex-row gap-8 items-start">
-            {/* Left side - Welcome and Stats */}
             <div className="w-full lg:w-1/2 space-y-8 pt-20 lg:pl-12 xl:pl-16">
-              {/* Greeting */}
               <div className="space-y-3">
                 <h1 className="text-4xl font-bold tracking-tight">
                   {greeting},
@@ -125,9 +114,7 @@ function OverviewPage() {
                 </p>
               </div>
 
-              {/* Key Metrics Chips */}
               <div className="flex flex-wrap gap-2 max-w-md">
-                {/* Payment Provider Warning or Revenue */}
                 {!hasPaymentProvider ? (
                   <Link
                     to="/projects/$projectId/settings"
@@ -153,7 +140,6 @@ function OverviewPage() {
                   </div>
                 )}
 
-                {/* Total Visits Today */}
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/50">
                   <Users className="h-3.5 w-3.5 text-blue-600 dark:text-blue-500" />
                   <span className="text-xs font-semibold text-blue-700 dark:text-blue-300">
@@ -164,7 +150,6 @@ function OverviewPage() {
                   </span>
                 </div>
 
-                {/* Churn Rate */}
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-900/50">
                   <Activity className="h-3.5 w-3.5 text-purple-600 dark:text-purple-500" />
                   <span className="text-xs font-semibold text-purple-700 dark:text-purple-300">
@@ -176,7 +161,6 @@ function OverviewPage() {
                 </div>
               </div>
 
-              {/* CTA Buttons */}
               <div className="flex flex-wrap gap-3">
                 <Link
                   to="/projects/$projectId/analytics"
@@ -221,7 +205,6 @@ function OverviewPage() {
               </div>
             </div>
 
-            {/* Right side - Globe */}
             <div className="w-full lg:w-1/2 lg:sticky lg:top-6">
               <GlobeVisualization
                 countryData={countryData?.data}
@@ -230,7 +213,6 @@ function OverviewPage() {
             </div>
           </div>
 
-          {/* Visitor Timeline and Traffic Sources */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <VisitorTimeline
               data={timelineData?.data}

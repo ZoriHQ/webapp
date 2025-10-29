@@ -1,5 +1,7 @@
+import { ChevronLeft, ChevronRight, Search } from 'lucide-react'
+import { useNavigate } from '@tanstack/react-router'
 import type Zoriapi from 'zorihq'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card } from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -17,8 +19,6 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { countryCodeToFlag } from '@/lib/country-utils'
-import { ChevronLeft, ChevronRight, Search } from 'lucide-react'
-import { useNavigate } from '@tanstack/react-router'
 
 interface LiveEventStreamProps {
   events: Array<Zoriapi.V1.Analytics.RecentEvent> | undefined

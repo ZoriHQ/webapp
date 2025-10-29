@@ -17,9 +17,10 @@ import {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { account } = useAuth()
   const params = useParams({ strict: false })
-  const projectId = (params as { projectId?: string })?.projectId
+  const projectId = (params as { projectId?: string }).projectId
 
-  const userName = (account as any)?.displayName || (account as any)?.primaryEmail || 'User'
+  const userName =
+    (account as any)?.displayName || (account as any)?.primaryEmail || 'User'
   const userAvatar = (account as any)?.profileImageUrl || ''
 
   const secondaryItems = [
