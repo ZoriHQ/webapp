@@ -33,7 +33,8 @@ export const providerGuides = {
     webhookSecretInstructions:
       'Create a webhook and copy the webhook ID from PayPal Dashboard',
     docsUrl: 'https://developer.paypal.com/api/rest/',
-    webhookDocsUrl: 'https://developer.paypal.com/docs/api-basics/notifications/webhooks/',
+    webhookDocsUrl:
+      'https://developer.paypal.com/docs/api-basics/notifications/webhooks/',
   },
   lemon_squeezy: {
     apiKeyLabel: 'API Key',

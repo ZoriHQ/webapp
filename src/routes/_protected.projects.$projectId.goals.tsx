@@ -1,7 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { IconPlus, IconTarget } from '@tabler/icons-react'
 import { useProject } from '@/hooks/use-projects'
-import { IconTarget, IconPlus } from '@tabler/icons-react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
 export const Route = createFileRoute('/_protected/projects/$projectId/goals')({
@@ -34,8 +40,8 @@ function GoalsPage() {
           </div>
           <CardTitle>Goals Coming Soon</CardTitle>
           <CardDescription className="max-w-md mx-auto">
-            We're building a powerful goal tracking system that will help you set
-            and monitor custom conversion goals based on your events.
+            We're building a powerful goal tracking system that will help you
+            set and monitor custom conversion goals based on your events.
           </CardDescription>
         </CardHeader>
         <CardContent className="text-center pb-8">

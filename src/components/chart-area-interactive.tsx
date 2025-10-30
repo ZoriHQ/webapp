@@ -1,10 +1,11 @@
 'use client'
 
 import * as React from 'react'
-import type Zoriapi from 'zorihq'
 import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts'
+import type Zoriapi from 'zorihq'
 
 import type { ChartConfig } from '@/components/ui/chart'
+import type { TimeRange } from '@/hooks/use-analytics'
 import {
   Card,
   CardContent,
@@ -17,7 +18,6 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart'
-import type { TimeRange } from '@/hooks/use-analytics'
 
 export const description = 'An interactive area chart'
 
@@ -36,7 +36,7 @@ const chartConfig = {
 } satisfies ChartConfig
 
 interface ChartAreaInteractiveProps {
-  data?: Zoriapi.V1.Analytics.UniqueVisitorsDataPoint[]
+  data?: Array<Zoriapi.V1.Analytics.UniqueVisitorsDataPoint>
   isLoading?: boolean
   timeRange: TimeRange
 }
@@ -62,7 +62,10 @@ export function ChartAreaInteractive({
     }
 
     // For multi-day periods (last_7_days, last_30_days, last_90_days), aggregate by day
-    const aggregatedByDay = new Map<string, { desktop: number; mobile: number }>()
+    const aggregatedByDay = new Map<
+      string,
+      { desktop: number; mobile: number }
+    >()
 
     data.forEach((item) => {
       if (!item.timestamp) return
@@ -92,9 +95,19 @@ export function ChartAreaInteractive({
 
   // Calculate key metrics from chart data
   const metrics = React.useMemo(() => {
-    if (!hasData) return { total: 0, desktop: 0, mobile: 0, desktopPercent: 0, mobilePercent: 0 }
+    if (!hasData)
+      return {
+        total: 0,
+        desktop: 0,
+        mobile: 0,
+        desktopPercent: 0,
+        mobilePercent: 0,
+      }
 
-    const total = chartData.reduce((sum, item) => sum + item.desktop + item.mobile, 0)
+    const total = chartData.reduce(
+      (sum, item) => sum + item.desktop + item.mobile,
+      0,
+    )
     const desktop = chartData.reduce((sum, item) => sum + item.desktop, 0)
     const mobile = chartData.reduce((sum, item) => sum + item.mobile, 0)
 
@@ -124,19 +137,29 @@ export function ChartAreaInteractive({
             <div className="flex flex-wrap gap-4 text-sm">
               <div className="flex items-center gap-2">
                 <span className="text-muted-foreground">Total:</span>
-                <span className="font-semibold">{metrics.total.toLocaleString()}</span>
+                <span className="font-semibold">
+                  {metrics.total.toLocaleString()}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-sm bg-[hsl(217,91%,60%)]" />
                 <span className="text-muted-foreground">Desktop:</span>
-                <span className="font-semibold">{metrics.desktop.toLocaleString()}</span>
-                <span className="text-muted-foreground text-xs">({metrics.desktopPercent.toFixed(1)}%)</span>
+                <span className="font-semibold">
+                  {metrics.desktop.toLocaleString()}
+                </span>
+                <span className="text-muted-foreground text-xs">
+                  ({metrics.desktopPercent.toFixed(1)}%)
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-sm bg-[hsl(32,98%,56%)]" />
                 <span className="text-muted-foreground">Mobile:</span>
-                <span className="font-semibold">{metrics.mobile.toLocaleString()}</span>
-                <span className="text-muted-foreground text-xs">({metrics.mobilePercent.toFixed(1)}%)</span>
+                <span className="font-semibold">
+                  {metrics.mobile.toLocaleString()}
+                </span>
+                <span className="text-muted-foreground text-xs">
+                  ({metrics.mobilePercent.toFixed(1)}%)
+                </span>
               </div>
             </div>
           )}
@@ -145,7 +168,9 @@ export function ChartAreaInteractive({
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         {isLoading ? (
           <div className="flex items-center justify-center h-[250px]">
-            <p className="text-sm text-muted-foreground">Loading chart data...</p>
+            <p className="text-sm text-muted-foreground">
+              Loading chart data...
+            </p>
           </div>
         ) : !hasData ? (
           <div className="flex flex-col items-center justify-center h-[250px] text-center">
@@ -162,98 +187,98 @@ export function ChartAreaInteractive({
             className="aspect-auto h-[250px] w-full"
           >
             <AreaChart data={chartData}>
-            <defs>
-              <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-desktop)"
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-desktop)"
-                  stopOpacity={0.2}
-                />
-              </linearGradient>
-              <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-mobile)"
-                  stopOpacity={0.6}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-mobile)"
-                  stopOpacity={0.2}
-                />
-              </linearGradient>
-            </defs>
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="date"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              minTickGap={32}
-              tickFormatter={(value) => {
-                const date = new Date(value)
-                // For hourly data (last_hour, today), show time
-                if (timeRange === 'last_hour' || timeRange === 'today') {
-                  return date.toLocaleTimeString('en-US', {
-                    hour: 'numeric',
-                    minute: '2-digit',
-                    hour12: true,
+              <defs>
+                <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
+                  <stop
+                    offset="5%"
+                    stopColor="var(--color-desktop)"
+                    stopOpacity={0.8}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor="var(--color-desktop)"
+                    stopOpacity={0.2}
+                  />
+                </linearGradient>
+                <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
+                  <stop
+                    offset="5%"
+                    stopColor="var(--color-mobile)"
+                    stopOpacity={0.6}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor="var(--color-mobile)"
+                    stopOpacity={0.2}
+                  />
+                </linearGradient>
+              </defs>
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="date"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                minTickGap={32}
+                tickFormatter={(value) => {
+                  const date = new Date(value)
+                  // For hourly data (last_hour, today), show time
+                  if (timeRange === 'last_hour' || timeRange === 'today') {
+                    return date.toLocaleTimeString('en-US', {
+                      hour: 'numeric',
+                      minute: '2-digit',
+                      hour12: true,
+                    })
+                  }
+                  // For daily/weekly/monthly data, show date
+                  return date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
                   })
-                }
-                // For daily/weekly/monthly data, show date
-                return date.toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                })
-              }}
-            />
-            <ChartTooltip
-              cursor={false}
-              content={
-                <ChartTooltipContent
-                  labelFormatter={(value) => {
-                    const date = new Date(value)
-                    // For hourly data (last_hour, today), show full date + time
-                    if (timeRange === 'last_hour' || timeRange === 'today') {
-                      return date.toLocaleString('en-US', {
+                }}
+              />
+              <ChartTooltip
+                cursor={false}
+                content={
+                  <ChartTooltipContent
+                    labelFormatter={(value) => {
+                      const date = new Date(value)
+                      // For hourly data (last_hour, today), show full date + time
+                      if (timeRange === 'last_hour' || timeRange === 'today') {
+                        return date.toLocaleString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          hour: 'numeric',
+                          minute: '2-digit',
+                          hour12: true,
+                        })
+                      }
+                      // For daily/weekly/monthly data, show date only
+                      return date.toLocaleDateString('en-US', {
                         month: 'short',
                         day: 'numeric',
-                        hour: 'numeric',
-                        minute: '2-digit',
-                        hour12: true,
                       })
-                    }
-                    // For daily/weekly/monthly data, show date only
-                    return date.toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                    })
-                  }}
-                  indicator="dot"
-                />
-              }
-            />
-            <Area
-              dataKey="mobile"
-              type="monotone"
-              fill="url(#fillMobile)"
-              stroke="var(--color-mobile)"
-              strokeWidth={2}
-              stackId="a"
-            />
-            <Area
-              dataKey="desktop"
-              type="monotone"
-              fill="url(#fillDesktop)"
-              stroke="var(--color-desktop)"
-              strokeWidth={2}
-              stackId="a"
-            />
+                    }}
+                    indicator="dot"
+                  />
+                }
+              />
+              <Area
+                dataKey="mobile"
+                type="monotone"
+                fill="url(#fillMobile)"
+                stroke="var(--color-mobile)"
+                strokeWidth={2}
+                stackId="a"
+              />
+              <Area
+                dataKey="desktop"
+                type="monotone"
+                fill="url(#fillDesktop)"
+                stroke="var(--color-desktop)"
+                strokeWidth={2}
+                stackId="a"
+              />
             </AreaChart>
           </ChartContainer>
         )}

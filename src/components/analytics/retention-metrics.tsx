@@ -1,9 +1,5 @@
+import { IconArrowBackUp, IconClock, IconUserMinus } from '@tabler/icons-react'
 import type Zoriapi from 'zorihq'
-import {
-  IconArrowBackUp,
-  IconUserMinus,
-  IconClock,
-} from '@tabler/icons-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface RetentionMetricsProps {
@@ -28,7 +24,11 @@ function formatHours(hours: number | undefined): string {
   return remainingHours > 0 ? `${days}d ${remainingHours}h` : `${days}d`
 }
 
-export function RetentionMetrics({ churnData, returnData, isLoading }: RetentionMetricsProps) {
+export function RetentionMetrics({
+  churnData,
+  returnData,
+  isLoading,
+}: RetentionMetricsProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {/* Churn Rate */}
@@ -39,7 +39,9 @@ export function RetentionMetrics({ churnData, returnData, isLoading }: Retention
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="text-2xl font-bold text-muted-foreground">Loading...</div>
+            <div className="text-2xl font-bold text-muted-foreground">
+              Loading...
+            </div>
           ) : churnData ? (
             <>
               <div className="text-2xl font-bold text-red-600 dark:text-red-400">
@@ -69,7 +71,9 @@ export function RetentionMetrics({ churnData, returnData, isLoading }: Retention
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="text-2xl font-bold text-muted-foreground">Loading...</div>
+            <div className="text-2xl font-bold text-muted-foreground">
+              Loading...
+            </div>
           ) : returnData ? (
             <>
               <div className="text-2xl font-bold text-green-600 dark:text-green-400">
@@ -89,12 +93,16 @@ export function RetentionMetrics({ churnData, returnData, isLoading }: Retention
       {/* Average Time Between Sessions */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Avg Time Between Visits</CardTitle>
+          <CardTitle className="text-sm font-medium">
+            Avg Time Between Visits
+          </CardTitle>
           <IconClock className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="text-2xl font-bold text-muted-foreground">Loading...</div>
+            <div className="text-2xl font-bold text-muted-foreground">
+              Loading...
+            </div>
           ) : returnData?.avg_time_between_sessions_hours !== undefined ? (
             <>
               <div className="text-2xl font-bold">

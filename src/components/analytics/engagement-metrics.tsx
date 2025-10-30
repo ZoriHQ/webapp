@@ -1,23 +1,24 @@
-import type Zoriapi from 'zorihq'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import {
-  IconUsers,
   IconActivity,
-  IconPercentage,
+  IconArrowBackUp,
+  IconCheck,
   IconClock,
   IconFileText,
-  IconUserCheck,
-  IconArrowBackUp,
-  IconUserMinus,
+  IconPercentage,
   IconSettings,
-  IconCheck,
+  IconUserCheck,
+  IconUserMinus,
+  IconUsers,
 } from '@tabler/icons-react'
+import type Zoriapi from 'zorihq'
+import type { MetricType } from '@/lib/metrics-config'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
-  DropdownMenuContent,
   DropdownMenuCheckboxItem,
+  DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -25,9 +26,8 @@ import {
 import {
   AVAILABLE_METRICS,
   loadMetricsPreferences,
-  saveMetricsPreferences,
   resetMetricsPreferences,
-  type MetricType,
+  saveMetricsPreferences,
 } from '@/lib/metrics-config'
 
 interface EngagementMetricsProps {
@@ -61,7 +61,9 @@ function formatDuration(seconds: number | undefined): string {
   const remainingSeconds = Math.round(seconds % 60)
 
   if (minutes < 60) {
-    return remainingSeconds > 0 ? `${minutes}m ${remainingSeconds}s` : `${minutes}m`
+    return remainingSeconds > 0
+      ? `${minutes}m ${remainingSeconds}s`
+      : `${minutes}m`
   }
 
   const hours = Math.floor(minutes / 60)
@@ -108,10 +110,14 @@ function MetricCard({
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          <div className="text-2xl font-bold text-muted-foreground">Loading...</div>
+          <div className="text-2xl font-bold text-muted-foreground">
+            Loading...
+          </div>
         ) : (
           <>
-            <div className={`text-2xl font-bold ${valueClassName || ''}`}>{value}</div>
+            <div className={`text-2xl font-bold ${valueClassName || ''}`}>
+              {value}
+            </div>
             <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
           </>
         )}
@@ -133,7 +139,7 @@ export function EngagementMetrics({
   returnData,
   isLoading = false,
 }: EngagementMetricsProps) {
-  const [enabledMetrics, setEnabledMetrics] = useState<MetricType[]>([])
+  const [enabledMetrics, setEnabledMetrics] = useState<Array<MetricType>>([])
 
   useEffect(() => {
     setEnabledMetrics(loadMetricsPreferences())
@@ -141,7 +147,7 @@ export function EngagementMetrics({
 
   const handleToggleMetric = (metricId: MetricType) => {
     const newMetrics = enabledMetrics.includes(metricId)
-      ? enabledMetrics.filter(id => id !== metricId)
+      ? enabledMetrics.filter((id) => id !== metricId)
       : [...enabledMetrics, metricId]
 
     setEnabledMetrics(newMetrics)
@@ -201,7 +207,7 @@ export function EngagementMetrics({
             <DropdownMenuLabel>Visible Metrics</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <div className="max-h-[400px] overflow-y-auto">
-              {AVAILABLE_METRICS.map(metric => (
+              {AVAILABLE_METRICS.map((metric) => (
                 <DropdownMenuCheckboxItem
                   key={metric.id}
                   checked={isEnabled(metric.id)}
@@ -268,26 +274,28 @@ export function EngagementMetrics({
         )}
 
         {/* Avg Session Duration */}
-        {isEnabled('avgSessionDuration') && avgSessionDuration !== undefined && (
-          <MetricCard
-            title="Avg Session Duration"
-            icon={IconClock}
-            value={formatDuration(avgSessionDuration)}
-            subtitle="Average time on site"
-            isLoading={isLoading}
-          />
-        )}
+        {isEnabled('avgSessionDuration') &&
+          avgSessionDuration !== undefined && (
+            <MetricCard
+              title="Avg Session Duration"
+              icon={IconClock}
+              value={formatDuration(avgSessionDuration)}
+              subtitle="Average time on site"
+              isLoading={isLoading}
+            />
+          )}
 
         {/* Pages per Session */}
-        {isEnabled('avgPagesPerSession') && avgPagesPerSession !== undefined && (
-          <MetricCard
-            title="Pages / Session"
-            icon={IconFileText}
-            value={avgPagesPerSession.toFixed(1)}
-            subtitle="Average pages viewed"
-            isLoading={isLoading}
-          />
-        )}
+        {isEnabled('avgPagesPerSession') &&
+          avgPagesPerSession !== undefined && (
+            <MetricCard
+              title="Pages / Session"
+              icon={IconFileText}
+              value={avgPagesPerSession.toFixed(1)}
+              subtitle="Average pages viewed"
+              isLoading={isLoading}
+            />
+          )}
 
         {/* Daily Active Users */}
         {isEnabled('dau') && dau !== undefined && (
@@ -331,7 +339,9 @@ export function EngagementMetrics({
             </CardHeader>
             <CardContent>
               {isLoading ? (
-                <div className="text-2xl font-bold text-muted-foreground">Loading...</div>
+                <div className="text-2xl font-bold text-muted-foreground">
+                  Loading...
+                </div>
               ) : (
                 <>
                   <div className="text-2xl font-bold text-red-600 dark:text-red-400">
@@ -356,7 +366,9 @@ export function EngagementMetrics({
             </CardHeader>
             <CardContent>
               {isLoading ? (
-                <div className="text-2xl font-bold text-muted-foreground">Loading...</div>
+                <div className="text-2xl font-bold text-muted-foreground">
+                  Loading...
+                </div>
               ) : (
                 <>
                   <div className="text-2xl font-bold text-green-600 dark:text-green-400">
@@ -373,26 +385,33 @@ export function EngagementMetrics({
         )}
 
         {/* Avg Time Between Visits */}
-        {isEnabled('avgTimeBetweenVisits') && returnData?.avg_time_between_sessions_hours !== undefined && (
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Avg Time Between Visits</CardTitle>
-              <IconClock className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              {isLoading ? (
-                <div className="text-2xl font-bold text-muted-foreground">Loading...</div>
-              ) : (
-                <>
-                  <div className="text-2xl font-bold">
-                    {formatHours(returnData.avg_time_between_sessions_hours)}
+        {isEnabled('avgTimeBetweenVisits') &&
+          returnData?.avg_time_between_sessions_hours !== undefined && (
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Avg Time Between Visits
+                </CardTitle>
+                <IconClock className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                {isLoading ? (
+                  <div className="text-2xl font-bold text-muted-foreground">
+                    Loading...
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">Average return interval</p>
-                </>
-              )}
-            </CardContent>
-          </Card>
-        )}
+                ) : (
+                  <>
+                    <div className="text-2xl font-bold">
+                      {formatHours(returnData.avg_time_between_sessions_hours)}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Average return interval
+                    </p>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          )}
       </div>
     </div>
   )

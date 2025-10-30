@@ -1,15 +1,15 @@
-import type Zoriapi from 'zorihq'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Area,
   AreaChart,
   CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
-  ResponsiveContainer,
 } from 'recharts'
 import { format } from 'date-fns'
+import type Zoriapi from 'zorihq'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface RevenueTimelineChartProps {
   data: Zoriapi.V1.Revenue.TimelineResponse | undefined
@@ -64,7 +64,13 @@ export function RevenueTimelineChart({
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={chartData}>
               <defs>
-                <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient
+                  id="revenueGradient"
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
                   <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
                   <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                 </linearGradient>

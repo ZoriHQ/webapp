@@ -26,7 +26,7 @@ interface RevenueSource {
 }
 
 interface RevenueAttributionProps {
-  revenueData: RevenueSource[]
+  revenueData: Array<RevenueSource>
   hasData?: boolean
   showToggle?: boolean
   onToggle?: () => void
@@ -112,10 +112,10 @@ export function RevenueAttribution({
               <div className="mt-4 p-4 bg-muted/50 rounded-lg border border-dashed">
                 <p className="text-sm text-muted-foreground">
                   <strong>How it works:</strong> Zori tracks each visitor with a
-                  unique ID. When you pass this ID to Stripe or LemonSqueezy payment
-                  metadata, we automatically attribute the revenue to the customer
-                  and their original traffic source. This helps you understand your
-                  true ROI.
+                  unique ID. When you pass this ID to Stripe or LemonSqueezy
+                  payment metadata, we automatically attribute the revenue to
+                  the customer and their original traffic source. This helps you
+                  understand your true ROI.
                 </p>
               </div>
             </>

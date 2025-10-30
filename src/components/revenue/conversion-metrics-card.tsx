@@ -1,3 +1,4 @@
+import { Clock, DollarSign, RefreshCw, TrendingUp, Users } from 'lucide-react'
 import type Zoriapi from 'zorihq'
 import {
   Card,
@@ -6,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { TrendingUp, Clock, DollarSign, RefreshCw, Users } from 'lucide-react'
 
 interface ConversionMetricsCardProps {
   data: Zoriapi.V1.Revenue.ConversionMetricsResponse | undefined
@@ -89,7 +89,9 @@ export function ConversionMetricsCard({
               <div key={metric.label} className="space-y-2">
                 <div className="flex items-center gap-2">
                   <div className={`p-1.5 rounded-md ${metric.bgColor}`}>
-                    <metric.icon className={`h-3.5 w-3.5 ${metric.iconColor}`} />
+                    <metric.icon
+                      className={`h-3.5 w-3.5 ${metric.iconColor}`}
+                    />
                   </div>
                   <p className="text-xs font-medium text-muted-foreground">
                     {metric.label}

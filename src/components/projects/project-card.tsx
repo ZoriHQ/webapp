@@ -241,11 +241,7 @@ export function ProjectCard({
               params={{ projectId: project.id }}
               className="flex-1"
             >
-              <Button
-                variant="default"
-                size="sm"
-                className="w-full"
-              >
+              <Button variant="default" size="sm" className="w-full">
                 <IconChartLine className="mr-2 h-4 w-4" />
                 View Analytics
               </Button>

@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react'
-import { IconEye, IconEyeOff, IconExternalLink } from '@tabler/icons-react'
+import { useEffect, useState } from 'react'
+import { IconExternalLink, IconEye, IconEyeOff } from '@tabler/icons-react'
+import { toast } from 'sonner'
+import type Zoriapi from 'zorihq'
 import {
   Dialog,
   DialogContent,
@@ -15,8 +17,6 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useUpdatePaymentProvider } from '@/hooks/use-payment-providers'
 import { getProviderName } from '@/lib/payment-provider-icons'
 import { getProviderGuide } from '@/lib/provider-guides'
-import { toast } from 'sonner'
-import type Zoriapi from 'zorihq'
 
 interface EditProviderDialogProps {
   open: boolean
@@ -58,7 +58,9 @@ export function EditProviderDialog({
         webhook_secret: webhookSecret,
       })
 
-      toast.success(`${getProviderName(provider.provider_type)} updated successfully`)
+      toast.success(
+        `${getProviderName(provider.provider_type)} updated successfully`,
+      )
 
       // Reset form and close dialog
       setApiKey('')
@@ -72,17 +74,22 @@ export function EditProviderDialog({
     }
   }
 
-  const guide = provider?.provider_type ? getProviderGuide(provider.provider_type) : null
+  const guide = provider?.provider_type
+    ? getProviderGuide(provider.provider_type)
+    : null
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>
-            Edit {provider ? getProviderName(provider.provider_type) : 'Provider'}
+            Edit{' '}
+            {provider ? getProviderName(provider.provider_type) : 'Provider'}
           </DialogTitle>
           <DialogDescription>
-            Update your {provider ? getProviderName(provider.provider_type) : 'provider'} credentials
+            Update your{' '}
+            {provider ? getProviderName(provider.provider_type) : 'provider'}{' '}
+            credentials
           </DialogDescription>
         </DialogHeader>
 
@@ -105,7 +112,8 @@ export function EditProviderDialog({
                     )}
                   </div>
                   <div>
-                    <strong>Webhook Secret:</strong> {guide.webhookSecretInstructions}
+                    <strong>Webhook Secret:</strong>{' '}
+                    {guide.webhookSecretInstructions}
                     {guide.webhookDocsUrl && (
                       <a
                         href={guide.webhookDocsUrl}
@@ -138,18 +146,26 @@ export function EditProviderDialog({
                 onClick={() => setShowApiKey(!showApiKey)}
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
-                {showApiKey ? <IconEyeOff className="h-4 w-4" /> : <IconEye className="h-4 w-4" />}
+                {showApiKey ? (
+                  <IconEyeOff className="h-4 w-4" />
+                ) : (
+                  <IconEye className="h-4 w-4" />
+                )}
               </button>
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="webhookSecret">{guide?.webhookSecretLabel || 'Webhook Secret'} *</Label>
+            <Label htmlFor="webhookSecret">
+              {guide?.webhookSecretLabel || 'Webhook Secret'} *
+            </Label>
             <div className="relative">
               <Input
                 id="webhookSecret"
                 type={showWebhookSecret ? 'text' : 'password'}
-                placeholder={guide?.webhookSecretPlaceholder || 'Enter webhook secret'}
+                placeholder={
+                  guide?.webhookSecretPlaceholder || 'Enter webhook secret'
+                }
                 value={webhookSecret}
                 onChange={(e) => setWebhookSecret(e.target.value)}
                 className="pr-10"
@@ -159,7 +175,11 @@ export function EditProviderDialog({
                 onClick={() => setShowWebhookSecret(!showWebhookSecret)}
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
-                {showWebhookSecret ? <IconEyeOff className="h-4 w-4" /> : <IconEye className="h-4 w-4" />}
+                {showWebhookSecret ? (
+                  <IconEyeOff className="h-4 w-4" />
+                ) : (
+                  <IconEye className="h-4 w-4" />
+                )}
               </button>
             </div>
           </div>

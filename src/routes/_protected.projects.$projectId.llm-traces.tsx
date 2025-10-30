@@ -1,7 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useProject } from '@/hooks/use-projects'
 import { IconBrain, IconPlus } from '@tabler/icons-react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useProject } from '@/hooks/use-projects'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
 export const Route = createFileRoute(
@@ -20,7 +26,8 @@ function LLMTracesPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">LLM Traces</h1>
           <p className="text-muted-foreground">
-            Track LLM usage and expenses for {projectData?.name || 'your project'}
+            Track LLM usage and expenses for{' '}
+            {projectData?.name || 'your project'}
           </p>
         </div>
         <Button disabled>
@@ -36,8 +43,8 @@ function LLMTracesPage() {
           </div>
           <CardTitle>LLM Traces Coming Soon</CardTitle>
           <CardDescription className="max-w-md mx-auto">
-            We're building a comprehensive LLM tracking system that will help you
-            monitor usage, costs, and performance of your AI integrations.
+            We're building a comprehensive LLM tracking system that will help
+            you monitor usage, costs, and performance of your AI integrations.
           </CardDescription>
         </CardHeader>
         <CardContent className="text-center pb-8">

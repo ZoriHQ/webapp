@@ -1,12 +1,12 @@
 import {
-  IconUsers,
+  IconActivity,
   IconCash,
-  IconTrendingUp,
-  IconPercentage,
   IconClock,
   IconFileText,
-  IconActivity,
+  IconPercentage,
+  IconTrendingUp,
   IconUserCheck,
+  IconUsers,
 } from '@tabler/icons-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -45,7 +45,9 @@ function formatDuration(seconds: number | undefined): string {
   const remainingSeconds = Math.round(seconds % 60)
 
   if (minutes < 60) {
-    return remainingSeconds > 0 ? `${minutes}m ${remainingSeconds}s` : `${minutes}m`
+    return remainingSeconds > 0
+      ? `${minutes}m ${remainingSeconds}s`
+      : `${minutes}m`
   }
 
   const hours = Math.floor(minutes / 60)
@@ -68,7 +70,8 @@ export function MetricsOverview({
   conversionRate,
   isLoading = false,
 }: MetricsOverviewProps) {
-  const hasRevenueMetrics = totalRevenue !== undefined || totalConversions !== undefined
+  const hasRevenueMetrics =
+    totalRevenue !== undefined || totalConversions !== undefined
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -76,12 +79,16 @@ export function MetricsOverview({
       {uniqueVisitors !== undefined && (
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Unique Visitors</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Unique Visitors
+            </CardTitle>
             <IconUsers className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <div className="text-2xl font-bold text-muted-foreground">Loading...</div>
+              <div className="text-2xl font-bold text-muted-foreground">
+                Loading...
+              </div>
             ) : (
               <>
                 <div className="text-2xl font-bold">
@@ -100,12 +107,16 @@ export function MetricsOverview({
       {totalSessions !== undefined && (
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Sessions</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Sessions
+            </CardTitle>
             <IconActivity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <div className="text-2xl font-bold text-muted-foreground">Loading...</div>
+              <div className="text-2xl font-bold text-muted-foreground">
+                Loading...
+              </div>
             ) : (
               <>
                 <div className="text-2xl font-bold">
@@ -129,7 +140,9 @@ export function MetricsOverview({
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <div className="text-2xl font-bold text-muted-foreground">Loading...</div>
+              <div className="text-2xl font-bold text-muted-foreground">
+                Loading...
+              </div>
             ) : (
               <>
                 <div className="text-2xl font-bold">
@@ -148,12 +161,16 @@ export function MetricsOverview({
       {avgSessionDuration !== undefined && (
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg Session Duration</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Avg Session Duration
+            </CardTitle>
             <IconClock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <div className="text-2xl font-bold text-muted-foreground">Loading...</div>
+              <div className="text-2xl font-bold text-muted-foreground">
+                Loading...
+              </div>
             ) : (
               <>
                 <div className="text-2xl font-bold">
@@ -172,12 +189,16 @@ export function MetricsOverview({
       {avgPagesPerSession !== undefined && (
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pages / Session</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Pages / Session
+            </CardTitle>
             <IconFileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <div className="text-2xl font-bold text-muted-foreground">Loading...</div>
+              <div className="text-2xl font-bold text-muted-foreground">
+                Loading...
+              </div>
             ) : (
               <>
                 <div className="text-2xl font-bold">
@@ -201,25 +222,33 @@ export function MetricsOverview({
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <div className="text-2xl font-bold text-muted-foreground">Loading...</div>
+              <div className="text-2xl font-bold text-muted-foreground">
+                Loading...
+              </div>
             ) : (
               <>
                 <div className="flex gap-4 items-baseline">
                   {dau !== undefined && (
                     <div>
-                      <div className="text-2xl font-bold">{dau.toLocaleString()}</div>
+                      <div className="text-2xl font-bold">
+                        {dau.toLocaleString()}
+                      </div>
                       <p className="text-xs text-muted-foreground">DAU</p>
                     </div>
                   )}
                   {wau !== undefined && (
                     <div>
-                      <div className="text-lg font-semibold text-muted-foreground">{wau.toLocaleString()}</div>
+                      <div className="text-lg font-semibold text-muted-foreground">
+                        {wau.toLocaleString()}
+                      </div>
                       <p className="text-xs text-muted-foreground">WAU</p>
                     </div>
                   )}
                   {mau !== undefined && (
                     <div>
-                      <div className="text-lg font-semibold text-muted-foreground">{mau.toLocaleString()}</div>
+                      <div className="text-lg font-semibold text-muted-foreground">
+                        {mau.toLocaleString()}
+                      </div>
                       <p className="text-xs text-muted-foreground">MAU</p>
                     </div>
                   )}
@@ -237,19 +266,25 @@ export function MetricsOverview({
           {totalRevenue !== undefined && (
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Total Revenue
+                </CardTitle>
                 <IconCash className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 {isLoading ? (
-                  <div className="text-2xl font-bold text-muted-foreground">Loading...</div>
+                  <div className="text-2xl font-bold text-muted-foreground">
+                    Loading...
+                  </div>
                 ) : (
                   <>
                     <div className="text-2xl font-bold text-green-600 dark:text-green-400">
                       ${totalRevenue.toLocaleString()}
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {totalConversions ? `From ${totalConversions} payments` : 'Total earnings'}
+                      {totalConversions
+                        ? `From ${totalConversions} payments`
+                        : 'Total earnings'}
                     </p>
                   </>
                 )}
@@ -268,7 +303,9 @@ export function MetricsOverview({
               </CardHeader>
               <CardContent>
                 {isLoading ? (
-                  <div className="text-2xl font-bold text-muted-foreground">Loading...</div>
+                  <div className="text-2xl font-bold text-muted-foreground">
+                    Loading...
+                  </div>
                 ) : (
                   <>
                     <div className="text-2xl font-bold">
@@ -287,15 +324,21 @@ export function MetricsOverview({
           {conversionRate !== undefined && (
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Conversion Rate</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Conversion Rate
+                </CardTitle>
                 <IconPercentage className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 {isLoading ? (
-                  <div className="text-2xl font-bold text-muted-foreground">Loading...</div>
+                  <div className="text-2xl font-bold text-muted-foreground">
+                    Loading...
+                  </div>
                 ) : (
                   <>
-                    <div className="text-2xl font-bold">{conversionRate.toFixed(2)}%</div>
+                    <div className="text-2xl font-bold">
+                      {conversionRate.toFixed(2)}%
+                    </div>
                     <p className="text-xs text-muted-foreground mt-1">
                       Visitors to customers
                     </p>

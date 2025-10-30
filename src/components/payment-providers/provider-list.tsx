@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import { IconPlus, IconLoader2 } from '@tabler/icons-react'
-import { Button } from '@/components/ui/button'
-import { usePaymentProviders } from '@/hooks/use-payment-providers'
+import { IconLoader2, IconPlus } from '@tabler/icons-react'
 import { ProviderCard } from './provider-card'
 import { ConnectProviderDialog } from './connect-provider-dialog'
 import { EditProviderDialog } from './edit-provider-dialog'
 import { DeleteProviderDialog } from './delete-provider-dialog'
 import type Zoriapi from 'zorihq'
+import { usePaymentProviders } from '@/hooks/use-payment-providers'
+import { Button } from '@/components/ui/button'
 
 interface ProviderListProps {
   projectId: string
@@ -16,16 +16,21 @@ export function ProviderList({ projectId }: ProviderListProps) {
   const [connectDialogOpen, setConnectDialogOpen] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [selectedProvider, setSelectedProvider] = useState<Zoriapi.V1.PaymentProviders.PaymentProviderResponse | null>(null)
+  const [selectedProvider, setSelectedProvider] =
+    useState<Zoriapi.V1.PaymentProviders.PaymentProviderResponse | null>(null)
 
   const { data: providersData, isLoading } = usePaymentProviders(projectId)
 
-  const handleEdit = (provider: Zoriapi.V1.PaymentProviders.PaymentProviderResponse) => {
+  const handleEdit = (
+    provider: Zoriapi.V1.PaymentProviders.PaymentProviderResponse,
+  ) => {
     setSelectedProvider(provider)
     setEditDialogOpen(true)
   }
 
-  const handleDelete = (provider: Zoriapi.V1.PaymentProviders.PaymentProviderResponse) => {
+  const handleDelete = (
+    provider: Zoriapi.V1.PaymentProviders.PaymentProviderResponse,
+  ) => {
     setSelectedProvider(provider)
     setDeleteDialogOpen(true)
   }
@@ -65,9 +70,12 @@ export function ProviderList({ projectId }: ProviderListProps) {
       ) : (
         <div className="rounded-lg border border-dashed p-8 text-center">
           <div className="mx-auto max-w-md">
-            <h3 className="text-sm font-semibold mb-2">No providers connected</h3>
+            <h3 className="text-sm font-semibold mb-2">
+              No providers connected
+            </h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Connect a payment provider to start tracking revenue by traffic source
+              Connect a payment provider to start tracking revenue by traffic
+              source
             </p>
             <Button onClick={() => setConnectDialogOpen(true)}>
               <IconPlus className="h-4 w-4 mr-2" />

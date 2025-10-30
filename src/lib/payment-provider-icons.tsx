@@ -1,10 +1,10 @@
 import {
-  IconBrandStripe,
   IconBrandPaypal,
+  IconBrandStripe,
   IconCreditCard,
   IconLemon,
-  IconSquare,
   IconPlug,
+  IconSquare,
 } from '@tabler/icons-react'
 
 export type ProviderType =
@@ -14,10 +14,7 @@ export type ProviderType =
   | 'lemon_squeezy'
   | 'square'
 
-export function getProviderIcon(
-  providerType?: string,
-  className?: string,
-) {
+export function getProviderIcon(providerType?: string, className?: string) {
   const iconClass = className || 'h-5 w-5'
 
   switch (providerType) {

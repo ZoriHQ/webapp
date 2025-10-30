@@ -36,6 +36,11 @@ export function useAuth() {
     return (user as any)?.selectedTeam ?? null
   }
 
+  const getToken = async (): Promise<string> => {
+    const tokens = await user?.currentSession.getTokens()
+    return tokens?.accessToken ?? ''
+  }
+
   return {
     isAuthenticated,
     isLoading,
@@ -46,6 +51,7 @@ export function useAuth() {
     requireAuth,
     getUser,
     getOrganization,
+    getToken,
   }
 }
 

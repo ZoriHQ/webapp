@@ -1,3 +1,5 @@
+import { toast } from 'sonner'
+import type Zoriapi from 'zorihq'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,8 +12,6 @@ import {
 } from '@/components/ui/alert-dialog'
 import { useDeletePaymentProvider } from '@/hooks/use-payment-providers'
 import { getProviderName } from '@/lib/payment-provider-icons'
-import { toast } from 'sonner'
-import type Zoriapi from 'zorihq'
 
 interface DeleteProviderDialogProps {
   open: boolean
@@ -34,7 +34,9 @@ export function DeleteProviderDialog({
     try {
       await deleteProvider.mutateAsync({ id: provider.id })
 
-      toast.success(`${getProviderName(provider.provider_type)} disconnected successfully`)
+      toast.success(
+        `${getProviderName(provider.provider_type)} disconnected successfully`,
+      )
       onOpenChange(false)
     } catch (error) {
       toast.error('Failed to disconnect provider. Please try again.')
@@ -49,11 +51,16 @@ export function DeleteProviderDialog({
           <AlertDialogTitle>Disconnect Payment Provider</AlertDialogTitle>
           <AlertDialogDescription>
             Are you sure you want to disconnect{' '}
-            <strong>{provider ? getProviderName(provider.provider_type) : 'this provider'}</strong>?
-            This will stop revenue tracking from this payment provider.
+            <strong>
+              {provider
+                ? getProviderName(provider.provider_type)
+                : 'this provider'}
+            </strong>
+            ? This will stop revenue tracking from this payment provider.
             <br />
             <br />
-            This action cannot be undone. You can always reconnect the provider later.
+            This action cannot be undone. You can always reconnect the provider
+            later.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

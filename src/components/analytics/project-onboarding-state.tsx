@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { IconCheck, IconCopy } from '@tabler/icons-react'
-import { SiNextdotjs, SiReact, SiHtml5, SiVuedotjs } from 'react-icons/si'
+import { SiHtml5, SiNextdotjs, SiReact, SiVuedotjs } from 'react-icons/si'
 import useWebSocket from 'react-use-websocket'
 import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter'
 import jsx from 'react-syntax-highlighter/dist/cjs/languages/prism/jsx'
@@ -34,14 +34,23 @@ export function ProjectOnboardingState({
   projectId,
   projectToken,
 }: ProjectOnboardingStateProps) {
-  const [copied, setCopied] = useState(false)
   const [firstEventReceived, setFirstEventReceived] = useState(false)
   const [eventLocation, setEventLocation] = useState<{
     lat: number
     lng: number
   } | null>(null)
-  const { accessToken } = useAuth()
-  const socketUrl = `${wsURL}/events/stream?id=${projectId}&token=${accessToken}`
+  const { getToken } = useAuth()
+  const [socketUrl, setSocketUrl] = useState<string>(
+    `${wsURL}/events/stream?id=${projectId}&token=`,
+  )
+
+  useEffect(() => {
+    const getAsyncToken = async () => {
+      const token = await getToken()
+      setSocketUrl(`${wsURL}/events/stream?id=${projectId}&token=${token}`)
+    }
+    getAsyncToken()
+  }, [getToken])
 
   const { lastMessage } = useWebSocket(socketUrl, {
     onOpen: () => console.log('opened'),
@@ -51,9 +60,10 @@ export function ProjectOnboardingState({
         const data: EventData = JSON.parse(event.data)
         if (data.event_name && !firstEventReceived) {
           setFirstEventReceived(true)
-          // Set location if available
           if (
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             data.location_latitude !== undefined &&
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             data.location_longitude !== undefined
           ) {
             setEventLocation({

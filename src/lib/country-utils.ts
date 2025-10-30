@@ -60,7 +60,7 @@ export const COUNTRY_NAMES: Record<string, string> = {
   CF: 'Central African Republic',
   CG: 'Republic of the Congo',
   CH: 'Switzerland',
-  CI: 'Côte d\'Ivoire',
+  CI: "Côte d'Ivoire",
   CK: 'Cook Islands',
   CL: 'Chile',
   CM: 'Cameroon',

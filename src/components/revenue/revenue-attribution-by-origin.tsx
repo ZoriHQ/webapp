@@ -1,3 +1,4 @@
+import { IconMoodEmpty } from '@tabler/icons-react'
 import type Zoriapi from 'zorihq'
 import {
   Card,
@@ -15,7 +16,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { IconMoodEmpty } from '@tabler/icons-react'
 
 interface RevenueAttributionByOriginProps {
   data: Zoriapi.V1.Revenue.AttributionByOriginResponse | undefined
@@ -52,7 +52,9 @@ export function RevenueAttributionByOrigin({
                   <TableRow>
                     <TableHead>Traffic Source</TableHead>
                     <TableHead className="text-right">Visitors</TableHead>
-                    <TableHead className="text-right">Paying Customers</TableHead>
+                    <TableHead className="text-right">
+                      Paying Customers
+                    </TableHead>
                     <TableHead className="text-right">Revenue</TableHead>
                     <TableHead className="text-right">Avg/Customer</TableHead>
                     <TableHead className="text-right">Conv. Rate</TableHead>
@@ -62,7 +64,8 @@ export function RevenueAttributionByOrigin({
                 <TableBody>
                   {data.data!.map((source, idx) => {
                     const revenue = (source.total_revenue || 0) / 100
-                    const avgRevenue = (source.avg_revenue_per_customer || 0) / 100
+                    const avgRevenue =
+                      (source.avg_revenue_per_customer || 0) / 100
                     const conversionRate = source.conversion_rate || 0
                     const revenuePercentage = source.revenue_percentage || 0
 
@@ -78,13 +81,19 @@ export function RevenueAttributionByOrigin({
                           {source.paying_customers || 0}
                         </TableCell>
                         <TableCell className="text-right font-semibold text-green-600 dark:text-green-400">
-                          ${revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          $
+                          {revenue.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
                         </TableCell>
                         <TableCell className="text-right text-muted-foreground">
                           ${avgRevenue.toFixed(2)}
                         </TableCell>
                         <TableCell className="text-right">
-                          <Badge variant="secondary">{conversionRate.toFixed(2)}%</Badge>
+                          <Badge variant="secondary">
+                            {conversionRate.toFixed(2)}%
+                          </Badge>
                         </TableCell>
                         <TableCell className="text-right">
                           <Badge>{revenuePercentage.toFixed(1)}%</Badge>
@@ -98,10 +107,10 @@ export function RevenueAttributionByOrigin({
             <div className="mt-4 p-4 bg-muted/50 rounded-lg border border-dashed">
               <p className="text-sm text-muted-foreground">
                 <strong>How it works:</strong> Zori tracks each visitor with a
-                unique ID. When you pass this ID to Stripe or LemonSqueezy payment
-                metadata, we automatically attribute the revenue to the customer
-                and their original traffic source. This helps you understand your
-                true ROI.
+                unique ID. When you pass this ID to Stripe or LemonSqueezy
+                payment metadata, we automatically attribute the revenue to the
+                customer and their original traffic source. This helps you
+                understand your true ROI.
               </p>
             </div>
           </>

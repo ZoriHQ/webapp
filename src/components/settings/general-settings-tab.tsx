@@ -1,11 +1,11 @@
 import { useState } from 'react'
+import { IconLoader2 } from '@tabler/icons-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Card } from '@/components/ui/card'
 import { useProject } from '@/hooks/use-projects'
-import { IconLoader2 } from '@tabler/icons-react'
 
 interface GeneralSettingsTabProps {
   projectId: string
@@ -100,7 +100,9 @@ export function GeneralSettingsTab({ projectId }: GeneralSettingsTabProps) {
       <Card className="p-6 border-destructive">
         <div className="space-y-4">
           <div>
-            <h4 className="text-sm font-semibold text-destructive">Danger Zone</h4>
+            <h4 className="text-sm font-semibold text-destructive">
+              Danger Zone
+            </h4>
             <p className="text-sm text-muted-foreground mt-1">
               Irreversible and destructive actions
             </p>

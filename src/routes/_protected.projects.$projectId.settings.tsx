@@ -1,17 +1,51 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useEffect } from 'react'
+import { toast } from 'sonner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { GeneralSettingsTab } from '@/components/settings/general-settings-tab'
 import { IntegrationsTab } from '@/components/settings/integrations-tab'
 import { InstallationTab } from '@/components/settings/installation-tab'
 import { useProject } from '@/hooks/use-projects'
 
-export const Route = createFileRoute('/_protected/projects/$projectId/settings')({
+export const Route = createFileRoute(
+  '/_protected/projects/$projectId/settings',
+)({
   component: ProjectSettings,
 })
 
 function ProjectSettings() {
   const { projectId } = Route.useParams()
   const { data: project } = useProject(projectId)
+
+  // Handle OAuth callback from payment provider
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search)
+    const provider = searchParams.get('provider')
+    const result = searchParams.get('result')
+    const status = searchParams.get('status')
+    const error = searchParams.get('error')
+
+    if (provider && (result || status)) {
+      // Show toast notification
+      // Handle both 'result' (old format) and 'status' (new format) params
+      if (result === 'success' || status === 'success') {
+        toast.success(
+          `Successfully connected ${provider.charAt(0).toUpperCase() + provider.slice(1)}`,
+        )
+      } else if (result === 'failure' || status === 'error') {
+        const errorMessage = error
+          ? `: ${decodeURIComponent(error)}`
+          : '. Please try again.'
+        toast.error(
+          `Failed to connect ${provider.charAt(0).toUpperCase() + provider.slice(1)}${errorMessage}`,
+        )
+      }
+
+      // Clean up URL by removing query params
+      const newUrl = window.location.pathname
+      window.history.replaceState({}, '', newUrl)
+    }
+  }, [])
 
   return (
     <div className="container mx-auto py-6 px-4 max-w-7xl">

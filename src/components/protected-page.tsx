@@ -1,9 +1,9 @@
 'use client'
 
 import { Loader2Icon } from 'lucide-react'
-import { useAuth, useAuthGuard } from '@/lib/use-auth'
 import { useUser } from '@stackframe/react'
 import { useNavigate } from '@tanstack/react-router'
+import { useAuth, useAuthGuard } from '@/lib/use-auth'
 import {
   Card,
   CardContent,

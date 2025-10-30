@@ -1,3 +1,4 @@
+import { IconUserCheck } from '@tabler/icons-react'
 import type Zoriapi from 'zorihq'
 import {
   Card,
@@ -15,7 +16,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { countryCodeToFlag } from '@/lib/country-utils'
-import { IconUserCheck } from '@tabler/icons-react'
 
 interface TopVisitorsTableProps {
   data: Zoriapi.V1.Analytics.TopVisitorsResponse | undefined
@@ -33,21 +33,25 @@ function formatTimestamp(timestamp: string | undefined) {
   })
 }
 
-export function TopVisitorsTable({ data, isLoading, onVisitorClick }: TopVisitorsTableProps) {
+export function TopVisitorsTable({
+  data,
+  isLoading,
+  onVisitorClick,
+}: TopVisitorsTableProps) {
   const hasVisitors = data?.visitors && data.visitors.length > 0
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Top Active Visitors</CardTitle>
-        <CardDescription>
-          Most active visitors by event count
-        </CardDescription>
+        <CardDescription>Most active visitors by event count</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
-            <p className="text-sm text-muted-foreground">Loading top visitors...</p>
+            <p className="text-sm text-muted-foreground">
+              Loading top visitors...
+            </p>
           </div>
         ) : hasVisitors ? (
           <div className="rounded-md border">
@@ -65,7 +69,8 @@ export function TopVisitorsTable({ data, isLoading, onVisitorClick }: TopVisitor
               </TableHeader>
               <TableBody>
                 {data.visitors!.map((visitor, idx) => {
-                  const countryCode = visitor.location_country_iso?.toUpperCase() || ''
+                  const countryCode =
+                    visitor.location_country_iso?.toUpperCase() || ''
                   const flagEmoji = countryCodeToFlag(countryCode)
                   const hasIdentity = visitor.user_id || visitor.external_id
 
@@ -74,7 +79,9 @@ export function TopVisitorsTable({ data, isLoading, onVisitorClick }: TopVisitor
                       <TableCell>
                         {visitor.visitor_id ? (
                           <button
-                            onClick={() => onVisitorClick?.(visitor.visitor_id!)}
+                            onClick={() =>
+                              onVisitorClick?.(visitor.visitor_id!)
+                            }
                             className="hover:text-primary hover:underline cursor-pointer transition-colors text-left"
                           >
                             <div className="flex items-center gap-2">

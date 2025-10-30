@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { requireAuth, getPostLoginRedirect } from '@/lib/route-guards'
+import { getPostLoginRedirect, requireAuth } from '@/lib/route-guards'
 
 const selectTeamSearchSchema = z.object({
   redirect: z.string().optional(),

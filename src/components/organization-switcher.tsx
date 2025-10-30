@@ -18,7 +18,7 @@ export function OrganizationSwitcher() {
   }
 
   const orgInitial = organization.name?.charAt(0).toUpperCase() || 'O'
-  const orgLogo = (organization as any).logo_url
+  const orgLogo = organization.logo_url
 
   return (
     <div className="flex h-screen w-16 flex-col items-center bg-background py-4 border-r">

@@ -1,12 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useProject } from '@/hooks/use-projects'
-import { useRecentEvents, useEventFilterOptions } from '@/hooks/use-analytics'
-import { LiveEventStream } from '@/components/analytics/live-event-stream'
 import { useState } from 'react'
-import { VisitorProfileModal } from '@/components/analytics/visitor-profile-modal'
-import { EventsFilterBar, type EventFiltersState } from '@/components/analytics/events-filter-bar'
 import { useQueryClient } from '@tanstack/react-query'
 import { z } from 'zod'
+import type { EventFiltersState } from '@/components/analytics/events-filter-bar'
+import { useProject } from '@/hooks/use-projects'
+import { useEventFilterOptions, useRecentEvents } from '@/hooks/use-analytics'
+import { LiveEventStream } from '@/components/analytics/live-event-stream'
+import { VisitorProfileModal } from '@/components/analytics/visitor-profile-modal'
+import { EventsFilterBar } from '@/components/analytics/events-filter-bar'
 
 const eventsSearchSchema = z.object({
   pages: z.array(z.string()).optional().catch([]),
@@ -45,12 +46,14 @@ function EventsPage() {
     ...(searchParams.visitor_id && {
       visitor_id: searchParams.visitor_id,
     }),
-    ...(searchParams.pages && searchParams.pages.length > 0 && {
-      page_path: searchParams.pages.join(','),
-    }),
-    ...(searchParams.origins && searchParams.origins.length > 0 && {
-      traffic_origin: searchParams.origins.join(','),
-    }),
+    ...(searchParams.pages &&
+      searchParams.pages.length > 0 && {
+        page_path: searchParams.pages.join(','),
+      }),
+    ...(searchParams.origins &&
+      searchParams.origins.length > 0 && {
+        traffic_origin: searchParams.origins.join(','),
+      }),
   }
 
   const { data: recentEventsData, isLoading: eventsLoading } = useRecentEvents(
@@ -80,7 +83,10 @@ function EventsPage() {
         ...prev,
         visitor_id: filters.visitor_id || undefined,
         pages: filters.pages.length > 0 ? filters.pages : undefined,
-        origins: filters.traffic_origins.length > 0 ? filters.traffic_origins : undefined,
+        origins:
+          filters.traffic_origins.length > 0
+            ? filters.traffic_origins
+            : undefined,
       }),
     })
   }

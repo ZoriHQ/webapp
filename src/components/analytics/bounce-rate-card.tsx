@@ -27,14 +27,14 @@ export function BounceRateCard({ data, isLoading }: BounceRateCardProps) {
     <Card>
       <CardHeader>
         <CardTitle>Bounce Rate by Page</CardTitle>
-        <CardDescription>
-          Pages with highest bounce rates
-        </CardDescription>
+        <CardDescription>Pages with highest bounce rates</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
-            <p className="text-sm text-muted-foreground">Loading bounce rate data...</p>
+            <p className="text-sm text-muted-foreground">
+              Loading bounce rate data...
+            </p>
           </div>
         ) : hasPageData ? (
           <div className="space-y-4">
