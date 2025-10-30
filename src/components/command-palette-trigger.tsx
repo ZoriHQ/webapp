@@ -12,12 +12,7 @@ export function CommandPaletteTrigger({
 }: CommandPaletteTriggerProps) {
   if (isMobile) {
     return (
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={onClick}
-        className="h-9 w-9"
-      >
+      <Button variant="ghost" size="icon" onClick={onClick} className="h-9 w-9">
         <IconSearch className="h-4 w-4" />
         <span className="sr-only">Search</span>
       </Button>

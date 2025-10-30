@@ -29,7 +29,7 @@ const config = defineConfig({
         manualChunks: {
           'react-vendor': ['react', 'react-dom'],
           'router-vendor': ['@tanstack/react-router', '@tanstack/react-query'],
-          'globe': ['three', 'react-globe.gl'],
+          globe: ['three', 'react-globe.gl'],
         },
       },
     },

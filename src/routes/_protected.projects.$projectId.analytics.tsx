@@ -1,9 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
-import type {TimeRange} from '@/hooks/use-analytics';
+import type { TimeRange } from '@/hooks/use-analytics'
 import { ChartAreaInteractive } from '@/components/chart-area-interactive'
 import {
-  
   useActiveUsers,
   useBounceRate,
   useChurnRate,
@@ -12,7 +11,7 @@ import {
   useTopVisitors,
   useVisitorsByCountry,
   useVisitorsByOrigin,
-  useVisitorsTimeline
+  useVisitorsTimeline,
 } from '@/hooks/use-analytics'
 import { useRevenueByOrigin } from '@/hooks/use-revenue'
 import { useProject } from '@/hooks/use-projects'
@@ -26,7 +25,9 @@ import { TopVisitorsTable } from '@/components/analytics/top-visitors-table'
 import { EmptyEventsState } from '@/components/analytics/empty-events-state'
 import { VisitorProfileModal } from '@/components/analytics/visitor-profile-modal'
 
-export const Route = createFileRoute('/_protected/projects/$projectId/analytics')({
+export const Route = createFileRoute(
+  '/_protected/projects/$projectId/analytics',
+)({
   component: ProjectDetailPage,
 })
 

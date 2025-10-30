@@ -133,7 +133,11 @@ export function TopCustomersTable({
                       </TableCell>
                       <TableCell className="text-right">
                         <span className="font-semibold text-green-600 dark:text-green-400">
-                          ${revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          $
+                          {revenue.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
                         </span>
                       </TableCell>
                       <TableCell className="text-right">
@@ -142,7 +146,11 @@ export function TopCustomersTable({
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right text-muted-foreground">
-                        ${avgOrder.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        $
+                        {avgOrder.toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
                       </TableCell>
                       <TableCell>
                         {countryCode ? (

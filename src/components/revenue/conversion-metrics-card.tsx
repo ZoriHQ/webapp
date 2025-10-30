@@ -89,7 +89,9 @@ export function ConversionMetricsCard({
               <div key={metric.label} className="space-y-2">
                 <div className="flex items-center gap-2">
                   <div className={`p-1.5 rounded-md ${metric.bgColor}`}>
-                    <metric.icon className={`h-3.5 w-3.5 ${metric.iconColor}`} />
+                    <metric.icon
+                      className={`h-3.5 w-3.5 ${metric.iconColor}`}
+                    />
                   </div>
                   <p className="text-xs font-medium text-muted-foreground">
                     {metric.label}

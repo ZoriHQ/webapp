@@ -19,10 +19,7 @@ export interface EventFilters {
   offset?: number
 }
 
-export function useRecentEvents(
-  projectId: string,
-  filters?: EventFilters,
-) {
+export function useRecentEvents(projectId: string, filters?: EventFilters) {
   const zClient = useApiClient()
 
   return useQuery<Zoriapi.V1.Analytics.RecentEventsResponse>({
@@ -36,7 +33,10 @@ export function useRecentEvents(
   })
 }
 
-export function useEventFilterOptions(projectId: string, timeRange?: TimeRange) {
+export function useEventFilterOptions(
+  projectId: string,
+  timeRange?: TimeRange,
+) {
   const zClient = useApiClient()
 
   return useQuery<Zoriapi.V1.Analytics.EventFilterOptionsResponse>({
@@ -183,11 +183,22 @@ export function useSessionMetrics(projectId: string, timeRange: TimeRange) {
   })
 }
 
-export function useBounceRate(projectId: string, timeRange: TimeRange, limit?: number) {
+export function useBounceRate(
+  projectId: string,
+  timeRange: TimeRange,
+  limit?: number,
+) {
   const zClient = useApiClient()
 
   return useQuery<Zoriapi.V1.Analytics.BounceRateResponse>({
-    queryKey: ['analytics', 'sessions', 'bounceRate', projectId, timeRange, limit],
+    queryKey: [
+      'analytics',
+      'sessions',
+      'bounceRate',
+      projectId,
+      timeRange,
+      limit,
+    ],
     queryFn: () =>
       zClient.v1.analytics.sessions.bounceRate({
         project_id: projectId,
@@ -211,11 +222,22 @@ export function useActiveUsers(projectId: string) {
   })
 }
 
-export function useChurnRate(projectId: string, timeRange: TimeRange, churnThresholdDays?: number) {
+export function useChurnRate(
+  projectId: string,
+  timeRange: TimeRange,
+  churnThresholdDays?: number,
+) {
   const zClient = useApiClient()
 
   return useQuery<Zoriapi.V1.Analytics.ChurnRateResponse>({
-    queryKey: ['analytics', 'retention', 'churnRate', projectId, timeRange, churnThresholdDays],
+    queryKey: [
+      'analytics',
+      'retention',
+      'churnRate',
+      projectId,
+      timeRange,
+      churnThresholdDays,
+    ],
     queryFn: () =>
       zClient.v1.analytics.retention.churnRate({
         project_id: projectId,
@@ -254,7 +276,11 @@ export function useCohortAnalysis(projectId: string, timeRange: TimeRange) {
   })
 }
 
-export function useTopVisitors(projectId: string, timeRange: TimeRange, limit?: number) {
+export function useTopVisitors(
+  projectId: string,
+  timeRange: TimeRange,
+  limit?: number,
+) {
   const zClient = useApiClient()
 
   return useQuery<Zoriapi.V1.Analytics.TopVisitorsResponse>({
@@ -286,7 +312,13 @@ export function useIdentifyVisitor(projectId: string) {
     onSuccess: (_, variables) => {
       // Invalidate the visitor profile query to refetch updated data
       queryClient.invalidateQueries({
-        queryKey: ['analytics', 'visitors', 'profile', projectId, variables.visitor_id],
+        queryKey: [
+          'analytics',
+          'visitors',
+          'profile',
+          projectId,
+          variables.visitor_id,
+        ],
       })
       // Also invalidate top visitors list in case it needs to update
       queryClient.invalidateQueries({

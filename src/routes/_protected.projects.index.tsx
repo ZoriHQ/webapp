@@ -1,8 +1,6 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
-import {
-  IconPlus,
-} from '@tabler/icons-react'
+import { IconPlus } from '@tabler/icons-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'

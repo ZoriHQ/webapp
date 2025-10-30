@@ -105,10 +105,9 @@ const STORAGE_KEY = 'zori-metrics-preferences'
 
 // Get default enabled metrics
 export function getDefaultMetrics(): Array<MetricType> {
-  return AVAILABLE_METRICS
-    .filter(m => m.defaultEnabled)
+  return AVAILABLE_METRICS.filter((m) => m.defaultEnabled)
     .sort((a, b) => a.priority - b.priority)
-    .map(m => m.id)
+    .map((m) => m.id)
 }
 
 // Load metrics preferences from localStorage
@@ -118,8 +117,8 @@ export function loadMetricsPreferences(): Array<MetricType> {
     if (stored) {
       const parsed = JSON.parse(stored) as Array<MetricType>
       // Validate that all stored metrics are valid
-      const validMetrics = parsed.filter(id =>
-        AVAILABLE_METRICS.some(m => m.id === id)
+      const validMetrics = parsed.filter((id) =>
+        AVAILABLE_METRICS.some((m) => m.id === id),
       )
       return validMetrics.length > 0 ? validMetrics : getDefaultMetrics()
     }

@@ -14,10 +14,7 @@ export type ProviderType =
   | 'lemon_squeezy'
   | 'square'
 
-export function getProviderIcon(
-  providerType?: string,
-  className?: string,
-) {
+export function getProviderIcon(providerType?: string, className?: string) {
   const iconClass = className || 'h-5 w-5'
 
   switch (providerType) {

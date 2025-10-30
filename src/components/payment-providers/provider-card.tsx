@@ -10,7 +10,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { getProviderColor, getProviderIcon, getProviderName } from '@/lib/payment-provider-icons'
+import {
+  getProviderColor,
+  getProviderIcon,
+  getProviderName,
+} from '@/lib/payment-provider-icons'
 
 interface ProviderCardProps {
   provider: Zoriapi.V1.PaymentProviders.PaymentProviderResponse
@@ -18,12 +22,18 @@ interface ProviderCardProps {
   onDelete: () => void
 }
 
-export function ProviderCard({ provider, onEdit, onDelete }: ProviderCardProps) {
+export function ProviderCard({
+  provider,
+  onEdit,
+  onDelete,
+}: ProviderCardProps) {
   return (
     <Card className="p-4">
       <div className="flex items-center gap-3">
         {/* Provider Icon */}
-        <div className={`flex items-center justify-center w-10 h-10 rounded-lg ${getProviderColor(provider.provider_type)}`}>
+        <div
+          className={`flex items-center justify-center w-10 h-10 rounded-lg ${getProviderColor(provider.provider_type)}`}
+        >
           {getProviderIcon(provider.provider_type, 'h-5 w-5')}
         </div>
 
@@ -34,14 +44,20 @@ export function ProviderCard({ provider, onEdit, onDelete }: ProviderCardProps) 
               {getProviderName(provider.provider_type)}
             </h3>
             {provider.is_active && (
-              <Badge variant="default" className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+              <Badge
+                variant="default"
+                className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+              >
                 Active
               </Badge>
             )}
           </div>
           {provider.last_synced_at && (
             <p className="text-xs text-muted-foreground mt-1">
-              Last synced {formatDistanceToNow(new Date(provider.last_synced_at), { addSuffix: true })}
+              Last synced{' '}
+              {formatDistanceToNow(new Date(provider.last_synced_at), {
+                addSuffix: true,
+              })}
             </p>
           )}
         </div>

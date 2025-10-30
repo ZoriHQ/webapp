@@ -9,13 +9,18 @@ interface FilterChipProps {
   className?: string
 }
 
-export function FilterChip({ label, value, onRemove, className }: FilterChipProps) {
+export function FilterChip({
+  label,
+  value,
+  onRemove,
+  className,
+}: FilterChipProps) {
   return (
     <Badge
       variant="outline"
       className={cn(
         'flex items-center gap-1.5 pr-1 pl-2.5 py-1 text-sm font-normal hover:bg-accent/50 transition-colors',
-        className
+        className,
       )}
     >
       <span className="text-muted-foreground text-xs">{label}:</span>

@@ -41,9 +41,9 @@ export function EventsFilterBar({
   onRefresh,
   isLoadingOptions = false,
 }: EventsFilterBarProps) {
-  const [openPopover, setOpenPopover] = useState<
-    'pages' | 'origins' | null
-  >(null)
+  const [openPopover, setOpenPopover] = useState<'pages' | 'origins' | null>(
+    null,
+  )
 
   const togglePage = (page: string) => {
     const newPages = filters.pages.includes(page)
@@ -86,7 +86,9 @@ export function EventsFilterBar({
   }
 
   const hasActiveFilters =
-    filters.pages.length > 0 || filters.traffic_origins.length > 0 || !!filters.visitor_id
+    filters.pages.length > 0 ||
+    filters.traffic_origins.length > 0 ||
+    !!filters.visitor_id
 
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -108,11 +110,7 @@ export function EventsFilterBar({
         onOpenChange={(open) => setOpenPopover(open ? 'pages' : null)}
       >
         <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-8 border-dashed"
-          >
+          <Button variant="outline" size="sm" className="h-8 border-dashed">
             <Plus className="mr-2 h-3.5 w-3.5" />
             Pages
             {filters.pages.length > 0 && (
@@ -133,16 +131,13 @@ export function EventsFilterBar({
                 {availablePages.map((page) => {
                   const isSelected = filters.pages.includes(page)
                   return (
-                    <CommandItem
-                      key={page}
-                      onSelect={() => togglePage(page)}
-                    >
+                    <CommandItem key={page} onSelect={() => togglePage(page)}>
                       <div
                         className={cn(
                           'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
                           isSelected
                             ? 'bg-primary text-primary-foreground'
-                            : 'opacity-50 [&_svg]:invisible'
+                            : 'opacity-50 [&_svg]:invisible',
                         )}
                       >
                         <Check className="h-3 w-3" />
@@ -163,11 +158,7 @@ export function EventsFilterBar({
         onOpenChange={(open) => setOpenPopover(open ? 'origins' : null)}
       >
         <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-8 border-dashed"
-          >
+          <Button variant="outline" size="sm" className="h-8 border-dashed">
             <Plus className="mr-2 h-3.5 w-3.5" />
             Traffic Sources
             {filters.traffic_origins.length > 0 && (
@@ -197,7 +188,7 @@ export function EventsFilterBar({
                           'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
                           isSelected
                             ? 'bg-primary text-primary-foreground'
-                            : 'opacity-50 [&_svg]:invisible'
+                            : 'opacity-50 [&_svg]:invisible',
                         )}
                       >
                         <Check className="h-3 w-3" />
@@ -216,7 +207,10 @@ export function EventsFilterBar({
       {filters.visitor_id && (
         <FilterChip
           label="Visitor"
-          value={filters.visitor_id.substring(0, 12) + (filters.visitor_id.length > 12 ? '...' : '')}
+          value={
+            filters.visitor_id.substring(0, 12) +
+            (filters.visitor_id.length > 12 ? '...' : '')
+          }
           onRemove={removeVisitorId}
         />
       )}

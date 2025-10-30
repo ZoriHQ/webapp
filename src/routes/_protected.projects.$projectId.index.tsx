@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Activity,
   AlertCircle,
@@ -8,6 +8,7 @@ import {
   Users,
 } from 'lucide-react'
 import { Link, createFileRoute } from '@tanstack/react-router'
+import { toast } from 'sonner'
 import { useProject } from '@/hooks/use-projects'
 import { useAuth } from '@/lib/use-auth'
 import {
@@ -36,6 +37,34 @@ function OverviewPage() {
   const { projectId } = Route.useParams()
   const [timeRange, setTimeRange] = useState<TimeRange>('today')
   const { account } = useAuth()
+
+  // Handle payment provider OAuth callback
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search)
+    const status = searchParams.get('status')
+    const provider = searchParams.get('provider')
+    const error = searchParams.get('error')
+
+    if (status && provider) {
+      // Show toast notification
+      if (status === 'success') {
+        toast.success(
+          `Successfully connected ${provider.charAt(0).toUpperCase() + provider.slice(1)} and started backfill`,
+        )
+      } else if (status === 'error') {
+        const errorMessage = error
+          ? `: ${decodeURIComponent(error)}`
+          : '. Please try again.'
+        toast.error(
+          `Failed to connect ${provider.charAt(0).toUpperCase() + provider.slice(1)}${errorMessage}`,
+        )
+      }
+
+      // Clean up URL by removing query params
+      const newUrl = window.location.pathname
+      window.history.replaceState({}, '', newUrl)
+    }
+  }, [])
 
   // Fetch project details
   const { data: projectData, isLoading: projectLoading } = useProject(projectId)

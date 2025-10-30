@@ -27,11 +27,11 @@ interface TrafficSourcesProps {
 const chartConfig = {
   visitors: {
     label: 'Visitors',
-    color: 'hsl(var(--primary))',
+    color: '#3b82f6', // blue-500
   },
   revenue: {
     label: 'Revenue',
-    color: '#10b981',
+    color: '#16a34a', // green-600
   },
 } satisfies ChartConfig
 
@@ -46,16 +46,51 @@ export function TrafficSources({
   const [showAllCountries, setShowAllCountries] = useState(false)
 
   // Merge visitor and revenue data by origin
-  const mergedOriginData = originData?.map((visitor) => {
-    const revenueMatch = revenueByOrigin?.find(
-      (rev) => (rev.origin || 'Direct') === (visitor.origin || 'Direct'),
-    )
-    return {
-      ...visitor,
-      revenue: revenueMatch ? (revenueMatch.total_revenue || 0) / 100 : 0,
-      payingCustomers: revenueMatch?.paying_customers || 0,
-    }
-  })
+  const mergedOriginData = originData
+    ?.map((visitor) => {
+      const revenueMatch = revenueByOrigin?.find(
+        (rev) => (rev.origin || 'Direct') === (visitor.origin || 'Direct'),
+      )
+      return {
+        ...visitor,
+        revenue: revenueMatch ? (revenueMatch.total_revenue || 0) / 100 : 0,
+        payingCustomers: revenueMatch?.paying_customers || 0,
+      }
+    })
+    .sort((a, b) => {
+      // Sort by revenue efficiency (revenue per visitor) - highest first
+      const aVisitors = a.unique_visitors || 0
+      const bVisitors = b.unique_visitors || 0
+      const aRevenue = a.revenue || 0
+      const bRevenue = b.revenue || 0
+
+      const aEfficiency = aVisitors > 0 ? aRevenue / aVisitors : 0
+      const bEfficiency = bVisitors > 0 ? bRevenue / bVisitors : 0
+
+      // Primary sort: by efficiency (descending)
+      if (bEfficiency !== aEfficiency) {
+        return bEfficiency - aEfficiency
+      }
+
+      // Tiebreaker: by total revenue (descending)
+      return bRevenue - aRevenue
+    })
+
+  // Calculate max total value for normalization
+  const maxOriginValue =
+    mergedOriginData?.reduce((max, source) => {
+      const visitors = source.unique_visitors || 0
+      const revenue = showRevenue ? source.revenue || 0 : 0
+      const total = visitors + revenue
+      return Math.max(max, total)
+    }, 0) || 1 // Avoid division by zero
+
+  // Calculate max value for country data normalization
+  const maxCountryValue =
+    countryData?.reduce((max, country) => {
+      const visitors = country.unique_visitors || 0
+      return Math.max(max, visitors)
+    }, 0) || 1 // Avoid division by zero
 
   return (
     <Card className="h-full">
@@ -133,10 +168,46 @@ export function TrafficSources({
                             ]}
                             margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
                           >
-                            <XAxis type="number" hide />
+                            <XAxis
+                              type="number"
+                              hide
+                              domain={[0, maxOriginValue]}
+                            />
                             <YAxis type="category" dataKey="name" hide />
                             <ChartTooltip
-                              content={<ChartTooltipContent />}
+                              content={
+                                <ChartTooltipContent
+                                  formatter={(value, name) => {
+                                    if (name === 'visitors') {
+                                      return (
+                                        <div className="flex items-center justify-between w-full gap-3">
+                                          <span className="text-muted-foreground flex items-center gap-1.5">
+                                            <span>👥</span>
+                                            Visitors
+                                          </span>
+                                          <span className="font-mono font-medium tabular-nums">
+                                            {Number(value).toLocaleString()}
+                                          </span>
+                                        </div>
+                                      )
+                                    }
+                                    if (name === 'revenue') {
+                                      return (
+                                        <div className="flex items-center justify-between w-full gap-3">
+                                          <span className="text-muted-foreground flex items-center gap-1.5">
+                                            <span>💰</span>
+                                            Revenue
+                                          </span>
+                                          <span className="font-mono font-medium tabular-nums text-green-600 dark:text-green-400">
+                                            ${Number(value).toLocaleString()}
+                                          </span>
+                                        </div>
+                                      )
+                                    }
+                                    return null
+                                  }}
+                                />
+                              }
                               cursor={false}
                             />
                             <Bar
@@ -223,10 +294,33 @@ export function TrafficSources({
                             ]}
                             margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
                           >
-                            <XAxis type="number" hide />
+                            <XAxis
+                              type="number"
+                              hide
+                              domain={[0, maxCountryValue]}
+                            />
                             <YAxis type="category" dataKey="name" hide />
                             <ChartTooltip
-                              content={<ChartTooltipContent />}
+                              content={
+                                <ChartTooltipContent
+                                  formatter={(value, name) => {
+                                    if (name === 'visitors') {
+                                      return (
+                                        <div className="flex items-center justify-between w-full gap-3">
+                                          <span className="text-muted-foreground flex items-center gap-1.5">
+                                            <span>👥</span>
+                                            Visitors
+                                          </span>
+                                          <span className="font-mono font-medium tabular-nums">
+                                            {Number(value).toLocaleString()}
+                                          </span>
+                                        </div>
+                                      )
+                                    }
+                                    return null
+                                  }}
+                                />
+                              }
                               cursor={false}
                             />
                             <Bar

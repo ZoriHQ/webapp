@@ -1,14 +1,13 @@
-import { Link, createFileRoute  } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { AlertCircle } from 'lucide-react'
-import type {TimeRange} from '@/hooks/use-revenue';
+import type { TimeRange } from '@/hooks/use-revenue'
 import {
-  
   useConversionMetrics,
   useRevenueByOrigin,
   useRevenueDashboard,
   useRevenueTimeline,
-  useTopCustomers
+  useTopCustomers,
 } from '@/hooks/use-revenue'
 import { useProject } from '@/hooks/use-projects'
 import { usePaymentProviders } from '@/hooks/use-payment-providers'
@@ -22,9 +21,11 @@ import { CustomerProfileModal } from '@/components/revenue/customer-profile-moda
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
-export const Route = createFileRoute('/_protected/projects/$projectId/revenue')({
-  component: RevenuePage,
-})
+export const Route = createFileRoute('/_protected/projects/$projectId/revenue')(
+  {
+    component: RevenuePage,
+  },
+)
 
 function RevenuePage() {
   const { projectId } = Route.useParams()
@@ -40,8 +41,10 @@ function RevenuePage() {
   // Fetch revenue data
   const { data: dashboardData, isLoading: dashboardLoading } =
     useRevenueDashboard(projectId, timeRange)
-  const { data: timelineData, isLoading: timelineLoading } =
-    useRevenueTimeline(projectId, timeRange)
+  const { data: timelineData, isLoading: timelineLoading } = useRevenueTimeline(
+    projectId,
+    timeRange,
+  )
   const { data: attributionData, isLoading: attributionLoading } =
     useRevenueByOrigin(projectId, timeRange)
   const { data: topCustomersData, isLoading: topCustomersLoading } =
@@ -76,9 +79,9 @@ function RevenuePage() {
                 Payment Provider Not Connected
               </h3>
               <p className="text-sm text-yellow-800 dark:text-yellow-200 mb-3">
-                To start tracking revenue, connect a payment provider like Stripe
-                or LemonSqueezy in your project settings. Once connected, revenue
-                data will automatically appear here.
+                To start tracking revenue, connect a payment provider like
+                Stripe or LemonSqueezy in your project settings. Once connected,
+                revenue data will automatically appear here.
               </p>
               <Link
                 to="/projects/$projectId/settings"

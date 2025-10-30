@@ -8,7 +8,9 @@ export function extractDomain(urlOrDomain: string): string {
 
   try {
     // Try to parse as URL
-    const url = new URL(urlOrDomain.startsWith('http') ? urlOrDomain : `https://${urlOrDomain}`)
+    const url = new URL(
+      urlOrDomain.startsWith('http') ? urlOrDomain : `https://${urlOrDomain}`,
+    )
     return url.hostname.replace(/^www\./, '')
   } catch {
     // If not a valid URL, treat as domain and clean it

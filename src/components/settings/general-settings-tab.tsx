@@ -100,7 +100,9 @@ export function GeneralSettingsTab({ projectId }: GeneralSettingsTabProps) {
       <Card className="p-6 border-destructive">
         <div className="space-y-4">
           <div>
-            <h4 className="text-sm font-semibold text-destructive">Danger Zone</h4>
+            <h4 className="text-sm font-semibold text-destructive">
+              Danger Zone
+            </h4>
             <p className="text-sm text-muted-foreground mt-1">
               Irreversible and destructive actions
             </p>
