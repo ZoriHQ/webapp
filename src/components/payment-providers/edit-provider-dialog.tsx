@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react'
-import { IconEye, IconEyeOff, IconExternalLink } from '@tabler/icons-react'
+import { useEffect, useState } from 'react'
+import { IconExternalLink, IconEye, IconEyeOff } from '@tabler/icons-react'
+import { toast } from 'sonner'
+import type Zoriapi from 'zorihq'
 import {
   Dialog,
   DialogContent,
@@ -15,8 +17,6 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useUpdatePaymentProvider } from '@/hooks/use-payment-providers'
 import { getProviderName } from '@/lib/payment-provider-icons'
 import { getProviderGuide } from '@/lib/provider-guides'
-import { toast } from 'sonner'
-import type Zoriapi from 'zorihq'
 
 interface EditProviderDialogProps {
   open: boolean

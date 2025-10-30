@@ -1,7 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
+import type {TimeRange} from '@/hooks/use-analytics';
 import { ChartAreaInteractive } from '@/components/chart-area-interactive'
 import {
+  
   useActiveUsers,
   useBounceRate,
   useChurnRate,
@@ -10,8 +12,7 @@ import {
   useTopVisitors,
   useVisitorsByCountry,
   useVisitorsByOrigin,
-  useVisitorsTimeline,
-  type TimeRange,
+  useVisitorsTimeline
 } from '@/hooks/use-analytics'
 import { useRevenueByOrigin } from '@/hooks/use-revenue'
 import { useProject } from '@/hooks/use-projects'

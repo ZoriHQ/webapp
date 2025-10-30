@@ -15,6 +15,24 @@ export function usePaymentProviders(projectId?: string) {
   })
 }
 
+export function useProviderInstructions(
+  providerType?: string,
+  projectId?: string,
+) {
+  const zClient = useApiClient()
+
+  return useQuery<Zoriapi.V1.PaymentProviders.ProviderInstructionsResponse>({
+    queryKey: ['providerInstructions', providerType],
+    queryFn: () =>
+      zClient.v1.paymentProviders.instructions({
+        provider_type:
+          providerType as Zoriapi.V1.PaymentProviders.PaymentProviderInstructionsParams['provider_type'],
+        project_id: projectId,
+      }),
+    enabled: !!providerType && !!zClient,
+  })
+}
+
 export function usePaymentProvider(id: string) {
   const zClient = useApiClient()
 

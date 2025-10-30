@@ -1,4 +1,8 @@
 import { useState } from 'react'
+import { IconActivity, IconClock, IconId, IconLink, IconMail, IconPhone, IconUser, IconUserCheck, IconUserPlus, IconWorld } from '@tabler/icons-react'
+import { DollarSign, ShoppingCart, TrendingUp } from 'lucide-react'
+import { toast } from 'sonner'
+import { format } from 'date-fns'
 import {
   Dialog,
   DialogContent,
@@ -20,13 +24,9 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
-import { useVisitorProfile, useIdentifyVisitor } from '@/hooks/use-analytics'
+import { useIdentifyVisitor, useVisitorProfile } from '@/hooks/use-analytics'
 import { useCustomerProfile } from '@/hooks/use-revenue'
 import { countryCodeToFlag, getCountryName } from '@/lib/country-utils'
-import { IconUser, IconClock, IconWorld, IconLink, IconActivity, IconUserCheck, IconUserPlus, IconMail, IconPhone, IconId } from '@tabler/icons-react'
-import { DollarSign, ShoppingCart, TrendingUp } from 'lucide-react'
-import { toast } from 'sonner'
-import { format } from 'date-fns'
 
 interface VisitorProfileModalProps {
   projectId: string

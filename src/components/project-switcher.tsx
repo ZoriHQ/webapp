@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { IconChevronDown, IconPlus } from '@tabler/icons-react'
-import { useNavigate, useParams, useLocation } from '@tanstack/react-router'
+import { useLocation, useNavigate, useParams } from '@tanstack/react-router'
 import { useProjects } from '@/hooks/use-projects'
 import {
   DropdownMenu,

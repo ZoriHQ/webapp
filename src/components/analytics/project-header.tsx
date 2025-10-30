@@ -1,4 +1,5 @@
 import { IconCalendar } from '@tabler/icons-react'
+import type { TimeRange } from '@/hooks/use-analytics'
 import {
   Select,
   SelectContent,
@@ -6,7 +7,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import type { TimeRange } from '@/hooks/use-analytics'
 
 interface ProjectHeaderProps {
   projectName?: string

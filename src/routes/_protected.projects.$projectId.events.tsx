@@ -1,12 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useProject } from '@/hooks/use-projects'
-import { useRecentEvents, useEventFilterOptions } from '@/hooks/use-analytics'
-import { LiveEventStream } from '@/components/analytics/live-event-stream'
 import { useState } from 'react'
-import { VisitorProfileModal } from '@/components/analytics/visitor-profile-modal'
-import { EventsFilterBar, type EventFiltersState } from '@/components/analytics/events-filter-bar'
 import { useQueryClient } from '@tanstack/react-query'
 import { z } from 'zod'
+import type {EventFiltersState} from '@/components/analytics/events-filter-bar';
+import { useProject } from '@/hooks/use-projects'
+import { useEventFilterOptions, useRecentEvents } from '@/hooks/use-analytics'
+import { LiveEventStream } from '@/components/analytics/live-event-stream'
+import { VisitorProfileModal } from '@/components/analytics/visitor-profile-modal'
+import {  EventsFilterBar } from '@/components/analytics/events-filter-bar'
 
 const eventsSearchSchema = z.object({
   pages: z.array(z.string()).optional().catch([]),

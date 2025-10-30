@@ -1,11 +1,11 @@
 import { useState } from 'react'
+import { IconLoader2 } from '@tabler/icons-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Card } from '@/components/ui/card'
 import { useProject } from '@/hooks/use-projects'
-import { IconLoader2 } from '@tabler/icons-react'
 
 interface GeneralSettingsTabProps {
   projectId: string

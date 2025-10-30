@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { IconPlus, IconTarget } from '@tabler/icons-react'
 import { useProject } from '@/hooks/use-projects'
-import { IconTarget, IconPlus } from '@tabler/icons-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 

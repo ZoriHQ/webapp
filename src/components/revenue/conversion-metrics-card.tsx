@@ -1,3 +1,4 @@
+import { Clock, DollarSign, RefreshCw, TrendingUp, Users } from 'lucide-react'
 import type Zoriapi from 'zorihq'
 import {
   Card,
@@ -6,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { TrendingUp, Clock, DollarSign, RefreshCw, Users } from 'lucide-react'
 
 interface ConversionMetricsCardProps {
   data: Zoriapi.V1.Revenue.ConversionMetricsResponse | undefined

@@ -1,33 +1,34 @@
-import type Zoriapi from 'zorihq'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import {
-  IconUsers,
   IconActivity,
-  IconPercentage,
+  IconArrowBackUp,
+  IconCheck,
   IconClock,
   IconFileText,
-  IconUserCheck,
-  IconArrowBackUp,
-  IconUserMinus,
+  IconPercentage,
   IconSettings,
-  IconCheck,
+  IconUserCheck,
+  IconUserMinus,
+  IconUsers,
 } from '@tabler/icons-react'
+import type Zoriapi from 'zorihq'
+import type {MetricType} from '@/lib/metrics-config';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
-  DropdownMenuContent,
   DropdownMenuCheckboxItem,
+  DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import {
   AVAILABLE_METRICS,
+  
   loadMetricsPreferences,
-  saveMetricsPreferences,
   resetMetricsPreferences,
-  type MetricType,
+  saveMetricsPreferences
 } from '@/lib/metrics-config'
 
 interface EngagementMetricsProps {
@@ -133,7 +134,7 @@ export function EngagementMetrics({
   returnData,
   isLoading = false,
 }: EngagementMetricsProps) {
-  const [enabledMetrics, setEnabledMetrics] = useState<MetricType[]>([])
+  const [enabledMetrics, setEnabledMetrics] = useState<Array<MetricType>>([])
 
   useEffect(() => {
     setEnabledMetrics(loadMetricsPreferences())

@@ -1,10 +1,11 @@
 'use client'
 
 import * as React from 'react'
-import type Zoriapi from 'zorihq'
 import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts'
+import type Zoriapi from 'zorihq'
 
 import type { ChartConfig } from '@/components/ui/chart'
+import type { TimeRange } from '@/hooks/use-analytics'
 import {
   Card,
   CardContent,
@@ -17,7 +18,6 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart'
-import type { TimeRange } from '@/hooks/use-analytics'
 
 export const description = 'An interactive area chart'
 
@@ -36,7 +36,7 @@ const chartConfig = {
 } satisfies ChartConfig
 
 interface ChartAreaInteractiveProps {
-  data?: Zoriapi.V1.Analytics.UniqueVisitorsDataPoint[]
+  data?: Array<Zoriapi.V1.Analytics.UniqueVisitorsDataPoint>
   isLoading?: boolean
   timeRange: TimeRange
 }

@@ -1,4 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useEffect } from 'react'
+import { toast } from 'sonner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { GeneralSettingsTab } from '@/components/settings/general-settings-tab'
 import { IntegrationsTab } from '@/components/settings/integrations-tab'
@@ -12,6 +14,26 @@ export const Route = createFileRoute('/_protected/projects/$projectId/settings')
 function ProjectSettings() {
   const { projectId } = Route.useParams()
   const { data: project } = useProject(projectId)
+
+  // Handle OAuth callback from payment provider
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search)
+    const provider = searchParams.get('provider')
+    const result = searchParams.get('result')
+
+    if (provider && result) {
+      // Show toast notification
+      if (result === 'success') {
+        toast.success(`Successfully connected ${provider}`)
+      } else if (result === 'failure') {
+        toast.error(`Failed to connect ${provider}`)
+      }
+
+      // Clean up URL by removing query params
+      const newUrl = window.location.pathname
+      window.history.replaceState({}, '', newUrl)
+    }
+  }, [])
 
   return (
     <div className="container mx-auto py-6 px-4 max-w-7xl">

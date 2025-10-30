@@ -2,20 +2,20 @@ import { useState } from 'react'
 import {
   IconAlertTriangle,
   IconCurrencyDollar,
+  IconEdit,
   IconLoader2,
   IconPlug,
-  IconEdit,
   IconTrash,
 } from '@tabler/icons-react'
+import { formatDistanceToNow } from 'date-fns'
+import type Zoriapi from 'zorihq'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { usePaymentProviders } from '@/hooks/use-payment-providers'
 import { getProviderIcon, getProviderName } from '@/lib/payment-provider-icons'
-import { formatDistanceToNow } from 'date-fns'
 import { ConnectProviderDialog } from '@/components/payment-providers/connect-provider-dialog'
 import { EditProviderDialog } from '@/components/payment-providers/edit-provider-dialog'
 import { DeleteProviderDialog } from '@/components/payment-providers/delete-provider-dialog'
-import type Zoriapi from 'zorihq'
 
 interface RevenueStatusIndicatorProps {
   projectId?: string

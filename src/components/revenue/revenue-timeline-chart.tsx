@@ -1,15 +1,15 @@
-import type Zoriapi from 'zorihq'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Area,
   AreaChart,
   CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
-  ResponsiveContainer,
 } from 'recharts'
 import { format } from 'date-fns'
+import type Zoriapi from 'zorihq'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface RevenueTimelineChartProps {
   data: Zoriapi.V1.Revenue.TimelineResponse | undefined

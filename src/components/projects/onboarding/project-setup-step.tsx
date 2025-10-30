@@ -6,10 +6,10 @@ import {
   IconExternalLink,
 } from '@tabler/icons-react'
 import { toast } from 'sonner'
+import { InstallationExamples } from '../installation-examples'
 import type { CreatedProject } from './project-onboarding'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { InstallationExamples } from '../installation-examples'
 
 interface ProjectSetupStepProps {
   project: CreatedProject | null

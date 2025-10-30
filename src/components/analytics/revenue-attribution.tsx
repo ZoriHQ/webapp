@@ -26,7 +26,7 @@ interface RevenueSource {
 }
 
 interface RevenueAttributionProps {
-  revenueData: RevenueSource[]
+  revenueData: Array<RevenueSource>
   hasData?: boolean
   showToggle?: boolean
   onToggle?: () => void

@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { Check, Plus, RefreshCw, Search } from 'lucide-react'
+import { FilterChip } from './filter-chip'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -14,20 +16,18 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command'
-import { FilterChip } from './filter-chip'
-import { Check, Plus, Search, RefreshCw } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export interface EventFiltersState {
-  pages: string[]
-  traffic_origins: string[]
+  pages: Array<string>
+  traffic_origins: Array<string>
   visitor_id?: string
 }
 
 interface EventsFilterBarProps {
   filters: EventFiltersState
-  availablePages?: string[]
-  availableOrigins?: string[]
+  availablePages?: Array<string>
+  availableOrigins?: Array<string>
   onFiltersChange: (filters: EventFiltersState) => void
   onRefresh?: () => void
   isLoadingOptions?: boolean

@@ -1,6 +1,6 @@
+import { DollarSign, ShoppingCart, TrendingUp, Users } from 'lucide-react'
 import type Zoriapi from 'zorihq'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { DollarSign, TrendingUp, Users, ShoppingCart } from 'lucide-react'
 
 interface RevenueDashboardMetricsProps {
   data: Zoriapi.V1.Revenue.DashboardResponse | undefined

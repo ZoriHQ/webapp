@@ -21,7 +21,7 @@ export interface MetricConfig {
 }
 
 // All available metrics with their configurations
-export const AVAILABLE_METRICS: MetricConfig[] = [
+export const AVAILABLE_METRICS: Array<MetricConfig> = [
   {
     id: 'uniqueVisitors',
     label: 'Unique Visitors',
@@ -104,7 +104,7 @@ export const AVAILABLE_METRICS: MetricConfig[] = [
 const STORAGE_KEY = 'zori-metrics-preferences'
 
 // Get default enabled metrics
-export function getDefaultMetrics(): MetricType[] {
+export function getDefaultMetrics(): Array<MetricType> {
   return AVAILABLE_METRICS
     .filter(m => m.defaultEnabled)
     .sort((a, b) => a.priority - b.priority)
@@ -112,11 +112,11 @@ export function getDefaultMetrics(): MetricType[] {
 }
 
 // Load metrics preferences from localStorage
-export function loadMetricsPreferences(): MetricType[] {
+export function loadMetricsPreferences(): Array<MetricType> {
   try {
     const stored = localStorage.getItem(STORAGE_KEY)
     if (stored) {
-      const parsed = JSON.parse(stored) as MetricType[]
+      const parsed = JSON.parse(stored) as Array<MetricType>
       // Validate that all stored metrics are valid
       const validMetrics = parsed.filter(id =>
         AVAILABLE_METRICS.some(m => m.id === id)
@@ -130,7 +130,7 @@ export function loadMetricsPreferences(): MetricType[] {
 }
 
 // Save metrics preferences to localStorage
-export function saveMetricsPreferences(metrics: MetricType[]): void {
+export function saveMetricsPreferences(metrics: Array<MetricType>): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(metrics))
   } catch (error) {

@@ -1,10 +1,10 @@
 import {
-  IconBrandStripe,
   IconBrandPaypal,
+  IconBrandStripe,
   IconCreditCard,
   IconLemon,
-  IconSquare,
   IconPlug,
+  IconSquare,
 } from '@tabler/icons-react'
 
 export type ProviderType =

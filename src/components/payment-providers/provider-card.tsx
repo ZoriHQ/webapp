@@ -1,4 +1,6 @@
-import { IconEdit, IconTrash, IconDots } from '@tabler/icons-react'
+import { IconDots, IconEdit, IconTrash } from '@tabler/icons-react'
+import { formatDistanceToNow } from 'date-fns'
+import type Zoriapi from 'zorihq'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -8,9 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { getProviderIcon, getProviderName, getProviderColor } from '@/lib/payment-provider-icons'
-import { formatDistanceToNow } from 'date-fns'
-import type Zoriapi from 'zorihq'
+import { getProviderColor, getProviderIcon, getProviderName } from '@/lib/payment-provider-icons'
 
 interface ProviderCardProps {
   provider: Zoriapi.V1.PaymentProviders.PaymentProviderResponse

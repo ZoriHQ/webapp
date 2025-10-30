@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react'
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || 'http://localhost:1323'
 
-export function useApiClient(): Zoriapi {
+export function useApiClient(): Zoriapi | null {
   const user = useUser()
   const [accessToken, setAccessToken] = useState<string>('__empty__')
 
@@ -30,10 +30,7 @@ export function useApiClient(): Zoriapi {
   }, [user])
 
   if (accessToken === '__empty__') {
-    return new Zoriapi({
-      baseURL: API_BASE_URL,
-      apiKey: accessToken,
-    })
+    return null
   }
 
   const zclient = new Zoriapi({

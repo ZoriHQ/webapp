@@ -1,12 +1,14 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute  } from '@tanstack/react-router'
 import { useState } from 'react'
+import { AlertCircle } from 'lucide-react'
+import type {TimeRange} from '@/hooks/use-revenue';
 import {
+  
+  useConversionMetrics,
+  useRevenueByOrigin,
   useRevenueDashboard,
   useRevenueTimeline,
-  useRevenueByOrigin,
-  useTopCustomers,
-  useConversionMetrics,
-  type TimeRange,
+  useTopCustomers
 } from '@/hooks/use-revenue'
 import { useProject } from '@/hooks/use-projects'
 import { usePaymentProviders } from '@/hooks/use-payment-providers'
@@ -18,8 +20,6 @@ import { TopCustomersTable } from '@/components/revenue/top-customers-table'
 import { ConversionMetricsCard } from '@/components/revenue/conversion-metrics-card'
 import { CustomerProfileModal } from '@/components/revenue/customer-profile-modal'
 import { Card, CardContent } from '@/components/ui/card'
-import { AlertCircle } from 'lucide-react'
-import { Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 
 export const Route = createFileRoute('/_protected/projects/$projectId/revenue')({

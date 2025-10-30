@@ -1,3 +1,5 @@
+import { toast } from 'sonner'
+import type Zoriapi from 'zorihq'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,8 +12,6 @@ import {
 } from '@/components/ui/alert-dialog'
 import { useDeletePaymentProvider } from '@/hooks/use-payment-providers'
 import { getProviderName } from '@/lib/payment-provider-icons'
-import { toast } from 'sonner'
-import type Zoriapi from 'zorihq'
 
 interface DeleteProviderDialogProps {
   open: boolean

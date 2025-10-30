@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import { IconPlus, IconLoader2 } from '@tabler/icons-react'
-import { Button } from '@/components/ui/button'
-import { usePaymentProviders } from '@/hooks/use-payment-providers'
+import { IconLoader2, IconPlus } from '@tabler/icons-react'
 import { ProviderCard } from './provider-card'
 import { ConnectProviderDialog } from './connect-provider-dialog'
 import { EditProviderDialog } from './edit-provider-dialog'
 import { DeleteProviderDialog } from './delete-provider-dialog'
 import type Zoriapi from 'zorihq'
+import { usePaymentProviders } from '@/hooks/use-payment-providers'
+import { Button } from '@/components/ui/button'
 
 interface ProviderListProps {
   projectId: string

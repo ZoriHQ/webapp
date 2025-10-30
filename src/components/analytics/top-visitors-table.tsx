@@ -1,3 +1,4 @@
+import { IconUserCheck } from '@tabler/icons-react'
 import type Zoriapi from 'zorihq'
 import {
   Card,
@@ -15,7 +16,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { countryCodeToFlag } from '@/lib/country-utils'
-import { IconUserCheck } from '@tabler/icons-react'
 
 interface TopVisitorsTableProps {
   data: Zoriapi.V1.Analytics.TopVisitorsResponse | undefined

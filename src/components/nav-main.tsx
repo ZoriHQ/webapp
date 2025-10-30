@@ -1,17 +1,17 @@
 import {
-  IconHome,
-  IconChartBar,
-  IconCalendarEvent,
-  IconTarget,
   IconBrain,
+  IconCalendarEvent,
+  IconChartBar,
   IconCurrencyDollar,
+  IconHome,
+  IconTarget,
 } from '@tabler/icons-react'
-import { useNavigate, useParams, useLocation } from '@tanstack/react-router'
+import { useLocation, useNavigate, useParams } from '@tanstack/react-router'
 
 import {
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,

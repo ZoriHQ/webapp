@@ -1,9 +1,9 @@
-import type Zoriapi from 'zorihq'
 import {
   IconArrowBackUp,
-  IconUserMinus,
   IconClock,
+  IconUserMinus,
 } from '@tabler/icons-react'
+import type Zoriapi from 'zorihq'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface RetentionMetricsProps {

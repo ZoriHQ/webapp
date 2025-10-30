@@ -1,3 +1,4 @@
+import { IconMoodEmpty } from '@tabler/icons-react'
 import type Zoriapi from 'zorihq'
 import {
   Card,
@@ -15,7 +16,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { IconMoodEmpty } from '@tabler/icons-react'
 
 interface RevenueAttributionByOriginProps {
   data: Zoriapi.V1.Revenue.AttributionByOriginResponse | undefined
