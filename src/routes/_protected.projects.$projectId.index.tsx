@@ -10,7 +10,7 @@ import {
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { useProject } from '@/hooks/use-projects'
-import { useAuth } from '@/lib/use-auth'
+import { useAuthState } from '@/lib/auth'
 import {
   useChurnRate,
   useDashboardMetrics,
@@ -36,7 +36,7 @@ export const Route = createFileRoute('/_protected/projects/$projectId/')({
 function OverviewPage() {
   const { projectId } = Route.useParams()
   const [timeRange, setTimeRange] = useState<TimeRange>('today')
-  const { account } = useAuth()
+  const { user } = useAuthState()
 
   // Handle payment provider OAuth callback
   useEffect(() => {
@@ -101,7 +101,7 @@ function OverviewPage() {
 
   const hasNoEvents = !projectData?.first_event_received_at && !projectLoading
 
-  const userName = (account as any)?.name?.split(' ')[0] || 'there'
+  const userName = user?.name.split(' ')[0] || 'there'
   const currentHour = new Date().getHours()
   let greeting = 'Good evening'
   if (currentHour < 12) {

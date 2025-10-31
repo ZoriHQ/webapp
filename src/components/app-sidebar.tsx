@@ -1,12 +1,13 @@
 import * as React from 'react'
 import { IconHelp, IconSettings } from '@tabler/icons-react'
 import { useParams } from '@tanstack/react-router'
+import { useClerk } from '@clerk/clerk-react'
 
 import { NavMain } from '@/components/nav-main'
 import { NavSecondary } from '@/components/nav-secondary'
 import { NavUser } from '@/components/nav-user'
 import { ProjectSwitcher } from '@/components/project-switcher'
-import { useAuth } from '@/lib/use-auth'
+import { getAuthMode, useAuthState } from '@/lib/auth'
 import {
   Sidebar,
   SidebarContent,
@@ -15,13 +16,30 @@ import {
 } from '@/components/ui/sidebar'
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { account } = useAuth()
+  const { user, isLoading } = useAuthState()
   const params = useParams({ strict: false })
   const projectId = (params as { projectId?: string }).projectId
+  const authMode = getAuthMode()
+  const clerk = useClerk()
 
-  const userName =
-    (account as any)?.displayName || (account as any)?.primaryEmail || 'User'
-  const userAvatar = (account as any)?.profileImageUrl || ''
+  const userName = user?.name || user?.email || 'User'
+  const userEmail = user?.email || ''
+  const userAvatar = user?.avatar || ''
+
+  // Don't render NavUser if still loading or no user
+  const showNavUser = !isLoading && user
+
+  const handleManageAccount = () => {
+    if (authMode === 'clerk' && clerk) {
+      clerk.openUserProfile()
+    }
+  }
+
+  const handleManageOrganization = () => {
+    if (authMode === 'clerk' && clerk) {
+      clerk.openOrganizationProfile()
+    }
+  }
 
   const secondaryItems = [
     {
@@ -46,13 +64,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavSecondary items={secondaryItems} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser
-          user={{
-            name: userName,
-            email: (account as any)?.primaryEmail || '',
-            avatar: userAvatar,
-          }}
-        />
+        {showNavUser && (
+          <NavUser
+            user={{
+              name: userName,
+              email: userEmail,
+              avatar: userAvatar,
+            }}
+            onManageAccount={
+              authMode === 'clerk' ? handleManageAccount : undefined
+            }
+            onManageOrganization={
+              authMode === 'clerk' ? handleManageOrganization : undefined
+            }
+          />
+        )}
       </SidebarFooter>
     </Sidebar>
   )

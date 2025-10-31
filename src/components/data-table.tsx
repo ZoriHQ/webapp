@@ -355,7 +355,7 @@ export function DataTable({
   )
 
   const dataIds = React.useMemo<Array<UniqueIdentifier>>(
-    () => data?.map(({ id }) => id) || [],
+    () => data.map(({ id }) => id),
     [data],
   )
 
@@ -501,7 +501,7 @@ export function DataTable({
                 ))}
               </TableHeader>
               <TableBody className="**:data-[slot=table-cell]:first:w-8">
-                {table.getRowModel().rows?.length ? (
+                {table.getRowModel().rows.length ? (
                   <SortableContext
                     items={dataIds}
                     strategy={verticalListSortingStrategy}

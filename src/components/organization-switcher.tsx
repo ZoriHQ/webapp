@@ -1,6 +1,5 @@
 'use client'
 
-import { useAuth } from '@/lib/use-auth'
 import { cn } from '@/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -11,7 +10,8 @@ import {
 } from '@/components/ui/tooltip'
 
 export function OrganizationSwitcher() {
-  const { organization } = useAuth()
+  // TODO: Implement organization switching when multi-org support is added
+  const organization = null
 
   if (!organization) {
     return null

@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
-import { SignIn } from '@stackframe/react'
+import { LoginComponent } from '@/components/auth/login'
 import { requireGuest } from '@/lib/route-guards'
 
 const loginSearchSchema = z.object({
@@ -14,15 +14,5 @@ export const Route = createFileRoute('/login')({
     await requireGuest({ location })
   },
 
-  component: LoginPageWrapper,
+  component: LoginComponent,
 })
-
-function LoginPageWrapper() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="w-full max-w-md">
-        <SignIn />
-      </div>
-    </div>
-  )
-}

@@ -1,109 +1,66 @@
 import { redirect } from '@tanstack/react-router'
-import { stackClientApp } from './stack-client'
+import { getAuthMode } from './auth'
+import { ossProvider } from './auth/oss-provider'
+
+/**
+ * Route Guards for Authentication
+ * Works with both Clerk and OSS modes
+ */
 
 export async function requireAuth({ location }: { location: any }) {
-  // Wait for Stack to be ready
-  const user = await stackClientApp.getUser({ or: 'redirect', to: '/login' })
+  const mode = getAuthMode()
 
-  if (!user) {
-    // Store the attempted location for redirecting after login
-    const redirectTo = location.href
-    throw redirect({
-      to: '/login',
-      search: {
-        redirect: redirectTo,
-      },
-    })
+  // In OSS mode, check actual authentication state
+  if (mode === 'oss') {
+    if (!ossProvider.isAuthenticated()) {
+      throw redirect({
+        to: '/login',
+        search: {
+          redirect: location.pathname,
+        },
+      })
+    }
+    return true
   }
 
-  return user
+  // In Clerk mode, we rely on Clerk's built-in authentication
+  // Clerk will automatically redirect to their sign-in page if not authenticated
+  // The ClerkProvider handles this for us
+  return true
 }
 
 export async function requireGuest({ location }: { location: any }) {
-  const user = await stackClientApp.getUser({ or: 'return-null' })
+  const mode = getAuthMode()
 
-  if (user) {
-    throw redirect({
-      to: '/projects',
-    })
+  // In OSS mode, check if user is authenticated
+  if (mode === 'oss') {
+    if (ossProvider.isAuthenticated()) {
+      throw redirect({
+        to: '/projects',
+      })
+    }
+    return null
   }
 
+  // In Clerk mode, if user is already signed in, redirect to projects
+  // Clerk will handle this check
   return null
 }
 
 export async function optionalAuth() {
-  const user = await stackClientApp.getUser({ or: 'return-null' })
-  return user
+  // No guard needed, allow access regardless of auth state
+  return null
 }
 
-export async function requireRole(role: string) {
-  const user = await stackClientApp.getUser({ or: 'redirect', to: '/login' })
+export function getPostLoginRedirect(search: Record<string, unknown>): string {
+  const redirectPath = search.redirect as string | undefined
 
-  if (!user) {
-    throw redirect({
-      to: '/login',
-    })
-  }
-
-  // Stack Auth stores roles differently - adjust based on your setup
-  const userRole = (user as any)?.clientMetadata?.role
-
-  if (userRole !== role) {
-    throw redirect({
-      to: '/login',
-      statusCode: 403,
-    })
-  }
-
-  return user
-}
-
-export async function requireOrganization() {
-  const user = await stackClientApp.getUser({ or: 'redirect', to: '/login' })
-
-  if (!user) {
-    throw redirect({
-      to: '/login',
-    })
-  }
-
-  return user
-}
-
-export async function requireAuthAndOrg({ location }: { location: any }) {
-  const user = await stackClientApp.getUser({ or: 'redirect', to: '/login' })
-
-  if (!user) {
-    const redirectTo = location.href
-    throw redirect({
-      to: '/login',
-      search: {
-        redirect: redirectTo,
-      },
-    })
-  }
-
-  // Check if user has a selected team (organization context)
-  if (!user.selectedTeam) {
-    // Redirect to team selection page if no team is selected
-    const redirectTo = location.href
-    throw redirect({
-      to: '/select-team',
-      search: {
-        redirect: redirectTo,
-      },
-    })
-  }
-
-  return user
-}
-
-export function getPostLoginRedirect(search: Record<string, any>): string {
-  // eslint-disable-next-line
-  const redirect = search?.redirect as string
-
-  if (redirect && redirect.startsWith('/') && !redirect.startsWith('//')) {
-    return redirect
+  if (
+    redirectPath &&
+    redirectPath.startsWith('/') &&
+    !redirectPath.startsWith('//')
+  ) {
+    return redirectPath
   }
 
   return '/projects'

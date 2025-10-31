@@ -21,7 +21,7 @@ export function NavMain() {
   const navigate = useNavigate()
   const location = useLocation()
   const params = useParams({ strict: false })
-  const projectId = (params as { projectId?: string })?.projectId
+  const projectId = (params as { projectId?: string }).projectId
 
   const insightsItems = [
     {
@@ -83,7 +83,7 @@ export function NavMain() {
                   disabled={item.url === '#'}
                   isActive={isActive}
                 >
-                  {item.icon && <item.icon />}
+                  {<item.icon />}
                   <span>{item.title}</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>

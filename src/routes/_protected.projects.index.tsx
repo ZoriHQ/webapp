@@ -1,5 +1,5 @@
-import { Link, createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useEffect, useState } from 'react'
 import { IconPlus } from '@tabler/icons-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -8,7 +8,6 @@ import { useDeleteProject, useProjects } from '@/hooks/use-projects'
 import {
   DeleteProjectDialog,
   ProjectCard,
-  ProjectOnboarding,
   ProjectsTable,
 } from '@/components/projects'
 
@@ -17,6 +16,7 @@ export const Route = createFileRoute('/_protected/projects/')({
 })
 
 function ProjectsIndexPage() {
+  const navigate = useNavigate()
   const [view, setView] = useState<'grid' | 'list'>('grid')
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -36,6 +36,13 @@ function ProjectsIndexPage() {
   const deleteProjectMutation = useDeleteProject()
 
   const projects = projectsData?.projects || []
+
+  // Redirect to /projects/new if no projects exist
+  useEffect(() => {
+    if (!isLoading && projects.length === 0) {
+      navigate({ to: '/projects/new' })
+    }
+  }, [isLoading, projects.length, navigate])
 
   const filteredProjects = projects.filter((project: any) => {
     const matchesSearch =
@@ -123,8 +130,9 @@ function ProjectsIndexPage() {
     )
   }
 
+  // This shouldn't render because of the redirect, but keep as fallback
   if (projects.length === 0) {
-    return <ProjectOnboarding />
+    return null
   }
 
   return (

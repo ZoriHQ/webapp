@@ -9,7 +9,6 @@ export interface CountryCoordinate {
   name: string
 }
 
-// Major countries and territories with their approximate coordinates
 const COUNTRY_COORDINATES: Record<string, CountryCoordinate> = {
   // North America
   US: { lat: 37.0902, lng: -95.7129, name: 'United States' },
@@ -115,8 +114,8 @@ const COUNTRY_COORDINATES: Record<string, CountryCoordinate> = {
 export function getCountryCoordinates(
   countryCode: string,
 ): CountryCoordinate | null {
-  const code = countryCode?.toUpperCase()
-  return COUNTRY_COORDINATES[code] || null
+  const code = countryCode.toUpperCase()
+  return COUNTRY_COORDINATES[code]
 }
 
 /**

@@ -1,4 +1,3 @@
-// Convert ISO country code to emoji flag
 export function countryCodeToFlag(countryCode: string): string {
   if (!countryCode || countryCode.length !== 2) return '🌍'
 
@@ -10,7 +9,6 @@ export function countryCodeToFlag(countryCode: string): string {
   return String.fromCodePoint(...codePoints)
 }
 
-// Map of ISO country codes to country names
 export const COUNTRY_NAMES: Record<string, string> = {
   // A
   AD: 'Andorra',
@@ -312,13 +310,11 @@ export const COUNTRY_NAMES: Record<string, string> = {
   ZW: 'Zimbabwe',
 }
 
-// Get country name from ISO code
 export function getCountryName(countryCode: string): string {
-  const code = countryCode?.toUpperCase()
+  const code = countryCode.toUpperCase()
   return COUNTRY_NAMES[code] || code || 'Unknown'
 }
 
-// Get country name with flag emoji
 export function getCountryWithFlag(countryCode: string): string {
   if (!countryCode) return '🌍 Unknown'
 

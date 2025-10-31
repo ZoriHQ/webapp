@@ -9,13 +9,13 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SelectTeamRouteImport } from './routes/select-team'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as CreateTeamRouteImport } from './routes/create-team'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RegisterSsoCallbackRouteImport } from './routes/register.sso-callback'
+import { Route as LoginSsoCallbackRouteImport } from './routes/login.sso-callback'
 import { Route as ProtectedProjectsRouteImport } from './routes/_protected.projects'
 import { Route as ProtectedProjectsIndexRouteImport } from './routes/_protected.projects.index'
 import { Route as ProtectedProjectsNewRouteImport } from './routes/_protected.projects.new'
@@ -28,11 +28,6 @@ import { Route as ProtectedProjectsProjectIdGoalsRouteImport } from './routes/_p
 import { Route as ProtectedProjectsProjectIdEventsRouteImport } from './routes/_protected.projects.$projectId.events'
 import { Route as ProtectedProjectsProjectIdAnalyticsRouteImport } from './routes/_protected.projects.$projectId.analytics'
 
-const SelectTeamRoute = SelectTeamRouteImport.update({
-  id: '/select-team',
-  path: '/select-team',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
@@ -41,11 +36,6 @@ const RegisterRoute = RegisterRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CreateTeamRoute = CreateTeamRouteImport.update({
-  id: '/create-team',
-  path: '/create-team',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -61,6 +51,16 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterSsoCallbackRoute = RegisterSsoCallbackRouteImport.update({
+  id: '/sso-callback',
+  path: '/sso-callback',
+  getParentRoute: () => RegisterRoute,
+} as any)
+const LoginSsoCallbackRoute = LoginSsoCallbackRouteImport.update({
+  id: '/sso-callback',
+  path: '/sso-callback',
+  getParentRoute: () => LoginRoute,
 } as any)
 const ProtectedProjectsRoute = ProtectedProjectsRouteImport.update({
   id: '/projects',
@@ -129,11 +129,11 @@ const ProtectedProjectsProjectIdAnalyticsRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/create-team': typeof CreateTeamRoute
-  '/login': typeof LoginRoute
-  '/register': typeof RegisterRoute
-  '/select-team': typeof SelectTeamRoute
+  '/login': typeof LoginRouteWithChildren
+  '/register': typeof RegisterRouteWithChildren
   '/projects': typeof ProtectedProjectsRouteWithChildren
+  '/login/sso-callback': typeof LoginSsoCallbackRoute
+  '/register/sso-callback': typeof RegisterSsoCallbackRoute
   '/projects/$projectId': typeof ProtectedProjectsProjectIdRouteWithChildren
   '/projects/new': typeof ProtectedProjectsNewRoute
   '/projects/': typeof ProtectedProjectsIndexRoute
@@ -148,10 +148,10 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/create-team': typeof CreateTeamRoute
-  '/login': typeof LoginRoute
-  '/register': typeof RegisterRoute
-  '/select-team': typeof SelectTeamRoute
+  '/login': typeof LoginRouteWithChildren
+  '/register': typeof RegisterRouteWithChildren
+  '/login/sso-callback': typeof LoginSsoCallbackRoute
+  '/register/sso-callback': typeof RegisterSsoCallbackRoute
   '/projects/new': typeof ProtectedProjectsNewRoute
   '/projects': typeof ProtectedProjectsIndexRoute
   '/projects/$projectId/analytics': typeof ProtectedProjectsProjectIdAnalyticsRoute
@@ -167,11 +167,11 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_protected': typeof ProtectedRouteWithChildren
   '/about': typeof AboutRoute
-  '/create-team': typeof CreateTeamRoute
-  '/login': typeof LoginRoute
-  '/register': typeof RegisterRoute
-  '/select-team': typeof SelectTeamRoute
+  '/login': typeof LoginRouteWithChildren
+  '/register': typeof RegisterRouteWithChildren
   '/_protected/projects': typeof ProtectedProjectsRouteWithChildren
+  '/login/sso-callback': typeof LoginSsoCallbackRoute
+  '/register/sso-callback': typeof RegisterSsoCallbackRoute
   '/_protected/projects/$projectId': typeof ProtectedProjectsProjectIdRouteWithChildren
   '/_protected/projects/new': typeof ProtectedProjectsNewRoute
   '/_protected/projects/': typeof ProtectedProjectsIndexRoute
@@ -188,11 +188,11 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
-    | '/create-team'
     | '/login'
     | '/register'
-    | '/select-team'
     | '/projects'
+    | '/login/sso-callback'
+    | '/register/sso-callback'
     | '/projects/$projectId'
     | '/projects/new'
     | '/projects/'
@@ -207,10 +207,10 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
-    | '/create-team'
     | '/login'
     | '/register'
-    | '/select-team'
+    | '/login/sso-callback'
+    | '/register/sso-callback'
     | '/projects/new'
     | '/projects'
     | '/projects/$projectId/analytics'
@@ -225,11 +225,11 @@ export interface FileRouteTypes {
     | '/'
     | '/_protected'
     | '/about'
-    | '/create-team'
     | '/login'
     | '/register'
-    | '/select-team'
     | '/_protected/projects'
+    | '/login/sso-callback'
+    | '/register/sso-callback'
     | '/_protected/projects/$projectId'
     | '/_protected/projects/new'
     | '/_protected/projects/'
@@ -246,21 +246,12 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProtectedRoute: typeof ProtectedRouteWithChildren
   AboutRoute: typeof AboutRoute
-  CreateTeamRoute: typeof CreateTeamRoute
-  LoginRoute: typeof LoginRoute
-  RegisterRoute: typeof RegisterRoute
-  SelectTeamRoute: typeof SelectTeamRoute
+  LoginRoute: typeof LoginRouteWithChildren
+  RegisterRoute: typeof RegisterRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/select-team': {
-      id: '/select-team'
-      path: '/select-team'
-      fullPath: '/select-team'
-      preLoaderRoute: typeof SelectTeamRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/register': {
       id: '/register'
       path: '/register'
@@ -273,13 +264,6 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/create-team': {
-      id: '/create-team'
-      path: '/create-team'
-      fullPath: '/create-team'
-      preLoaderRoute: typeof CreateTeamRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -302,6 +286,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/register/sso-callback': {
+      id: '/register/sso-callback'
+      path: '/sso-callback'
+      fullPath: '/register/sso-callback'
+      preLoaderRoute: typeof RegisterSsoCallbackRouteImport
+      parentRoute: typeof RegisterRoute
+    }
+    '/login/sso-callback': {
+      id: '/login/sso-callback'
+      path: '/sso-callback'
+      fullPath: '/login/sso-callback'
+      preLoaderRoute: typeof LoginSsoCallbackRouteImport
+      parentRoute: typeof LoginRoute
     }
     '/_protected/projects': {
       id: '/_protected/projects'
@@ -441,14 +439,34 @@ const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
   ProtectedRouteChildren,
 )
 
+interface LoginRouteChildren {
+  LoginSsoCallbackRoute: typeof LoginSsoCallbackRoute
+}
+
+const LoginRouteChildren: LoginRouteChildren = {
+  LoginSsoCallbackRoute: LoginSsoCallbackRoute,
+}
+
+const LoginRouteWithChildren = LoginRoute._addFileChildren(LoginRouteChildren)
+
+interface RegisterRouteChildren {
+  RegisterSsoCallbackRoute: typeof RegisterSsoCallbackRoute
+}
+
+const RegisterRouteChildren: RegisterRouteChildren = {
+  RegisterSsoCallbackRoute: RegisterSsoCallbackRoute,
+}
+
+const RegisterRouteWithChildren = RegisterRoute._addFileChildren(
+  RegisterRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProtectedRoute: ProtectedRouteWithChildren,
   AboutRoute: AboutRoute,
-  CreateTeamRoute: CreateTeamRoute,
-  LoginRoute: LoginRoute,
-  RegisterRoute: RegisterRoute,
-  SelectTeamRoute: SelectTeamRoute,
+  LoginRoute: LoginRouteWithChildren,
+  RegisterRoute: RegisterRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

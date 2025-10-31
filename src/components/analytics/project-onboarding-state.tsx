@@ -8,7 +8,7 @@ import markup from 'react-syntax-highlighter/dist/cjs/languages/prism/markup'
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/cjs/styles/prism'
 import { Button } from '@/components/ui/button'
 import { GlobeVisualization } from '@/components/overview/globe-visualization'
-import { useAuth } from '@/lib/use-auth'
+import { useAuthState } from '@/lib/auth'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 SyntaxHighlighter.registerLanguage('jsx', jsx)
@@ -39,7 +39,7 @@ export function ProjectOnboardingState({
     lat: number
     lng: number
   } | null>(null)
-  const { getToken } = useAuth()
+  const { getToken } = useAuthState()
   const [socketUrl, setSocketUrl] = useState<string>(
     `${wsURL}/events/stream?id=${projectId}&token=`,
   )

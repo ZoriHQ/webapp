@@ -7,9 +7,10 @@ import {
   IconNotification,
   IconSun,
   IconUserCircle,
+  IconUsers,
 } from '@tabler/icons-react'
-import { useUser } from '@stackframe/react'
 import { useNavigate } from '@tanstack/react-router'
+import { getAuthMode, useAuthState } from '@/lib/auth'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -32,22 +33,25 @@ import {
 } from '@/components/ui/sidebar'
 import { useTheme } from '@/components/theme-provider'
 
-export function NavUser({
-  user,
-}: {
+interface NavUserProps {
   user: {
     name: string
     email: string
     avatar: string
   }
-}) {
+  onManageAccount?: () => void
+  onManageOrganization?: () => void
+}
+
+export function NavUser({ user, onManageAccount, onManageOrganization }: NavUserProps) {
   const { isMobile } = useSidebar()
-  const stackUser = useUser()
+  const { signOut } = useAuthState()
   const navigate = useNavigate()
   const { theme, setTheme } = useTheme()
+  const authMode = getAuthMode()
 
   const handleLogout = async () => {
-    await stackUser?.signOut()
+    await signOut()
     navigate({ to: '/login' })
   }
 
@@ -95,10 +99,18 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <IconUserCircle />
-                Account
-              </DropdownMenuItem>
+              {authMode === 'clerk' && (
+                <>
+                  <DropdownMenuItem onClick={onManageAccount}>
+                    <IconUserCircle />
+                    Manage Account
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={onManageOrganization}>
+                    <IconUsers />
+                    Manage Team
+                  </DropdownMenuItem>
+                </>
+              )}
               <DropdownMenuItem>
                 <IconCreditCard />
                 Billing

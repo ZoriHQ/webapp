@@ -22,7 +22,7 @@ export function ProjectSwitcher() {
   const navigate = useNavigate()
   const location = useLocation()
   const params = useParams({ strict: false })
-  const projectId = (params as { projectId?: string })?.projectId
+  const projectId = (params as { projectId?: string }).projectId
 
   const { data: projectsData, isLoading } = useProjects()
   const projects = projectsData?.projects || []
@@ -46,24 +46,25 @@ export function ProjectSwitcher() {
   }
 
   // Auto-select first project if none selected
-  // But don't redirect if user is on specific pages like /projects/new
+  // But don't redirect if user is on specific pages like /projects/new or team settings
   React.useEffect(() => {
     const isOnProjectCreationPage = location.pathname === '/projects/new'
     const isOnProjectsListPage = location.pathname === '/projects'
+    const isOnTeamPage = location.pathname.startsWith('/team')
 
     if (
       !projectId &&
       projects.length > 0 &&
       !isLoading &&
       !isOnProjectCreationPage &&
-      !isOnProjectsListPage
+      !isOnProjectsListPage &&
+      !isOnTeamPage
     ) {
       const firstProjectId = projects[0]?.id
       if (firstProjectId) {
         handleProjectSwitch(firstProjectId)
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId, projects, isLoading, location.pathname])
 
   if (isLoading) {

@@ -1,9 +1,8 @@
 'use client'
 
 import { Loader2Icon } from 'lucide-react'
-import { useUser } from '@stackframe/react'
 import { useNavigate } from '@tanstack/react-router'
-import { useAuth, useAuthGuard } from '@/lib/use-auth'
+import { useAuthState } from '@/lib/auth'
 import {
   Card,
   CardContent,
@@ -14,21 +13,16 @@ import {
 import { Button } from '@/components/ui/button'
 
 export function ProtectedPage() {
-  // Protect this page - redirects to login if not authenticated
-  const { isLoading: authLoading } = useAuthGuard()
-
-  // Get auth data
-  const { account, organization, isAuthenticated } = useAuth()
-  const stackUser = useUser()
+  const { user, isAuthenticated, isLoading, signOut } = useAuthState()
   const navigate = useNavigate()
 
   const handleLogout = async () => {
-    await stackUser?.signOut()
+    await signOut()
     navigate({ to: '/login' })
   }
 
   // Show loading while checking auth
-  if (authLoading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2Icon className="h-8 w-8 animate-spin text-primary" />
@@ -36,7 +30,7 @@ export function ProtectedPage() {
     )
   }
 
-  // Only render if authenticated (useAuthGuard will redirect if not)
+  // Only render if authenticated
   if (!isAuthenticated) {
     return null
   }
@@ -61,57 +55,19 @@ export function ProtectedPage() {
             <div>
               <span className="font-medium">Name:</span>{' '}
               <span className="text-muted-foreground">
-                {(account as any)?.displayName || 'N/A'}
+                {user?.name || 'N/A'}
               </span>
             </div>
             <div>
               <span className="font-medium">Email:</span>{' '}
               <span className="text-muted-foreground">
-                {(account as any)?.primaryEmail || 'N/A'}
+                {user?.email || 'N/A'}
               </span>
             </div>
             <div>
-              <span className="font-medium">Account ID:</span>{' '}
+              <span className="font-medium">User ID:</span>{' '}
               <span className="text-muted-foreground font-mono text-xs">
-                {account?.id || 'N/A'}
-              </span>
-            </div>
-            <div>
-              <span className="font-medium">Created:</span>{' '}
-              <span className="text-muted-foreground">
-                {(account as any)?.createdAt
-                  ? new Date((account as any).createdAt).toLocaleDateString()
-                  : 'N/A'}
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Organization Information Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Organization</CardTitle>
-            <CardDescription>Your organization details</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <div>
-              <span className="font-medium">Name:</span>{' '}
-              <span className="text-muted-foreground">
-                {organization?.name || 'N/A'}
-              </span>
-            </div>
-            <div>
-              <span className="font-medium">Organization ID:</span>{' '}
-              <span className="text-muted-foreground font-mono text-xs">
-                {organization?.id || 'N/A'}
-              </span>
-            </div>
-            <div>
-              <span className="font-medium">Created:</span>{' '}
-              <span className="text-muted-foreground">
-                {organization?.created_at
-                  ? new Date(organization.created_at).toLocaleDateString()
-                  : 'N/A'}
+                {user?.id || 'N/A'}
               </span>
             </div>
           </CardContent>

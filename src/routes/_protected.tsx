@@ -1,7 +1,6 @@
 // eslint-disable-next-line
 import { createFileRoute, Outlet, useParams } from '@tanstack/react-router'
 import { useState } from 'react'
-import { requireAuthAndOrg } from '@/lib/route-guards'
 import { AppSidebar } from '@/components/app-sidebar'
 import { CommandPalette } from '@/components/command-palette'
 import { CommandPaletteTrigger } from '@/components/command-palette-trigger'
@@ -15,7 +14,8 @@ import { Separator } from '@/components/ui/separator'
 
 export const Route = createFileRoute('/_protected')({
   beforeLoad: async ({ location }) => {
-    await requireAuthAndOrg({ location })
+    const { requireAuth } = await import('@/lib/route-guards')
+    await requireAuth({ location })
   },
 
   component: ProtectedLayout,

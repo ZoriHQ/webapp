@@ -1,13 +1,15 @@
 import React from 'react'
-// eslint-disable-next-line
-import ReactDOM, { type Container } from 'react-dom/client'
+import ReactDOM from 'react-dom/client'
 import { RouterProvider } from '@tanstack/react-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { StackProvider, StackTheme } from '@stackframe/react'
 import { createAppRouter } from './router'
-import { stackClientApp } from './lib/stack-client'
+import type { Container } from 'react-dom/client'
+import { AuthProviderComponent } from '@/lib/auth'
 import { ThemeProvider } from '@/components/theme-provider'
+import {
+  handleUnauthorized,
+  isUnauthorizedError,
+} from '@/lib/auth/unauthorized-handler'
 import './index.css'
 
 const queryClient = new QueryClient({
@@ -16,6 +18,11 @@ const queryClient = new QueryClient({
       staleTime: 1000 * 60 * 5, // 5 minutes
       gcTime: 1000 * 60 * 10, // 10 minutes
       retry: (failureCount, error) => {
+        // Don't retry on 401 errors
+        if (isUnauthorizedError(error)) {
+          return false
+        }
+
         if (error instanceof Error) {
           const message = error.message
           if (
@@ -36,16 +43,13 @@ const router = createAppRouter(queryClient)
 
 function RootApp() {
   return (
-    <StackProvider app={stackClientApp}>
-      <StackTheme>
-        <QueryClientProvider client={queryClient}>
-          <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-            <RouterProvider router={router} />
-          </ThemeProvider>
-          {import.meta.env.DEV && <ReactQueryDevtools />}
-        </QueryClientProvider>
-      </StackTheme>
-    </StackProvider>
+    <AuthProviderComponent>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+          <RouterProvider router={router} />
+        </ThemeProvider>
+      </QueryClientProvider>
+    </AuthProviderComponent>
   )
 }
 

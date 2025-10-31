@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
-import { SignUp } from '@stackframe/react'
+import { RegisterComponent } from '@/components/auth/register'
 import { requireGuest } from '@/lib/route-guards'
 
 const registerSearchSchema = z.object({
@@ -14,15 +14,5 @@ export const Route = createFileRoute('/register')({
     await requireGuest({ location })
   },
 
-  component: RegisterPageWrapper,
+  component: RegisterComponent,
 })
-
-function RegisterPageWrapper() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="w-full max-w-md">
-        <SignUp />
-      </div>
-    </div>
-  )
-}
