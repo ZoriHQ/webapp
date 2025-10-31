@@ -1,6 +1,11 @@
 // eslint-disable-next-line
-import { createFileRoute, Outlet, useParams } from '@tanstack/react-router'
-import { useState } from 'react'
+import {
+  createFileRoute,
+  Outlet,
+  useParams,
+  useNavigate,
+} from '@tanstack/react-router'
+import { useState, useEffect } from 'react'
 import { AppSidebar } from '@/components/app-sidebar'
 import { CommandPalette } from '@/components/command-palette'
 import { CommandPaletteTrigger } from '@/components/command-palette-trigger'
@@ -11,6 +16,7 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar'
 import { Separator } from '@/components/ui/separator'
+import { useAuthState, getAuthMode } from '@/lib/auth'
 
 export const Route = createFileRoute('/_protected')({
   beforeLoad: async ({ location }) => {
@@ -25,6 +31,31 @@ function ProtectedLayout() {
   const [commandOpen, setCommandOpen] = useState(false)
   const params = useParams({ strict: false })
   const projectId = (params as { projectId?: string }).projectId
+  const { isAuthenticated, isLoading } = useAuthState()
+  const navigate = useNavigate()
+  const authMode = getAuthMode()
+
+  // For Clerk mode, check authentication in the component
+  // since we can't reliably check it in beforeLoad
+  useEffect(() => {
+    if (authMode === 'clerk' && !isLoading && !isAuthenticated) {
+      navigate({ to: '/login' })
+    }
+  }, [authMode, isLoading, isAuthenticated, navigate])
+
+  // Show loading state while checking auth
+  if (authMode === 'clerk' && isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    )
+  }
+
+  // Don't render protected content if not authenticated
+  if (authMode === 'clerk' && !isAuthenticated) {
+    return null
+  }
 
   return (
     <SidebarProvider>

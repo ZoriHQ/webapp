@@ -1,7 +1,7 @@
 import { useNavigate } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { SignUp } from '@clerk/clerk-react'
-import { getAuthMode } from '@/lib/auth'
+import { getAuthMode, useAuthState } from '@/lib/auth'
 import {
   Card,
   CardContent,
@@ -19,13 +19,23 @@ import {
 export function RegisterComponent() {
   const mode = getAuthMode()
   const navigate = useNavigate()
+  const { isAuthenticated, isLoading } = useAuthState()
 
-  // In OSS mode, users are always authenticated
+  // Redirect authenticated users to projects
   useEffect(() => {
-    if (mode === 'oss') {
+    if (!isLoading && isAuthenticated) {
       navigate({ to: '/projects' })
     }
-  }, [mode, navigate])
+  }, [isLoading, isAuthenticated, navigate])
+
+  // Show loading state while checking auth
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    )
+  }
 
   if (mode === 'clerk') {
     return (

@@ -13,14 +13,23 @@ import { getAuthMode, useAuthState } from '@/lib/auth'
 export function LoginComponent() {
   const mode = getAuthMode()
   const navigate = useNavigate()
-  const { isAuthenticated } = useAuthState()
+  const { isAuthenticated, isLoading } = useAuthState()
 
   // Redirect authenticated users to projects
   useEffect(() => {
-    if (isAuthenticated) {
+    if (!isLoading && isAuthenticated) {
       navigate({ to: '/projects' })
     }
-  }, [isAuthenticated, navigate])
+  }, [isLoading, isAuthenticated, navigate])
+
+  // Show loading state while checking auth
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    )
+  }
 
   if (mode === 'clerk') {
     return (
