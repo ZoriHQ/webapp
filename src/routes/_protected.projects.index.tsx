@@ -31,18 +31,19 @@ function ProjectsIndexPage() {
     projectName: '',
   })
 
-  const { data: projectsData, isLoading } = useProjects()
+  const { data: projectsData, isLoading, isSuccess } = useProjects()
   const queryClient = useQueryClient()
   const deleteProjectMutation = useDeleteProject()
 
   const projects = projectsData?.projects || []
 
   // Redirect to /projects/new if no projects exist
+  // Wait for successful response before checking
   useEffect(() => {
-    if (!isLoading && projects.length === 0) {
+    if (isSuccess && projects.length === 0) {
       navigate({ to: '/projects/new' })
     }
-  }, [isLoading, projects.length, navigate])
+  }, [isSuccess, projects.length, navigate])
 
   const filteredProjects = projects.filter((project: any) => {
     const matchesSearch =
