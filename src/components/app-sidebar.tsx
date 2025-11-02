@@ -49,7 +49,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     },
     {
       title: 'Get Help',
-      url: '#',
+      url: 'https://discord.gg/bNfsVNjw',
       icon: IconHelp,
     },
   ]
