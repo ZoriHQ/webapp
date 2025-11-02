@@ -19,14 +19,19 @@ export function NavSecondary({
   items: Array<{
     title: string
     url: string
+    external?: boolean
     icon: Icon
   }>
 } & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
   const navigate = useNavigate()
 
-  const handleNavigation = (url: string) => {
-    if (url !== '#') {
-      navigate({ to: url as any })
+  const handleNavigation = (item: { url: string; external?: boolean }) => {
+    if (item.url !== '#' && !item.external) {
+      navigate({ to: item.url as any })
+    }
+
+    if (item.external) {
+      window.open(item.url, '_blank')
     }
   }
 
@@ -37,7 +42,7 @@ export function NavSecondary({
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton
-                onClick={() => handleNavigation(item.url)}
+                onClick={() => handleNavigation(item)}
                 disabled={item.url === '#'}
               >
                 <item.icon />
