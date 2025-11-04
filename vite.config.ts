@@ -10,6 +10,9 @@ function injectZoriAnalytics(): Plugin {
   return {
     name: 'inject-zori-analytics',
     transformIndexHtml(html) {
+      const zoriPublishableKey =
+        process.env.VITE_ZORI_PUBLISHABLE_KEY ||
+        'zori_pt_a06776c2d31f612efb69c3dfeed1d6e4121364797b6e3b253c'
       // Only inject if VITE_ENABLE_ANALYTICS is set to 'true'
       if (process.env.VITE_ENABLE_ANALYTICS === 'true') {
         const analyticsScript = `

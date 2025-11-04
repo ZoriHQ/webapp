@@ -34,40 +34,20 @@ import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent } from '@/components/ui/card'
-import { useIdentifyVisitor, useVisitorProfile } from '@/hooks/use-analytics'
+import {
+  useIdentifyVisitor,
+  useRecentEvents,
+  useVisitorProfile,
+} from '@/hooks/use-analytics'
 import { useCustomerProfile } from '@/hooks/use-revenue'
 import { countryCodeToFlag, getCountryName } from '@/lib/country-utils'
+import { formatFullDate, formatTimestamp } from '@/lib/utils'
 
 interface VisitorProfileModalProps {
   projectId: string
   visitorId: string | null
   open: boolean
   onOpenChange: (open: boolean) => void
-}
-
-function formatTimestamp(timestamp: string) {
-  const date = new Date(timestamp)
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMins = Math.floor(diffMs / 60000)
-
-  if (diffMins < 1) return 'Just now'
-  if (diffMins < 60) return `${diffMins}m ago`
-  const diffHours = Math.floor(diffMins / 60)
-  if (diffHours < 24) return `${diffHours}h ago`
-  const diffDays = Math.floor(diffHours / 24)
-  return `${diffDays}d ago`
-}
-
-function formatFullDate(timestamp: string) {
-  return new Date(timestamp).toLocaleString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
 }
 
 function getEventBadgeVariant(
@@ -94,13 +74,14 @@ export function VisitorProfileModal({
   const { data: profile, isLoading } = useVisitorProfile(projectId, visitorId)
   const { data: customerProfile, isLoading: isLoadingRevenue } =
     useCustomerProfile(projectId, visitorId)
+  const { data: visitorEvents } = useRecentEvents({
+    project_id: projectId,
+    visitor_id: visitorId as string,
+    time_range: 'today',
+    limit: 100,
+    offset: 0,
+  })
   const identifyVisitor = useIdentifyVisitor(projectId)
-
-  console.log('[VisitorProfileModal] Customer profile data:', customerProfile)
-  console.log(
-    '[VisitorProfileModal] Has payments:',
-    customerProfile?.payment_count,
-  )
 
   const [showIdentifyForm, setShowIdentifyForm] = useState(false)
   const [identifyData, setIdentifyData] = useState({
@@ -118,7 +99,6 @@ export function VisitorProfileModal({
   const handleIdentify = async () => {
     if (!visitorId) return
 
-    // Filter out empty values
     const data: Record<string, string> = {}
     if (identifyData.name) data.name = identifyData.name
     if (identifyData.email) data.email = identifyData.email
@@ -746,10 +726,10 @@ export function VisitorProfileModal({
               {/* Right Side - Event List */}
               <div>
                 <h3 className="text-sm font-semibold mb-3">
-                  Event History ({profile.events?.length || 0})
+                  Event History ({visitorEvents?.events?.length || 0})
                 </h3>
                 <div className="rounded-lg border">
-                  {profile.events && profile.events.length > 0 ? (
+                  {visitorEvents?.events.length > 0 ? (
                     <div className="max-h-[600px] overflow-y-auto">
                       <Table>
                         <TableHeader className="sticky top-0 bg-background z-10">
@@ -761,7 +741,7 @@ export function VisitorProfileModal({
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {profile.events.map((event, idx) => (
+                          {visitorEvents?.events.map((event, idx) => (
                             <TableRow key={idx}>
                               <TableCell>
                                 <Badge

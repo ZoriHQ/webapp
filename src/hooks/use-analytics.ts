@@ -19,17 +19,22 @@ export interface EventFilters {
   offset?: number
 }
 
-export function useRecentEvents(projectId: string, filters?: EventFilters) {
+export function useRecentEvents(
+  params: Zoriapi.V1.Analytics.Events.EventRecentParams,
+) {
   const zClient = useApiClient()
 
   return useQuery<Zoriapi.V1.Analytics.RecentEventsResponse>({
-    queryKey: ['analytics', 'events', 'recent', projectId, filters],
-    queryFn: () =>
-      zClient.v1.analytics.events.recent({
-        project_id: projectId,
-        ...filters,
-      }),
-    enabled: !!projectId,
+    queryKey: [
+      'analytics',
+      'events',
+      'recent',
+      params.project_id,
+      params.time_range,
+      params.visitor_id,
+    ],
+    queryFn: () => zClient.v1.analytics.events.recent(params),
+    enabled: !!params.project_id,
   })
 }
 
