@@ -117,7 +117,7 @@ function EventsPage() {
   }
 
   const handleRefresh = () => {
-    // Invalidate the events query to refetch
+    // Invalidate the events query to refetch - use partial key to invalidate all variations
     queryClient.invalidateQueries({
       queryKey: ['analytics', 'events', 'recent', projectId],
     })
