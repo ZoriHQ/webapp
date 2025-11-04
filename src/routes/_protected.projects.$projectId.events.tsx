@@ -12,6 +12,7 @@ import { EventsFilterBar } from '@/components/analytics/events-filter-bar'
 const eventsSearchSchema = z.object({
   pages: z.array(z.string()).optional().catch([]),
   origins: z.array(z.string()).optional().catch([]),
+  event_names: z.array(z.string()).optional().catch([]),
   visitor_id: z.string().optional().catch(undefined),
   limit: z.number().optional().catch(100),
   offset: z.number().optional().catch(0),
@@ -33,7 +34,7 @@ function EventsPage() {
   )
   const [isVisitorModalOpen, setIsVisitorModalOpen] = useState(false)
 
-  const { data: projectData, isLoading: projectLoading } = useProject(projectId)
+  const { data: projectData } = useProject(projectId)
 
   // Fetch available filter options
   const { data: filterOptionsData, isLoading: filterOptionsLoading } =
@@ -41,6 +42,8 @@ function EventsPage() {
 
   // Build filter object from URL params
   const eventFilters = {
+    project_id: projectId,
+    time_range: 'last_7_days' as const,
     limit: searchParams.limit || 100,
     offset: searchParams.offset || 0,
     ...(searchParams.visitor_id && {
@@ -54,10 +57,13 @@ function EventsPage() {
       searchParams.origins.length > 0 && {
         traffic_origin: searchParams.origins.join(','),
       }),
+    ...(searchParams.event_names &&
+      searchParams.event_names.length > 0 && {
+        event_name: searchParams.event_names.join(','),
+      }),
   }
 
   const { data: recentEventsData, isLoading: eventsLoading } = useRecentEvents(
-    projectId,
     eventFilters,
   )
 
@@ -76,6 +82,16 @@ function EventsPage() {
     })
   }
 
+  const handleFilterByEvent = (eventName: string) => {
+    navigate({
+      to: '.',
+      search: (prev) => ({
+        ...prev,
+        event_names: [eventName],
+      }),
+    })
+  }
+
   const handleFiltersChange = (filters: EventFiltersState) => {
     navigate({
       to: '.',
@@ -87,6 +103,8 @@ function EventsPage() {
           filters.traffic_origins.length > 0
             ? filters.traffic_origins
             : undefined,
+        event_names:
+          filters.event_names.length > 0 ? filters.event_names : undefined,
       }),
     })
   }
@@ -95,6 +113,7 @@ function EventsPage() {
     visitor_id: searchParams.visitor_id,
     pages: searchParams.pages || [],
     traffic_origins: searchParams.origins || [],
+    event_names: searchParams.event_names || [],
   }
 
   const handleRefresh = () => {
@@ -124,6 +143,7 @@ function EventsPage() {
         filters={currentFilters}
         availablePages={filterOptionsData?.pages || []}
         availableOrigins={filterOptionsData?.traffic_origins || []}
+        availableEventNames={(filterOptionsData as any)?.event_names || []}
         onFiltersChange={handleFiltersChange}
         onRefresh={handleRefresh}
         isLoadingOptions={filterOptionsLoading}
@@ -134,6 +154,7 @@ function EventsPage() {
         isLoading={eventsLoading}
         onVisitorClick={handleVisitorClick}
         onFilterByVisitor={handleFilterByVisitor}
+        onFilterByEvent={handleFilterByEvent}
         total={recentEventsData?.total}
         limit={eventFilters.limit}
         offset={eventFilters.offset}

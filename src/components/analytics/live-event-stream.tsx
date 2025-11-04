@@ -25,6 +25,7 @@ interface LiveEventStreamProps {
   isLoading: boolean
   onVisitorClick?: (visitorId: string) => void
   onFilterByVisitor?: (visitorId: string) => void
+  onFilterByEvent?: (eventName: string) => void
   total?: number
   limit?: number
   offset?: number
@@ -64,6 +65,7 @@ export function LiveEventStream({
   isLoading,
   onVisitorClick,
   onFilterByVisitor,
+  onFilterByEvent,
   total = 0,
   limit = 100,
   offset = 0,
@@ -191,9 +193,30 @@ export function LiveEventStream({
                         )}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={getEventBadgeVariant(event.event_name)}>
-                          {event.event_name || 'unknown'}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <Badge variant={getEventBadgeVariant(event.event_name)}>
+                            {event.event_name || 'unknown'}
+                          </Badge>
+                          {onFilterByEvent && event.event_name && (
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <button
+                                    onClick={() =>
+                                      onFilterByEvent(event.event_name!)
+                                    }
+                                    className="text-muted-foreground hover:text-primary transition-colors"
+                                  >
+                                    <Search className="h-3 w-3" />
+                                  </button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Filter by this event</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell className="font-mono text-xs max-w-[200px]">
                         {event.page_url ? (
