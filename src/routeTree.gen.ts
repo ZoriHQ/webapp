@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RegisterSsoCallbackRouteImport } from './routes/register.sso-callback'
@@ -36,11 +35,6 @@ const RegisterRoute = RegisterRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProtectedRoute = ProtectedRouteImport.update({
@@ -128,7 +122,6 @@ const ProtectedProjectsProjectIdAnalyticsRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
   '/login': typeof LoginRouteWithChildren
   '/register': typeof RegisterRouteWithChildren
   '/projects': typeof ProtectedProjectsRouteWithChildren
@@ -147,7 +140,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
   '/login': typeof LoginRouteWithChildren
   '/register': typeof RegisterRouteWithChildren
   '/login/sso-callback': typeof LoginSsoCallbackRoute
@@ -166,7 +158,6 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_protected': typeof ProtectedRouteWithChildren
-  '/about': typeof AboutRoute
   '/login': typeof LoginRouteWithChildren
   '/register': typeof RegisterRouteWithChildren
   '/_protected/projects': typeof ProtectedProjectsRouteWithChildren
@@ -187,7 +178,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/about'
     | '/login'
     | '/register'
     | '/projects'
@@ -206,7 +196,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/about'
     | '/login'
     | '/register'
     | '/login/sso-callback'
@@ -224,7 +213,6 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_protected'
-    | '/about'
     | '/login'
     | '/register'
     | '/_protected/projects'
@@ -245,7 +233,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProtectedRoute: typeof ProtectedRouteWithChildren
-  AboutRoute: typeof AboutRoute
   LoginRoute: typeof LoginRouteWithChildren
   RegisterRoute: typeof RegisterRouteWithChildren
 }
@@ -264,13 +251,6 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_protected': {
@@ -464,7 +444,6 @@ const RegisterRouteWithChildren = RegisterRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProtectedRoute: ProtectedRouteWithChildren,
-  AboutRoute: AboutRoute,
   LoginRoute: LoginRouteWithChildren,
   RegisterRoute: RegisterRouteWithChildren,
 }

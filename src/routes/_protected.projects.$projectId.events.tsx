@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { z } from 'zod'
+import type Zoriapi from 'zorihq'
 import type { EventFiltersState } from '@/components/analytics/events-filter-bar'
 import { useProject } from '@/hooks/use-projects'
 import { useEventFilterOptions, useRecentEvents } from '@/hooks/use-analytics'
@@ -40,12 +41,12 @@ function EventsPage() {
     useEventFilterOptions(projectId, 'last_7_days')
 
   // Build filter object from URL params
-  const eventFilters = {
+  const eventFilters: Zoriapi.V1.Analytics.Events.EventRecentParams = {
+    project_id: projectId,
+    time_range: 'last_7_days',
     limit: searchParams.limit || 100,
     offset: searchParams.offset || 0,
-    ...(searchParams.visitor_id && {
-      visitor_id: searchParams.visitor_id,
-    }),
+    visitor_id: searchParams.visitor_id,
     ...(searchParams.pages &&
       searchParams.pages.length > 0 && {
         page_path: searchParams.pages.join(','),
@@ -56,10 +57,8 @@ function EventsPage() {
       }),
   }
 
-  const { data: recentEventsData, isLoading: eventsLoading } = useRecentEvents(
-    projectId,
-    eventFilters,
-  )
+  const { data: recentEventsData, isLoading: eventsLoading } =
+    useRecentEvents(eventFilters)
 
   const handleVisitorClick = (visitorId: string) => {
     setSelectedVisitorId(visitorId)
@@ -98,11 +97,9 @@ function EventsPage() {
   }
 
   const handleRefresh = () => {
-    // Invalidate the events query to refetch
     queryClient.invalidateQueries({
       queryKey: ['analytics', 'events', 'recent', projectId],
     })
-    // Also invalidate filter options
     queryClient.invalidateQueries({
       queryKey: ['analytics', 'events', 'filterOptions', projectId],
     })

@@ -5,7 +5,6 @@
  */
 
 import Zoriapi from 'zorihq'
-import type { LoginResponse as SDKLoginResponse } from 'zorihq/resources/v1/auth'
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || 'http://localhost:1323'
@@ -30,7 +29,7 @@ export async function loginWithCredentials(
   })
 
   try {
-    const response: SDKLoginResponse = await client.v1.auth.login({
+    const response = await client.v1.auth.login({
       username,
       password,
     })

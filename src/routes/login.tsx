@@ -10,8 +10,8 @@ const loginSearchSchema = z.object({
 export const Route = createFileRoute('/login')({
   validateSearch: loginSearchSchema,
 
-  beforeLoad: async ({ location }) => {
-    await requireGuest({ location })
+  beforeLoad: ({ location }) => {
+    requireGuest({ location })
   },
 
   component: LoginComponent,

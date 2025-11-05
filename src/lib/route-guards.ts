@@ -7,7 +7,7 @@ import { ossProvider } from './auth/oss-provider'
  * Works with both Clerk and OSS modes
  */
 
-export async function requireAuth({ location }: { location: any }) {
+export function requireAuth({ location }: { location: any }) {
   const mode = getAuthMode()
 
   // In OSS mode, check actual authentication state
@@ -29,7 +29,7 @@ export async function requireAuth({ location }: { location: any }) {
   return true
 }
 
-export async function requireGuest({ location }: { location: any }) {
+export function requireGuest({ location }: { location: any }) {
   const mode = getAuthMode()
 
   // In OSS mode, check if user is authenticated
@@ -44,11 +44,6 @@ export async function requireGuest({ location }: { location: any }) {
 
   // In Clerk mode, if user is already signed in, redirect to projects
   // Clerk will handle this check
-  return null
-}
-
-export async function optionalAuth() {
-  // No guard needed, allow access regardless of auth state
   return null
 }
 

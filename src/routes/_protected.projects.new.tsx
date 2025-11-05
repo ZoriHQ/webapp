@@ -39,13 +39,11 @@ function NewProjectPage() {
       {
         onSuccess: (data) => {
           toast.success('Project created successfully!')
-          // Navigate to the new project's overview page
           if (data.id) {
             navigate({
               to: '/projects/$projectId',
               params: { projectId: data.id },
             }).then(() => {
-              // Force a page reload to ensure the project data is loaded
               window.location.reload()
             })
           }
@@ -78,7 +76,7 @@ function NewProjectPage() {
             <Label htmlFor="name">Project Name</Label>
             <Input
               id="name"
-              placeholder="My Awesome Website"
+              placeholder="Your project name"
               value={newProject.name}
               onChange={(e) =>
                 setNewProject({ ...newProject, name: e.target.value })

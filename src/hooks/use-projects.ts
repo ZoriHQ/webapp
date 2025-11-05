@@ -7,11 +7,7 @@ export function useProjects() {
 
   return useQuery<Zoriapi.V1.Projects.ListProjectsResponse>({
     queryKey: ['projects'],
-    queryFn: () => {
-      if (!zClient) throw new Error('API client not initialized')
-      return zClient.v1.projects.list()
-    },
-    enabled: !!zClient,
+    queryFn: () => zClient.v1.projects.list(),
   })
 }
 
@@ -20,11 +16,8 @@ export function useProject(projectId: string) {
 
   return useQuery<Zoriapi.V1.Projects.Project>({
     queryKey: ['projects', projectId],
-    queryFn: () => {
-      if (!zClient) throw new Error('API client not initialized')
-      return zClient.v1.projects.get(projectId)
-    },
-    enabled: !!projectId && !!zClient,
+    queryFn: () => zClient.v1.projects.get(projectId),
+    enabled: !!projectId,
   })
 }
 
@@ -36,10 +29,7 @@ export function useCreateProject() {
     Error,
     Zoriapi.V1.Projects.ProjectCreateParams
   >({
-    mutationFn: (data) => {
-      if (!zClient) throw new Error('API client not initialized')
-      return zClient.v1.projects.create(data)
-    },
+    mutationFn: (data) => zClient.v1.projects.create(data),
   })
 }
 
@@ -51,10 +41,7 @@ export function useUpdateProject(projectId: string) {
     Error,
     Zoriapi.V1.Projects.ProjectCreateParams
   >({
-    mutationFn: (data) => {
-      if (!zClient) throw new Error('API client not initialized')
-      return zClient.v1.projects.update(projectId, data)
-    },
+    mutationFn: (data) => zClient.v1.projects.update(projectId, data),
   })
 }
 
@@ -66,9 +53,6 @@ export function useDeleteProject() {
     Error,
     { projectId: string }
   >({
-    mutationFn: ({ projectId }) => {
-      if (!zClient) throw new Error('API client not initialized')
-      return zClient.v1.projects.delete(projectId)
-    },
+    mutationFn: ({ projectId }) => zClient.v1.projects.delete(projectId),
   })
 }

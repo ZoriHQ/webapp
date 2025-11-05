@@ -10,8 +10,8 @@ const registerSearchSchema = z.object({
 export const Route = createFileRoute('/register')({
   validateSearch: registerSearchSchema,
 
-  beforeLoad: async ({ location }) => {
-    await requireGuest({ location })
+  beforeLoad: ({ location }) => {
+    requireGuest({ location })
   },
 
   component: RegisterComponent,

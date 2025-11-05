@@ -10,12 +10,6 @@ import {
 import type { ReactNode } from 'react'
 import type { AuthProvider, AuthUser } from './types'
 
-/**
- * Clerk Auth Provider
- * Full-featured authentication provider for cloud deployments
- * Wraps Clerk's authentication system
- */
-
 // Clerk configuration
 const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
@@ -34,7 +28,6 @@ function useClerkAuthProvider(): AuthProvider {
   const { isSignedIn, getToken: clerkGetToken } = useClerkAuth()
   const { signOut: clerkSignOut } = useClerk()
 
-  // Use useMemo to create a stable reference that updates when Clerk state changes
   return useMemo(() => {
     const getUser = (): AuthUser | null => {
       if (!isLoaded || !user) return null
@@ -56,7 +49,6 @@ function useClerkAuthProvider(): AuthProvider {
     }
 
     const signIn = async (_email: string, _password: string): Promise<void> => {
-      // Clerk handles sign-in through their UI components
       // This method is for compatibility with the AuthProvider interface
       throw new Error('Please use Clerk SignIn component for authentication')
     }
@@ -66,7 +58,6 @@ function useClerkAuthProvider(): AuthProvider {
       _password: string,
       _name: string,
     ): Promise<void> => {
-      // Clerk handles sign-up through their UI components
       // This method is for compatibility with the AuthProvider interface
       throw new Error('Please use Clerk SignUp component for registration')
     }
@@ -77,16 +68,7 @@ function useClerkAuthProvider(): AuthProvider {
 
     const getToken = async (): Promise<string | null> => {
       if (!isLoaded || !isSignedIn) return null
-
-      try {
-        // Get the session token from Clerk using the auth hook
-        // This is more reliable than user.getToken()
-        const token = await clerkGetToken()
-        return token
-      } catch (error) {
-        console.error('Failed to get Clerk session token:', error)
-        return null
-      }
+      return await clerkGetToken()
     }
 
     return {
@@ -101,12 +83,8 @@ function useClerkAuthProvider(): AuthProvider {
   }, [user, isLoaded, isSignedIn, clerkGetToken, clerkSignOut])
 }
 
-// Context for Clerk auth provider
 const ClerkAuthContext = createContext<AuthProvider | null>(null)
 
-/**
- * Internal component that provides auth context using Clerk hooks
- */
 function ClerkAuthContextProvider({ children }: { children: ReactNode }) {
   const authProvider = useClerkAuthProvider()
 
@@ -117,10 +95,6 @@ function ClerkAuthContextProvider({ children }: { children: ReactNode }) {
   )
 }
 
-/**
- * Main Clerk Auth Provider Component
- * Wraps the app with ClerkProvider and auth context
- */
 export function ClerkAuthProviderComponent({
   children,
 }: {
@@ -137,9 +111,6 @@ export function ClerkAuthProviderComponent({
   )
 }
 
-/**
- * Hook to use Clerk auth provider
- */
 export function useClerkAuthContext(): AuthProvider {
   const context = useContext(ClerkAuthContext)
   if (!context) {
@@ -151,5 +122,4 @@ export function useClerkAuthContext(): AuthProvider {
   return context
 }
 
-// Export Clerk components for use in routes
 export { SignIn as ClerkSignIn, SignUp as ClerkSignUp }

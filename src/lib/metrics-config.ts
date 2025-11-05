@@ -110,7 +110,6 @@ export function getDefaultMetrics(): Array<MetricType> {
     .map((m) => m.id)
 }
 
-// Load metrics preferences from localStorage
 export function loadMetricsPreferences(): Array<MetricType> {
   try {
     const stored = localStorage.getItem(STORAGE_KEY)
@@ -128,7 +127,6 @@ export function loadMetricsPreferences(): Array<MetricType> {
   return getDefaultMetrics()
 }
 
-// Save metrics preferences to localStorage
 export function saveMetricsPreferences(metrics: Array<MetricType>): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(metrics))
@@ -137,7 +135,6 @@ export function saveMetricsPreferences(metrics: Array<MetricType>): void {
   }
 }
 
-// Reset to default metrics
 export function resetMetricsPreferences(): void {
   try {
     localStorage.removeItem(STORAGE_KEY)
