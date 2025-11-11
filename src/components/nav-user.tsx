@@ -43,7 +43,11 @@ interface NavUserProps {
   onManageOrganization?: () => void
 }
 
-export function NavUser({ user, onManageAccount, onManageOrganization }: NavUserProps) {
+export function NavUser({
+  user,
+  onManageAccount,
+  onManageOrganization,
+}: NavUserProps) {
   const { isMobile } = useSidebar()
   const { signOut } = useAuthState()
   const navigate = useNavigate()

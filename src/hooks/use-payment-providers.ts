@@ -29,7 +29,7 @@ export function useProviderInstructions(
           providerType as Zoriapi.V1.PaymentProviders.PaymentProviderInstructionsParams['provider_type'],
         project_id: projectId,
       }),
-    enabled: !!providerType && !!zClient,
+    enabled: !!providerType,
   })
 }
 

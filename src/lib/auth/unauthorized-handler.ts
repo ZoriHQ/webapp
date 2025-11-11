@@ -37,18 +37,15 @@ export function handleUnauthorized(): void {
 export function isUnauthorizedError(error: unknown): boolean {
   if (!error) return false
 
-  // Check for Response object (from fetch)
   if (error instanceof Response) {
     return error.status === 401
   }
 
-  // Check for error object with status property
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (error !== null && typeof error === 'object' && 'status' in error) {
     return (error as { status: number }).status === 401
   }
 
-  // Check for error message containing 401
   if (error instanceof Error) {
     return (
       error.message.includes('401') || error.message.includes('Unauthorized')

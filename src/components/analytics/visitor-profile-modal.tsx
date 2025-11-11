@@ -74,7 +74,7 @@ export function VisitorProfileModal({
   const { data: profile, isLoading } = useVisitorProfile(projectId, visitorId)
   const { data: customerProfile, isLoading: isLoadingRevenue } =
     useCustomerProfile(projectId, visitorId)
-  const { data: visitorEvents } = useRecentEvents({
+  const { data: visitorEvents, isLoading: eventsLoading } = useRecentEvents({
     project_id: projectId,
     visitor_id: visitorId as string,
     time_range: 'today',
@@ -365,7 +365,7 @@ export function VisitorProfileModal({
             )}
 
             {/* Revenue Information - Always show, even if $0 */}
-            {!isLoadingRevenue && (
+            {!isLoadingRevenue && customerProfile && (
               <div className="rounded-lg border border-green-200 bg-green-50 dark:bg-green-950 dark:border-green-900 p-4">
                 <h3 className="text-sm font-semibold mb-4 text-green-900 dark:text-green-100">
                   Revenue Summary
@@ -429,13 +429,13 @@ export function VisitorProfileModal({
                 <Separator className="my-4 bg-green-200 dark:bg-green-900" />
 
                 {/* Revenue Attribution */}
-                {(customerProfile?.payment_count ?? 0) > 0 && (
+                {(customerProfile.payment_count ?? 0) > 0 && (
                   <div className="space-y-3">
                     <h4 className="text-sm font-semibold text-green-900 dark:text-green-100">
                       Revenue Attribution
                     </h4>
                     <div className="space-y-3 rounded-lg border border-green-200 dark:border-green-900 bg-background p-4">
-                      {customerProfile?.first_payment_date && (
+                      {customerProfile.first_payment_date && (
                         <>
                           <div className="flex items-start gap-3">
                             <IconClock className="h-4 w-4 text-muted-foreground mt-0.5" />
@@ -455,7 +455,7 @@ export function VisitorProfileModal({
                         </>
                       )}
 
-                      {customerProfile?.last_payment_date && (
+                      {customerProfile.last_payment_date && (
                         <>
                           <div className="flex items-start gap-3">
                             <IconClock className="h-4 w-4 text-muted-foreground mt-0.5" />
@@ -482,12 +482,12 @@ export function VisitorProfileModal({
                             Traffic Origin (First Touch)
                           </p>
                           <p className="text-sm font-medium truncate">
-                            {customerProfile?.first_traffic_origin || 'Direct'}
+                            {customerProfile.first_traffic_origin || 'Direct'}
                           </p>
                         </div>
                       </div>
 
-                      {customerProfile?.first_utm_source && (
+                      {customerProfile.first_utm_source && (
                         <>
                           <Separator />
                           <div className="flex items-start gap-3">
@@ -504,7 +504,7 @@ export function VisitorProfileModal({
                         </>
                       )}
 
-                      {customerProfile?.first_utm_medium && (
+                      {customerProfile.first_utm_medium && (
                         <>
                           <Separator />
                           <div className="flex items-start gap-3">
@@ -521,7 +521,7 @@ export function VisitorProfileModal({
                         </>
                       )}
 
-                      {customerProfile?.first_utm_campaign && (
+                      {customerProfile.first_utm_campaign && (
                         <>
                           <Separator />
                           <div className="flex items-start gap-3">
@@ -542,7 +542,7 @@ export function VisitorProfileModal({
                 )}
 
                 {/* Payment History */}
-                {customerProfile?.payments &&
+                {customerProfile.payments &&
                   customerProfile.payments.length > 0 && (
                     <div className="mt-4">
                       <h4 className="text-sm font-semibold mb-2 text-green-900 dark:text-green-100">
@@ -728,8 +728,9 @@ export function VisitorProfileModal({
                 <h3 className="text-sm font-semibold mb-3">
                   Event History ({visitorEvents?.events?.length || 0})
                 </h3>
+                {eventsLoading && <p>Loading...</p>}
                 <div className="rounded-lg border">
-                  {visitorEvents?.events.length > 0 ? (
+                  {visitorEvents && visitorEvents.events!.length > 0 ? (
                     <div className="max-h-[600px] overflow-y-auto">
                       <Table>
                         <TableHeader className="sticky top-0 bg-background z-10">
@@ -741,7 +742,7 @@ export function VisitorProfileModal({
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {visitorEvents?.events.map((event, idx) => (
+                          {visitorEvents.events!.map((event, idx) => (
                             <TableRow key={idx}>
                               <TableCell>
                                 <Badge

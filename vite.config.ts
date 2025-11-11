@@ -13,19 +13,13 @@ function injectZoriAnalytics(): Plugin {
       const zoriPublishableKey =
         process.env.VITE_ZORI_PUBLISHABLE_KEY ||
         'zori_pt_a06776c2d31f612efb69c3dfeed1d6e4121364797b6e3b253c'
-      // Only inject if VITE_ENABLE_ANALYTICS is set to 'true'
-      if (process.env.VITE_ENABLE_ANALYTICS === 'true') {
-        const analyticsScript = `
-    <script
-      async
-      src="https://cdn.zorihq.com/script.min.js"
-      data-key="zori_pt_a06776c2d31f612efb69c3dfeed1d6e4121364797b6e3b253c">
-    </script>`
-
-        // Inject before closing </head> tag
-        return html.replace('</head>', `${analyticsScript}\n  </head>`)
-      }
-      return html
+      const analyticsScript = `
+  <script
+    async
+    src="https://cdn.zorihq.com/script.min.js"
+    data-key="${zoriPublishableKey}">
+  </script>`
+      return html.replace('</head>', `${analyticsScript}\n  </head>`)
     },
   }
 }

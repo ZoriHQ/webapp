@@ -19,7 +19,6 @@ class OSSAuthProvider implements AuthProvider {
   private listeners: Array<() => void> = []
 
   constructor() {
-    // Restore session from localStorage on init
     this.restoreSession()
   }
 
@@ -91,7 +90,6 @@ class OSSAuthProvider implements AuthProvider {
   }
 
   signUp(_email: string, _password: string, _name: string): Promise<void> {
-    // Sign up not supported in OSS mode
     return Promise.reject(
       new Error(
         'Sign up is not available in OSS mode. Please contact your administrator.',
@@ -104,18 +102,16 @@ class OSSAuthProvider implements AuthProvider {
     return Promise.resolve()
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async getToken(): Promise<string | null> {
-    return Promise.resolve(this.token)
+    return localStorage.getItem(OSS_TOKEN_KEY)
   }
 }
 
-// Create singleton instance
 const ossProvider = new OSSAuthProvider()
 
-// Create context
 const OSSAuthContext = createContext<AuthProvider>(ossProvider)
 
-// Provider component with reactivity
 export function OSSAuthProviderComponent({
   children,
 }: {
@@ -125,7 +121,6 @@ export function OSSAuthProviderComponent({
   const [, setUpdateCounter] = useState(0)
 
   useEffect(() => {
-    // Subscribe to auth state changes
     const unsubscribe = ossProvider.subscribe(() => {
       setUpdateCounter((prev) => prev + 1)
     })
@@ -140,13 +135,11 @@ export function OSSAuthProviderComponent({
   )
 }
 
-// Hook to use OSS auth with reactivity
 export function useOSSAuth(): AuthProvider {
   const context = useContext(OSSAuthContext)
   const [, setUpdateCounter] = useState(0)
 
   useEffect(() => {
-    // Subscribe to auth state changes
     const unsubscribe = ossProvider.subscribe(() => {
       setUpdateCounter((prev) => prev + 1)
     })
