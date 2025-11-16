@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/sidebar'
 import { Separator } from '@/components/ui/separator'
 import { getAuthMode, useAuthState } from '@/lib/auth'
+import { AppContextProvider } from '@/contexts/app.context'
 
 export const Route = createFileRoute('/_protected')({
   beforeLoad: async ({ location }) => {
@@ -34,15 +35,12 @@ function ProtectedLayout() {
   const navigate = useNavigate()
   const authMode = getAuthMode()
 
-  // For Clerk mode, check authentication in the component
-  // since we can't reliably check it in beforeLoad
   useEffect(() => {
     if (authMode === 'clerk' && !isLoading && !isAuthenticated) {
       navigate({ to: '/login' })
     }
   }, [authMode, isLoading, isAuthenticated, navigate])
 
-  // Show loading state while checking auth
   if (authMode === 'clerk' && isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -51,39 +49,42 @@ function ProtectedLayout() {
     )
   }
 
-  // Don't render protected content if not authenticated
   if (authMode === 'clerk' && !isAuthenticated) {
     return null
   }
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-sidebar">
-        <AppSidebar />
-        <SidebarInset className="flex flex-1 flex-col">
-          <div className="flex flex-col h-full p-4">
-            <div className="flex flex-col flex-1 bg-background rounded-xl shadow-md border">
-              <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-4 px-6 border-b bg-background rounded-t-xl">
-                <SidebarTrigger className="-ml-1" />
-                <Separator orientation="vertical" className="mr-2 h-4" />
-                <div className="flex flex-1 items-center justify-center">
-                  <div className="w-full max-w-md">
-                    <CommandPaletteTrigger
-                      onClick={() => setCommandOpen(true)}
-                    />
+      <AppContextProvider values={null}>
+        <div className="flex min-h-screen w-full bg-sidebar">
+          <AppSidebar />
+          <SidebarInset className="flex flex-1 flex-col">
+            <div className="flex flex-col h-full p-4">
+              <div className="flex flex-col flex-1 bg-background rounded-xl shadow-md border">
+                <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-4 px-6 border-b bg-background rounded-t-xl">
+                  <SidebarTrigger className="-ml-1" />
+                  <Separator orientation="vertical" className="mr-2 h-4" />
+                  <div className="flex flex-1 items-center justify-center">
+                    <div className="w-full max-w-md">
+                      <CommandPaletteTrigger
+                        onClick={() => setCommandOpen(true)}
+                      />
+                    </div>
                   </div>
-                </div>
-                {/* Revenue Status Indicator - Only on project pages */}
-                {projectId && <RevenueStatusIndicator projectId={projectId} />}
-              </header>
-              <main className="flex flex-1 flex-col p-6 overflow-auto">
-                <Outlet />
-              </main>
+                  {/* Revenue Status Indicator - Only on project pages */}
+                  {projectId && (
+                    <RevenueStatusIndicator projectId={projectId} />
+                  )}
+                </header>
+                <main className="flex flex-1 flex-col p-6 overflow-auto">
+                  <Outlet />
+                </main>
+              </div>
             </div>
-          </div>
-        </SidebarInset>
-        <CommandPalette open={commandOpen} onOpenChange={setCommandOpen} />
-      </div>
+          </SidebarInset>
+          <CommandPalette open={commandOpen} onOpenChange={setCommandOpen} />
+        </div>
+      </AppContextProvider>
     </SidebarProvider>
   )
 }

@@ -1,11 +1,8 @@
-'use client'
-
-import * as React from 'react'
-import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts'
-import type Zoriapi from 'zorihq'
+import { useMemo } from 'react'
+import { Area, AreaChart, CartesianGrid, Dot, XAxis, YAxis } from 'recharts'
 
 import type { ChartConfig } from '@/components/ui/chart'
-import type { TimeRange } from '@/hooks/use-analytics'
+import { useVisitorsTimeline } from '@/hooks/use-analytics'
 import {
   Card,
   CardContent,
@@ -13,11 +10,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from '@/components/ui/chart'
+import { ChartContainer, ChartTooltip } from '@/components/ui/chart'
+import { useAppContext } from '@/contexts/app.context'
 
 const chartConfig = {
   visitors: {
@@ -31,82 +25,133 @@ const chartConfig = {
     label: 'Mobile',
     color: 'hsl(32, 98%, 56%)',
   },
+  revenue: {
+    label: 'Revenue',
+    color: 'hsl(142, 76%, 36%)',
+  },
 } satisfies ChartConfig
 
-interface VisitorTimelineProps {
-  data?: Array<Zoriapi.V1.Analytics.UniqueVisitorsDataPoint>
-  isLoading?: boolean
-  timeRange: TimeRange
-}
+export function VisitorTimeline() {
+  const { storedValues } = useAppContext()
+  const { data, isLoading } = useVisitorsTimeline({
+    project_id: storedValues!.projectId!,
+    time_range: storedValues!.timeRange,
+  })
 
-export function VisitorTimeline({
-  data,
-  isLoading = false,
-  timeRange,
-}: VisitorTimelineProps) {
-  // Transform API data to chart format with proper grouping
-  const chartData = React.useMemo(() => {
-    if (!data || data.length === 0) {
-      return []
-    }
+  const chartData = useMemo(() => {
+    if (!data?.data) return []
 
-    // For hourly data (last_hour, today), don't aggregate - show each data point
-    if (timeRange === 'last_hour' || timeRange === 'today') {
-      return data.map((item) => ({
-        date: item.timestamp || '',
-        desktop: item.desktop || 0,
-        mobile: item.mobile || 0,
-      }))
-    }
+    return data.data.map((item) => {
+      const timestamp = item.time_bucket
+        ? new Date(item.time_bucket).getTime()
+        : 0
 
-    // For multi-day periods, aggregate by day
-    const aggregatedByDay = new Map<
-      string,
-      { desktop: number; mobile: number }
-    >()
-
-    data.forEach((item) => {
-      if (!item.timestamp) return
-
-      // Get the date portion only (YYYY-MM-DD)
-      const date = new Date(item.timestamp)
-      const dateKey = date.toISOString().split('T')[0]
-
-      const existing = aggregatedByDay.get(dateKey) || {
-        desktop: 0,
-        mobile: 0,
+      return {
+        date: timestamp,
+        desktop:
+          (item.num_desktop_visits ?? 0) + (item.num_unknown_visits ?? 0),
+        mobile: item.num_mobile_visits ?? 0,
+        revenue: item.num_revenue ?? 0,
       }
-      aggregatedByDay.set(dateKey, {
-        desktop: existing.desktop + (item.desktop || 0),
-        mobile: existing.mobile + (item.mobile || 0),
-      })
     })
-
-    // Convert map to array and sort by date
-    return Array.from(aggregatedByDay.entries())
-      .map(([dateKey, values]) => ({
-        date: `${dateKey}T00:00:00Z`,
-        desktop: values.desktop,
-        mobile: values.mobile,
-      }))
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-  }, [data, timeRange])
+  }, [data])
 
   const hasData = chartData.length > 0
 
-  // Calculate total visitors
-  const totalVisitors = React.useMemo(() => {
-    if (!hasData) return 0
-    return chartData.reduce((sum, item) => sum + item.desktop + item.mobile, 0)
-  }, [chartData, hasData])
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (!active || !payload?.length) return null
+
+    const timestamp = typeof label === 'number' ? label : Number(label)
+    const date = new Date(timestamp)
+    const timeRange = storedValues!.timeRange
+
+    let formattedDate = ''
+    if (timeRange === 'last_hour' || timeRange === 'today') {
+      formattedDate = date.toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      })
+    } else {
+      formattedDate = date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      })
+    }
+
+    const desktop =
+      payload.find((p: any) => p.dataKey === 'desktop')?.value || 0
+    const mobile = payload.find((p: any) => p.dataKey === 'mobile')?.value || 0
+    const revenue =
+      payload.find((p: any) => p.dataKey === 'revenue')?.value || 0
+    const total = desktop + mobile
+
+    return (
+      <div className="bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-lg p-3 min-w-[200px]">
+        <p className="text-sm font-medium text-foreground mb-2">
+          {formattedDate}
+        </p>
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <div
+                className="w-2.5 h-2.5 rounded-full"
+                style={{ backgroundColor: 'hsl(217, 91%, 60%)' }}
+              />
+              <span className="text-sm text-muted-foreground">Desktop</span>
+            </div>
+            <span className="text-sm font-semibold text-foreground">
+              {desktop.toLocaleString()}
+            </span>
+          </div>
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <div
+                className="w-2.5 h-2.5 rounded-full"
+                style={{ backgroundColor: 'hsl(32, 98%, 56%)' }}
+              />
+              <span className="text-sm text-muted-foreground">Mobile</span>
+            </div>
+            <span className="text-sm font-semibold text-foreground">
+              {mobile.toLocaleString()}
+            </span>
+          </div>
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <div
+                className="w-2.5 h-2.5 rounded-full"
+                style={{ backgroundColor: 'hsl(142, 76%, 36%)' }}
+              />
+              <span className="text-sm text-muted-foreground">Revenue</span>
+            </div>
+            <span className="text-sm font-semibold text-green-600 dark:text-green-400">
+              ${revenue.toLocaleString()}
+            </span>
+          </div>
+          <div className="h-px bg-border my-1.5" />
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-sm font-medium text-foreground">
+              Total Visitors
+            </span>
+            <span className="text-sm font-bold text-foreground">
+              {total.toLocaleString()}
+            </span>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <Card className="h-full">
       <CardHeader>
         <CardTitle>Visitor Activity</CardTitle>
         <CardDescription>
-          {hasData && !isLoading
-            ? `${totalVisitors.toLocaleString()} total visitors`
+          {isLoading
+            ? 'Loading visitor timeline...'
             : 'Visitor timeline over time'}
         </CardDescription>
       </CardHeader>
@@ -163,6 +208,7 @@ export function VisitorTimeline({
                 tickMargin={8}
                 minTickGap={32}
                 tickFormatter={(value) => {
+                  const timeRange = storedValues!.timeRange
                   const date = new Date(value)
                   if (timeRange === 'last_hour' || timeRange === 'today') {
                     return date.toLocaleTimeString('en-US', {
@@ -177,30 +223,14 @@ export function VisitorTimeline({
                   })
                 }}
               />
-              <ChartTooltip
-                cursor={false}
-                content={
-                  <ChartTooltipContent
-                    labelFormatter={(value) => {
-                      const date = new Date(value)
-                      if (timeRange === 'last_hour' || timeRange === 'today') {
-                        return date.toLocaleString('en-US', {
-                          month: 'short',
-                          day: 'numeric',
-                          hour: 'numeric',
-                          minute: '2-digit',
-                          hour12: true,
-                        })
-                      }
-                      return date.toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                      })
-                    }}
-                    indicator="dot"
-                  />
-                }
+              <YAxis
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                tickFormatter={(value) => value.toLocaleString()}
+                allowDecimals={false}
               />
+              <ChartTooltip content={<CustomTooltip />} />
               <Area
                 dataKey="mobile"
                 type="monotone"
@@ -208,6 +238,20 @@ export function VisitorTimeline({
                 stroke="var(--color-mobile)"
                 strokeWidth={2}
                 stackId="a"
+                dot={(props: any) => {
+                  const hasRevenue = props.payload?.revenue > 0
+                  if (!hasRevenue) return <></>
+                  return (
+                    <Dot
+                      {...props}
+                      r={4}
+                      fill="hsl(142, 76%, 36%)"
+                      stroke="hsl(142, 76%, 36%)"
+                      strokeWidth={2}
+                    />
+                  )
+                }}
+                activeDot={{ r: 5, strokeWidth: 2 }}
               />
               <Area
                 dataKey="desktop"
@@ -216,6 +260,8 @@ export function VisitorTimeline({
                 stroke="var(--color-desktop)"
                 strokeWidth={2}
                 stackId="a"
+                dot={false}
+                activeDot={{ r: 5, strokeWidth: 2 }}
               />
             </AreaChart>
           </ChartContainer>

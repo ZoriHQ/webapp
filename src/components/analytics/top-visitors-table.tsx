@@ -1,5 +1,5 @@
 import { IconUserCheck, IconUsers } from '@tabler/icons-react'
-import type Zoriapi from 'zorihq'
+
 import {
   Card,
   CardContent,
@@ -24,10 +24,10 @@ import {
   formatDuration,
   generateAvatarFromHash,
 } from '@/lib/utils'
+import { useTopVisitors } from '@/hooks/use-analytics'
+import { useAppContext } from '@/contexts/app.context'
 
 interface TopVisitorsTableProps {
-  data: Zoriapi.V1.Analytics.TopVisitorsResponse | undefined
-  isLoading: boolean
   onVisitorClick?: (visitorId: string) => void
 }
 
@@ -41,11 +41,14 @@ function formatTimestamp(timestamp: string | undefined) {
   })
 }
 
-export function TopVisitorsTable({
-  data,
-  isLoading,
-  onVisitorClick,
-}: TopVisitorsTableProps) {
+export function TopVisitorsTable({ onVisitorClick }: TopVisitorsTableProps) {
+  const { storedValues } = useAppContext()
+  const { data, isLoading } = useTopVisitors({
+    project_id: storedValues!.projectId!,
+    time_range: storedValues!.timeRange,
+    limit: 10,
+  })
+
   const hasVisitors = data?.visitors && data.visitors.length > 0
 
   return (

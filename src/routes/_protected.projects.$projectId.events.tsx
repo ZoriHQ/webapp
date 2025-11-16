@@ -37,11 +37,12 @@ function EventsPage() {
 
   const { data: projectData } = useProject(projectId)
 
-  // Fetch available filter options
   const { data: filterOptionsData, isLoading: filterOptionsLoading } =
-    useEventFilterOptions(projectId, 'last_7_days')
+    useEventFilterOptions({
+      project_id: projectId,
+      time_range: 'last_7_days',
+    })
 
-  // Build filter object from URL params
   const eventFilters: Zoriapi.V1.Analytics.Events.EventRecentParams = {
     project_id: projectId,
     time_range: 'last_7_days',
@@ -135,7 +136,6 @@ function EventsPage() {
         </div>
       </div>
 
-      {/* Filter Bar */}
       <EventsFilterBar
         filters={currentFilters}
         availablePages={filterOptionsData?.pages || []}

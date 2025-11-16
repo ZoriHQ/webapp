@@ -386,6 +386,7 @@ export function DataTable({
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
+    // eslint-disable-next-line
     if (active && over && active.id !== over.id) {
       setData((data) => {
         const oldIndex = dataIds.indexOf(active.id)

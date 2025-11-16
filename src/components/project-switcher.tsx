@@ -1,6 +1,4 @@
-'use client'
-
-import * as React from 'react'
+import { useEffect, useMemo } from 'react'
 import { IconChevronDown, IconPlus } from '@tabler/icons-react'
 import { useLocation, useNavigate, useParams } from '@tanstack/react-router'
 import { useProjects } from '@/hooks/use-projects'
@@ -17,8 +15,10 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
+import { useAppContext } from '@/contexts/app.context'
 
 export function ProjectSwitcher() {
+  const { setStoredValues, storedValues } = useAppContext()
   const navigate = useNavigate()
   const location = useLocation()
   const params = useParams({ strict: false })
@@ -27,7 +27,16 @@ export function ProjectSwitcher() {
   const { data: projectsData, isLoading } = useProjects()
   const projects = projectsData?.projects || []
 
-  const currentProject = React.useMemo(() => {
+  useEffect(() => {
+    if (projectId) {
+      setStoredValues((prevValues) => ({
+        timeRange: prevValues!.timeRange,
+        projectId: projectId,
+      }))
+    }
+  }, [projectId])
+
+  const currentProject = useMemo(() => {
     if (!projectId || !projects.length) return null
     return projects.find((p) => p.id === projectId) || projects[0]
   }, [projectId, projects])
@@ -47,7 +56,7 @@ export function ProjectSwitcher() {
 
   // Auto-select first project if none selected
   // But don't redirect if user is on specific pages like /projects/new or team settings
-  React.useEffect(() => {
+  useEffect(() => {
     const isOnProjectCreationPage = location.pathname === '/projects/new'
     const isOnProjectsListPage = location.pathname === '/projects'
     const isOnTeamPage = location.pathname.startsWith('/team')

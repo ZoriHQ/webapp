@@ -3,13 +3,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTheme } from 'next-themes'
 import Globe from 'react-globe.gl'
-import type Zoriapi from 'zorihq'
 import { getCountryCoordinates } from '@/lib/country-coordinates'
 import { Card, CardContent } from '@/components/ui/card'
+import { useAppContext } from '@/contexts/app.context'
+import { useTrafficByCountryTile } from '@/hooks/use-analytics-tiles'
 
 interface GlobeVisualizationProps {
-  countryData: Array<Zoriapi.V1.Analytics.CountryDataPoint> | undefined
-  isLoading: boolean
   highlightPoint?: {
     lat: number
     lng: number
@@ -26,8 +25,6 @@ interface PointData {
 }
 
 export function GlobeVisualization({
-  countryData,
-  isLoading,
   highlightPoint,
 }: GlobeVisualizationProps) {
   const globeEl = useRef<any>(null)
@@ -38,24 +35,29 @@ export function GlobeVisualization({
   const [dimensions, setDimensions] = useState({ width: 600, height: 500 })
   const [isGlobeReady, setIsGlobeReady] = useState(false)
 
-  // Load country GeoJSON data
+  const { storedValues } = useAppContext()
+  const { data, isLoading } = useTrafficByCountryTile({
+    project_id: storedValues!.projectId as string,
+    time_range: storedValues?.timeRange || 'last_7_days',
+  })
+
   useEffect(() => {
-    fetch(
-      'https://raw.githubusercontent.com/vasturiano/react-globe.gl/master/example/datasets/ne_110m_admin_0_countries.geojson',
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        setCountries(data)
-        setIsGlobeReady(true)
-      })
+    const fetchDataAsync = async () => {
+      const fetchResult = await fetch(
+        'https://raw.githubusercontent.com/vasturiano/react-globe.gl/master/example/datasets/ne_110m_admin_0_countries.geojson',
+      )
+      const adminCountriesData = await fetchResult.json()
+      setCountries(adminCountriesData)
+      setIsGlobeReady(true)
+    }
+    fetchDataAsync()
   }, [])
 
-  // Measure container dimensions on mount
   useEffect(() => {
     if (globeContainerRef.current) {
       const updateDimensions = () => {
         const width = globeContainerRef.current?.clientWidth || 500
-        const height = width // Keep it square
+        const height = width
         setDimensions({ width, height })
       }
 
@@ -84,13 +86,13 @@ export function GlobeVisualization({
       })
     }
 
-    if (countryData && countryData.length > 0) {
-      const countryPoints = countryData
+    if (data?.data && data.data.length > 0) {
+      const countryPoints = data.data
         .map((country) => {
-          const coords = getCountryCoordinates(country.country_code || '')
+          const coords = getCountryCoordinates(country.country || '')
           if (!coords) return null
 
-          const visitors = country.unique_visitors || 0
+          const visitors = country.count || 0
 
           const size = Math.min(1.5, Math.max(1, Math.log(visitors + 1) / 10))
           const opacity = Math.min(
@@ -116,9 +118,8 @@ export function GlobeVisualization({
     }
 
     return points
-  }, [countryData, isDark, highlightPoint])
+  }, [data?.data, isDark, highlightPoint])
 
-  // Rotate globe to highlight point when set
   useEffect(() => {
     if (
       isGlobeReady &&
@@ -135,37 +136,34 @@ export function GlobeVisualization({
             altitude: 2.5,
           },
           1500,
-        ) // Smooth transition over 1.5 seconds
+        )
       }, 300)
       return () => clearTimeout(timer)
     }
   }, [isGlobeReady, highlightPoint])
 
-  // Auto-rotate globe slowly - only after globe is ready and no highlight point
   useEffect(() => {
     if (isGlobeReady && globeEl.current) {
-      // Small delay to ensure globe is fully initialized
       const timer = setTimeout(() => {
         const controls = globeEl.current?.controls()
         if (controls) {
-          // Disable auto-rotate if we have a highlight point
           controls.autoRotate =
             !highlightPoint ||
             (highlightPoint.lat === 0 && highlightPoint.lng === 0)
-          controls.autoRotateSpeed = 0.3 // Slow rotation
-          controls.enableZoom = false // Disable zoom/scroll
-          controls.enablePan = false // Disable panning
+          controls.autoRotateSpeed = 0.3
+          controls.enableZoom = false
+          controls.enablePan = false
         }
       }, 500)
       return () => clearTimeout(timer)
     }
   }, [isGlobeReady, highlightPoint])
 
-  const backgroundColor = 'rgba(0,0,0,0)' // Fully transparent
-  const globeColor = isDark ? '#0a0a0a' : '#ffffff' // Globe base (ocean)
+  const backgroundColor = 'rgba(0,0,0,0)'
+  const globeColor = isDark ? '#0a0a0a' : '#ffffff'
   const atmosphereColor = isDark ? '#333333' : '#cccccc'
-  const landColor = isDark ? '#1a1a1a' : '#f5f5f5' // Land color
-  const borderColor = isDark ? '#ffffff' : '#000000' // Border color (opposite)
+  const landColor = isDark ? '#1a1a1a' : '#f5f5f5'
+  const borderColor = isDark ? '#ffffff' : '#000000'
 
   return (
     <Card className="overflow-hidden border-0 bg-transparent shadow-none">
@@ -244,7 +242,6 @@ export function GlobeVisualization({
                   box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
                   animation: pulse 2s ease-in-out infinite;
                 `
-                // Add keyframes animation if not already present
                 if (!document.getElementById('globe-pulse-animation')) {
                   const style = document.createElement('style')
                   style.id = 'globe-pulse-animation'

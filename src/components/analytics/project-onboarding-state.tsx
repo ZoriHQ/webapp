@@ -328,11 +328,7 @@ export function ProjectOnboardingState({
 
       {/* Right side - Spinning Globe */}
       <div className="lg:sticky lg:top-6">
-        <GlobeVisualization
-          countryData={[]}
-          isLoading={false}
-          highlightPoint={eventLocation}
-        />
+        <GlobeVisualization highlightPoint={eventLocation} />
       </div>
     </div>
   )

@@ -1,31 +1,18 @@
-import { useEffect, useState } from 'react'
-import {
-  Activity,
-  AlertCircle,
-  DollarSign,
-  TrendingDown,
-  TrendingUp,
-  Users,
-} from 'lucide-react'
+import { useEffect } from 'react'
+import { Activity, AlertCircle, DollarSign } from 'lucide-react'
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { useProject } from '@/hooks/use-projects'
 import { useAuthState } from '@/lib/auth'
-import {
-  useChurnRate,
-  useDashboardMetrics,
-  useVisitorsByCountry,
-  useVisitorsByOrigin,
-  useVisitorsTimeline,
-  // eslint-disable-next-line
-  type TimeRange,
-} from '@/hooks/use-analytics'
-import { useRevenueByOrigin, useRevenueDashboard } from '@/hooks/use-revenue'
+
 import { usePaymentProviders } from '@/hooks/use-payment-providers'
 import { ProjectOnboardingState } from '@/components/analytics/project-onboarding-state'
 import { GlobeVisualization } from '@/components/overview/globe-visualization'
 import { VisitorTimeline } from '@/components/overview/visitor-timeline'
-import { TrafficSources } from '@/components/analytics/traffic-sources'
+import { TrafficSourcesJoinedTile } from '@/components/analytics/tiles/traffic-sources.joined-tile'
+import { RevenueChip } from '@/components/analytics/chips/revenue-chip'
+import { VisitorsChip } from '@/components/analytics/chips/visitors-chip'
+import { ChurnChip } from '@/components/analytics/chips/churn-chip'
 
 import { Button } from '@/components/ui/button'
 
@@ -35,10 +22,8 @@ export const Route = createFileRoute('/_protected/projects/$projectId/')({
 
 function OverviewPage() {
   const { projectId } = Route.useParams()
-  const [timeRange, setTimeRange] = useState<TimeRange>('today')
   const { user } = useAuthState()
 
-  // Handle payment provider OAuth callback
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search)
     const status = searchParams.get('status')
@@ -69,33 +54,6 @@ function OverviewPage() {
   // Fetch project details
   const { data: projectData, isLoading: projectLoading } = useProject(projectId)
 
-  // Fetch analytics data
-  const { data: countryData, isLoading: countryLoading } = useVisitorsByCountry(
-    projectId,
-    timeRange,
-  )
-  const { data: timelineData, isLoading: timelineLoading } =
-    useVisitorsTimeline(projectId, timeRange)
-  const { data: originData, isLoading: originLoading } = useVisitorsByOrigin(
-    projectId,
-    timeRange,
-  )
-  const { data: metricsData, isLoading: metricsLoading } = useDashboardMetrics(
-    projectId,
-    timeRange,
-  )
-  const { data: churnData, isLoading: churnLoading } = useChurnRate(
-    projectId,
-    timeRange,
-  )
-
-  const { data: revenueDashboardData } = useRevenueDashboard(
-    projectId,
-    timeRange,
-  )
-
-  const { data: revenueByOriginData } = useRevenueByOrigin(projectId, timeRange)
-
   const { data: providersData } = usePaymentProviders(projectId)
   const hasPaymentProvider = (providersData?.providers?.length || 0) > 0
 
@@ -115,10 +73,6 @@ function OverviewPage() {
     minute: '2-digit',
     hour12: true,
   })
-
-  const todayVisits = metricsData?.unique_visitors || 0
-  const todayRevenue = revenueDashboardData?.total_revenue || 0
-  const churnRate = churnData?.churn_rate_percent || 0
 
   return (
     <>
@@ -158,36 +112,12 @@ function OverviewPage() {
                     </div>
                   </Link>
                 ) : (
-                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900/50">
-                    <DollarSign className="h-3.5 w-3.5 text-green-600 dark:text-green-500" />
-                    <span className="text-xs font-semibold text-green-700 dark:text-green-300">
-                      ${todayRevenue.toLocaleString()}
-                    </span>
-                    <span className="text-xs text-green-600 dark:text-green-400">
-                      revenue today
-                    </span>
-                  </div>
+                  <RevenueChip projectId={projectId} />
                 )}
 
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/50">
-                  <Users className="h-3.5 w-3.5 text-blue-600 dark:text-blue-500" />
-                  <span className="text-xs font-semibold text-blue-700 dark:text-blue-300">
-                    {todayVisits.toLocaleString()}
-                  </span>
-                  <span className="text-xs text-blue-600 dark:text-blue-400">
-                    visits today
-                  </span>
-                </div>
+                <VisitorsChip projectId={projectId} />
 
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-900/50">
-                  <Activity className="h-3.5 w-3.5 text-purple-600 dark:text-purple-500" />
-                  <span className="text-xs font-semibold text-purple-700 dark:text-purple-300">
-                    {churnRate.toFixed(1)}%
-                  </span>
-                  <span className="text-xs text-purple-600 dark:text-purple-400">
-                    churn rate
-                  </span>
-                </div>
+                <ChurnChip projectId={projectId} />
               </div>
 
               <div className="flex flex-wrap gap-3">
@@ -235,26 +165,13 @@ function OverviewPage() {
             </div>
 
             <div className="w-full lg:w-1/2 lg:sticky lg:top-6">
-              <GlobeVisualization
-                countryData={countryData?.data}
-                isLoading={countryLoading}
-              />
+              <GlobeVisualization />
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <VisitorTimeline
-              data={timelineData?.data}
-              isLoading={timelineLoading}
-              timeRange={timeRange}
-            />
-            <TrafficSources
-              originData={originData?.data}
-              countryData={countryData?.data}
-              revenueByOrigin={revenueByOriginData?.data}
-              isLoading={originLoading || countryLoading}
-              showRevenue={hasPaymentProvider}
-            />
+            <VisitorTimeline />
+            <TrafficSourcesJoinedTile />
           </div>
         </div>
       )}

@@ -10,7 +10,6 @@ import {
 import type { ReactNode } from 'react'
 import type { AuthProvider, AuthUser } from './types'
 
-// Clerk configuration
 const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
 if (!CLERK_PUBLISHABLE_KEY && import.meta.env.VITE_AUTH_MODE === 'clerk') {
@@ -49,8 +48,9 @@ function useClerkAuthProvider(): AuthProvider {
     }
 
     const signIn = async (_email: string, _password: string): Promise<void> => {
-      // This method is for compatibility with the AuthProvider interface
-      throw new Error('Please use Clerk SignIn component for authentication')
+      return Promise.reject(
+        'Please use Clerk SignIn component for authentication',
+      )
     }
 
     const signUp = async (
@@ -58,8 +58,9 @@ function useClerkAuthProvider(): AuthProvider {
       _password: string,
       _name: string,
     ): Promise<void> => {
-      // This method is for compatibility with the AuthProvider interface
-      throw new Error('Please use Clerk SignUp component for registration')
+      return Promise.reject(
+        'Please use Clerk SignUp component for registration',
+      )
     }
 
     const signOut = async (): Promise<void> => {

@@ -5,6 +5,7 @@ import { useApiClient } from '@/lib/api-client'
 export type TimeRange =
   | 'last_hour'
   | 'today'
+  | 'yesterday'
   | 'last_7_days'
   | 'last_30_days'
   | 'last_90_days'
@@ -17,6 +18,19 @@ export interface EventFilters {
   page_path?: string
   limit?: number
   offset?: number
+}
+
+// Custom types that match component expectations
+export interface CountryDataPoint {
+  country_code: string
+  unique_visitors: number
+  percentage: number
+}
+
+export interface OriginDataPoint {
+  origin: string
+  unique_visitors: number
+  percentage: number
 }
 
 export function useRecentEvents(
@@ -44,61 +58,20 @@ export function useRecentEvents(
 }
 
 export function useEventFilterOptions(
-  projectId: string,
-  timeRange?: TimeRange,
+  params: Zoriapi.V1.Analytics.EventFilterOptionsParams,
 ) {
   const zClient = useApiClient()
 
   return useQuery<Zoriapi.V1.Analytics.EventFilterOptionsResponse>({
-    queryKey: ['analytics', 'events', 'filterOptions', projectId, timeRange],
-    queryFn: () =>
-      zClient.v1.analytics.events.filterOptions({
-        project_id: projectId,
-        time_range: timeRange,
-      }),
-    enabled: !!projectId,
-  })
-}
-
-export function useVisitorsByCountry(projectId: string, timeRange: TimeRange) {
-  const zClient = useApiClient()
-
-  return useQuery<Zoriapi.V1.Analytics.VisitorsByCountryResponse>({
-    queryKey: ['analytics', 'visitors', 'country', projectId, timeRange],
-    queryFn: () =>
-      zClient.v1.analytics.visitors.byCountry({
-        project_id: projectId,
-        time_range: timeRange,
-      }),
-    enabled: !!projectId,
-  })
-}
-
-export function useVisitorsByOrigin(projectId: string, timeRange: TimeRange) {
-  const zClient = useApiClient()
-
-  return useQuery<Zoriapi.V1.Analytics.VisitorsByOriginResponse>({
-    queryKey: ['analytics', 'visitors', 'origin', projectId, timeRange],
-    queryFn: () =>
-      zClient.v1.analytics.visitors.byOrigin({
-        project_id: projectId,
-        time_range: timeRange,
-      }),
-    enabled: !!projectId,
-  })
-}
-
-export function useVisitorsByDevice(projectId: string, timeRange: TimeRange) {
-  const zClient = useApiClient()
-
-  return useQuery<Zoriapi.V1.Analytics.VisitorsByDeviceResponse>({
-    queryKey: ['analytics', 'visitors', 'device', projectId, timeRange],
-    queryFn: () =>
-      zClient.v1.analytics.visitors.byDevice({
-        project_id: projectId,
-        time_range: timeRange,
-      }),
-    enabled: !!projectId,
+    queryKey: [
+      'analytics',
+      'events',
+      'filterOptions',
+      params.project_id,
+      params.time_range,
+    ],
+    queryFn: () => zClient.v1.analytics.events.filterOptions(params),
+    enabled: !!params.project_id,
   })
 }
 
@@ -123,119 +96,28 @@ export function useVisitorProfile(projectId: string, visitorId: string | null) {
   })
 }
 
-export function useVisitorsTimeline(projectId: string, timeRange: TimeRange) {
-  const zClient = useApiClient()
-
-  return useQuery<Zoriapi.V1.Analytics.UniqueVisitorsTimelineResponse>({
-    queryKey: ['analytics', 'visitors', 'timeline', projectId, timeRange],
-    queryFn: async () => {
-      console.log('[useVisitorsTimeline] Fetching timeline for:', {
-        projectId,
-        timeRange,
-      })
-      console.log(
-        '[useVisitorsTimeline] zClient.v1.analytics.visitors:',
-        zClient.v1.analytics.visitors,
-      )
-      console.log(
-        '[useVisitorsTimeline] typeof timeline:',
-        typeof zClient.v1.analytics.visitors.timeline,
-      )
-      console.log(
-        '[useVisitorsTimeline] typeof profile:',
-        typeof zClient.v1.analytics.visitors.profile,
-      )
-
-      if (typeof zClient.v1.analytics.visitors.timeline !== 'function') {
-        console.error(
-          '[useVisitorsTimeline] timeline is not a function! Type:',
-          typeof zClient.v1.analytics.visitors.timeline,
-        )
-        throw new Error('timeline method not available on visitors API')
-      }
-
-      const result = await zClient.v1.analytics.visitors.timeline({
-        project_id: projectId,
-        time_range: timeRange,
-      })
-      console.log('[useVisitorsTimeline] Result:', result)
-      return result
-    },
-    enabled: !!projectId,
-  })
-}
-
-export function useDashboardMetrics(projectId: string, timeRange: TimeRange) {
-  const zClient = useApiClient()
-
-  return useQuery<Zoriapi.V1.Analytics.DashboardMetricsResponse>({
-    queryKey: ['analytics', 'dashboard', projectId, timeRange],
-    queryFn: () =>
-      zClient.v1.analytics.dashboard({
-        project_id: projectId,
-        time_range: timeRange,
-      }),
-    enabled: !!projectId,
-  })
-}
-
-export function useSessionMetrics(projectId: string, timeRange: TimeRange) {
-  const zClient = useApiClient()
-
-  return useQuery<Zoriapi.V1.Analytics.SessionMetricsResponse>({
-    queryKey: ['analytics', 'sessions', 'metrics', projectId, timeRange],
-    queryFn: () =>
-      zClient.v1.analytics.sessions.metrics({
-        project_id: projectId,
-        time_range: timeRange,
-      }),
-    enabled: !!projectId,
-  })
-}
-
-export function useBounceRate(
-  projectId: string,
-  timeRange: TimeRange,
-  limit?: number,
+export function useVisitorsTimeline(
+  params: Zoriapi.V1.Analytics.AnalyticsTimelineParams,
 ) {
   const zClient = useApiClient()
 
-  return useQuery<Zoriapi.V1.Analytics.BounceRateResponse>({
+  return useQuery<Zoriapi.V1.Analytics.TimelineTileResponse>({
     queryKey: [
       'analytics',
-      'sessions',
-      'bounceRate',
-      projectId,
-      timeRange,
-      limit,
+      'visitors',
+      'timeline',
+      params.project_id,
+      params.time_range,
     ],
-    queryFn: () =>
-      zClient.v1.analytics.sessions.bounceRate({
-        project_id: projectId,
-        time_range: timeRange,
-        limit,
-      }),
-    enabled: !!projectId,
-  })
-}
-
-export function useActiveUsers(projectId: string) {
-  const zClient = useApiClient()
-
-  return useQuery<Zoriapi.V1.Analytics.ActiveUsersResponse>({
-    queryKey: ['analytics', 'users', 'active', projectId],
-    queryFn: () =>
-      zClient.v1.analytics.users.active({
-        project_id: projectId,
-      }),
-    enabled: !!projectId,
+    queryFn: async () => {
+      return zClient.v1.analytics.timeline(params)
+    },
+    enabled: !!params.project_id,
   })
 }
 
 export function useChurnRate(
-  projectId: string,
-  timeRange: TimeRange,
-  churnThresholdDays?: number,
+  params: Zoriapi.V1.Analytics.Retention.RetentionChurnRateParams,
 ) {
   const zClient = useApiClient()
 
@@ -244,64 +126,29 @@ export function useChurnRate(
       'analytics',
       'retention',
       'churnRate',
-      projectId,
-      timeRange,
-      churnThresholdDays,
+      params.project_id,
+      params.time_range,
     ],
-    queryFn: () =>
-      zClient.v1.analytics.retention.churnRate({
-        project_id: projectId,
-        time_range: timeRange,
-        churn_threshold_days: churnThresholdDays,
-      }),
-    enabled: !!projectId,
-  })
-}
-
-export function useReturnRate(projectId: string, timeRange: TimeRange) {
-  const zClient = useApiClient()
-
-  return useQuery<Zoriapi.V1.Analytics.ReturnRateResponse>({
-    queryKey: ['analytics', 'retention', 'returnRate', projectId, timeRange],
-    queryFn: () =>
-      zClient.v1.analytics.retention.returnRate({
-        project_id: projectId,
-        time_range: timeRange,
-      }),
-    enabled: !!projectId,
-  })
-}
-
-export function useCohortAnalysis(projectId: string, timeRange: TimeRange) {
-  const zClient = useApiClient()
-
-  return useQuery<Zoriapi.V1.Analytics.CohortAnalysisResponse>({
-    queryKey: ['analytics', 'retention', 'cohorts', projectId, timeRange],
-    queryFn: () =>
-      zClient.v1.analytics.retention.cohorts({
-        project_id: projectId,
-        time_range: timeRange,
-      }),
-    enabled: !!projectId,
+    queryFn: () => zClient.v1.analytics.retention.churnRate(params),
+    enabled: !!params.project_id,
   })
 }
 
 export function useTopVisitors(
-  projectId: string,
-  timeRange: TimeRange,
-  limit?: number,
+  params: Zoriapi.V1.Analytics.Visitors.VisitorTopParams,
 ) {
   const zClient = useApiClient()
 
   return useQuery<Zoriapi.V1.Analytics.TopVisitorsResponse>({
-    queryKey: ['analytics', 'visitors', 'top', projectId, timeRange, limit],
-    queryFn: () =>
-      zClient.v1.analytics.visitors.top({
-        project_id: projectId,
-        time_range: timeRange,
-        limit,
-      }),
-    enabled: !!projectId,
+    queryKey: [
+      'analytics',
+      'visitors',
+      'top',
+      params.project_id,
+      params.time_range,
+    ],
+    queryFn: () => zClient.v1.analytics.visitors.top(params),
+    enabled: !!params.project_id,
   })
 }
 
@@ -320,7 +167,6 @@ export function useIdentifyVisitor(projectId: string) {
         ...data,
       }),
     onSuccess: (_, variables) => {
-      // Invalidate the visitor profile query to refetch updated data
       queryClient.invalidateQueries({
         queryKey: [
           'analytics',
@@ -330,7 +176,6 @@ export function useIdentifyVisitor(projectId: string) {
           variables.visitor_id,
         ],
       })
-      // Also invalidate top visitors list in case it needs to update
       queryClient.invalidateQueries({
         queryKey: ['analytics', 'visitors', 'top', projectId],
       })

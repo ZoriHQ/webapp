@@ -1,7 +1,8 @@
-import * as React from 'react'
+import { useClerk } from '@clerk/clerk-react'
+import { useEffect } from 'react'
 import { IconHelp, IconSettings } from '@tabler/icons-react'
 import { useParams } from '@tanstack/react-router'
-import { useClerk } from '@clerk/clerk-react'
+import type { ComponentProps } from 'react'
 
 import { NavMain } from '@/components/nav-main'
 import { NavSecondary } from '@/components/nav-secondary'
@@ -14,9 +15,11 @@ import {
   SidebarFooter,
   SidebarHeader,
 } from '@/components/ui/sidebar'
+import { useAppContext } from '@/contexts/app.context'
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
   const { user, isLoading } = useAuthState()
+  const { storedValues, setStoredValues } = useAppContext()
   const params = useParams({ strict: false })
   const projectId = (params as { projectId?: string }).projectId
   const authMode = getAuthMode()
@@ -29,14 +32,23 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   // Don't render NavUser if still loading or no user
   const showNavUser = !isLoading && user
 
+  useEffect(() => {
+    if (projectId) {
+      setStoredValues((prevValues) => ({
+        timeRange: prevValues!.timeRange,
+        projectId: projectId,
+      }))
+    }
+  }, [projectId])
+
   const handleManageAccount = () => {
-    if (authMode === 'clerk' && clerk) {
+    if (authMode === 'clerk') {
       clerk.openUserProfile()
     }
   }
 
   const handleManageOrganization = () => {
-    if (authMode === 'clerk' && clerk) {
+    if (authMode === 'clerk') {
       clerk.openOrganizationProfile()
     }
   }
