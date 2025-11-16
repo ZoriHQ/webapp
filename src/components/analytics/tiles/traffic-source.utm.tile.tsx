@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
 import { useTrafficByUTMTile } from '@/hooks/use-analytics-tiles'
 
 interface TrafficSourceUtmTileProps {
-  params: Zoriapi.V1.Analytics.Tiles.TileTrafficByUtmParams
+  params: Zoriapi.V1.Analytics.Tiles.TileGetTrafficByUtmParams
 }
 
 const chartConfig = {

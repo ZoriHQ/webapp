@@ -32,7 +32,7 @@ export const BounceRateTile = () => {
               current: currentRate,
               previous: previousRate,
               trendDirection: 'down-good',
-              formatter: (val) => `${(val * 100).toFixed(1)}%`,
+              formatter: (val) => `${val.toFixed(1)}%`,
             })}
           </>
         )}

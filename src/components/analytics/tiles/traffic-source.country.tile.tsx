@@ -12,7 +12,7 @@ import { countryCodeToFlag, getCountryName } from '@/lib/country-utils'
 import { useTrafficByCountryTile } from '@/hooks/use-analytics-tiles'
 
 interface TrafficSourceCountryTileProps {
-  params: Zoriapi.V1.Analytics.Tiles.TileTrafficByCountryParams
+  params: Zoriapi.V1.Analytics.Tiles.TileGetTrafficByCountryParams
 }
 
 const chartConfig = {
