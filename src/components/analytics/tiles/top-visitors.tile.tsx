@@ -6,13 +6,15 @@ import { useTopUniqueVisitorsTile } from '@/hooks/use-analytics-tiles'
 
 export const UniqueVisitorsTile = () => {
   const { storedValues } = useAppContext()
-  const { isLoading, data, isError } = useTopUniqueVisitorsTile({
+  const { isLoading, data, isError, error } = useTopUniqueVisitorsTile({
     time_range: storedValues?.timeRange || 'last_7_days',
     project_id: storedValues!.projectId as string,
   })
 
   const currentCount = data?.count ?? 0
-  const previousCount = data?.previous_count ?? 0
+  const previousCount = data?.previous_count ?? 0;
+
+  console.log('Error: ', error)
 
   return (
     <Card>
@@ -25,7 +27,10 @@ export const UniqueVisitorsTile = () => {
             Loading...
           </div>
         ) : isError ? (
-          <ErrorTile />
+          <>
+            <ErrorTile />
+            {JSON.stringify(error)}
+          </>
         ) : (
           <>
             <div className="text-2xl font-bold">

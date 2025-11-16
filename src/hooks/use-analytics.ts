@@ -97,11 +97,11 @@ export function useVisitorProfile(projectId: string, visitorId: string | null) {
 }
 
 export function useVisitorsTimeline(
-  params: Zoriapi.V1.Analytics.AnalyticsTimelineParams,
+  params: Zoriapi.V1.Analytics.AnalyticsRetrieveTimelineParams,
 ) {
   const zClient = useApiClient()
 
-  return useQuery<Zoriapi.V1.Analytics.TimelineTileResponse>({
+  return useQuery<Zoriapi.V1.Analytics.AnalyticsRetrieveTimelineResponse>({
     queryKey: [
       'analytics',
       'visitors',
@@ -110,7 +110,7 @@ export function useVisitorsTimeline(
       params.time_range,
     ],
     queryFn: async () => {
-      return zClient.v1.analytics.timeline(params)
+      return zClient.v1.analytics.retrieveTimeline(params)
     },
     enabled: !!params.project_id,
   })
