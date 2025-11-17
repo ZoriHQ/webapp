@@ -128,11 +128,11 @@ export function NavUser({
             <DropdownMenuSub>
               <DropdownMenuSubTrigger>
                 {theme === 'light' ? (
-                  <IconSun className="h-4 w-4" />
+                  <IconSun className="h-4 w-4 mr-2" />
                 ) : (
-                  <IconMoon className="h-4 w-4" />
+                  <IconMoon className="h-4 w-4 mr-2" />
                 )}
-                <span>Theme</span>
+                <span className="mr-2"> Theme</span>
               </DropdownMenuSubTrigger>
               <DropdownMenuSubContent>
                 <DropdownMenuItem onClick={() => setTheme('light')}>
