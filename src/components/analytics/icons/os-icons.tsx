@@ -2,6 +2,7 @@
 import windowsIcon from './windows.png'
 import appleIcon from './apple.png'
 import linuxIcon from './linux.png'
+import androidIcon from './android.png'
 
 export const WindowsIcon = ({ className }: { className?: string }) => (
   <img src={windowsIcon} alt="Windows" className={className} />
@@ -16,7 +17,7 @@ export const LinuxIcon = ({ className }: { className?: string }) => (
 )
 
 export const AndroidIcon = ({ className }: { className?: string }) => (
-  <img src={linuxIcon} alt="Android" className={className} />
+  <img src={androidIcon} alt="Android" className={className} />
 )
 
 export const IOSIcon = ({ className }: { className?: string }) => (
