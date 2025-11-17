@@ -13,7 +13,7 @@ import { getFaviconUrl } from '@/lib/favicon-utils'
 import { useTrafficByReferrerTile } from '@/hooks/use-analytics-tiles'
 
 interface TrafficSourceRefererTileProps {
-  params: Zoriapi.V1.Analytics.Tiles.TileGetTrafficByRefererParams
+  params: Zoriapi.V1.Analytics.Tiles.TileTrafficByRefererParams
 }
 
 const chartConfig = {

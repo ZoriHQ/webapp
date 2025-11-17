@@ -1,6 +1,6 @@
 import { DollarSign } from 'lucide-react'
-import { useRevenueDashboard } from '@/hooks/use-revenue'
 import { AnalyticChip } from './analytic-chip'
+import { useRevenueDashboard } from '@/hooks/use-revenue'
 
 interface RevenueChipProps {
   projectId: string

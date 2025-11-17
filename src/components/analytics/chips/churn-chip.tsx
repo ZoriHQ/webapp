@@ -1,6 +1,6 @@
 import { Activity } from 'lucide-react'
-import { useChurnRate } from '@/hooks/use-analytics'
 import { AnalyticChip } from './analytic-chip'
+import { useChurnRate } from '@/hooks/use-analytics'
 
 interface ChurnChipProps {
   projectId: string

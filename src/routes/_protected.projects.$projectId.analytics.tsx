@@ -8,6 +8,8 @@ import { EmptyEventsState } from '@/components/analytics/empty-events-state'
 import { VisitorProfileModal } from '@/components/analytics/visitor-profile-modal'
 import { VisitorTimeline } from '@/components/overview/visitor-timeline'
 import { TrafficSourcesJoinedTile } from '@/components/analytics/tiles/traffic-sources.joined-tile'
+import { VisitorsByBrowserTile } from '@/components/analytics/tiles/visitors-by-browser.tile'
+import { VisitorsByOSTile } from '@/components/analytics/tiles/visitors-by-os.tile'
 
 export const Route = createFileRoute(
   '/_protected/projects/$projectId/analytics',
@@ -47,6 +49,12 @@ function ProjectDetailPage() {
             <VisitorTimeline />
 
             <TrafficSourcesJoinedTile />
+          </div>
+
+          {/* Browser and OS Analytics */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <VisitorsByBrowserTile />
+            <VisitorsByOSTile />
           </div>
 
           <div className="mb-8">

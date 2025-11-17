@@ -14,6 +14,30 @@ export function useTopUniqueVisitorsTile(
   })
 }
 
+export function useVisitorsByBrowserTile(
+  params: Zoriapi.V1.Analytics.Tiles.TileVisitorsByBrowserParams,
+) {
+  const zClient = useApiClient()
+
+  return useQuery<Zoriapi.V1.Analytics.VisitorsByBrowserResponse>({
+    queryKey: ['visitorsByBrowser', params],
+    queryFn: (): Promise<Zoriapi.V1.Analytics.VisitorsByBrowserResponse> =>
+      zClient.v1.analytics.tiles.visitorsByBrowser(params),
+  })
+}
+
+export function useVisitorsByOSTile(
+  params: Zoriapi.V1.Analytics.Tiles.TileVisitorsByOsParams,
+) {
+  const zClient = useApiClient()
+
+  return useQuery<Zoriapi.V1.Analytics.VisitorsByOsResponse>({
+    queryKey: ['visitorsByOS', params],
+    queryFn: (): Promise<Zoriapi.V1.Analytics.VisitorsByOsResponse> =>
+      zClient.v1.analytics.tiles.visitorsByOs(params),
+  })
+}
+
 export function useBounceRateTile(
   params: Zoriapi.V1.Analytics.Tiles.TileBounceRateParams,
 ) {
@@ -67,10 +91,10 @@ export function useUniqueSessionsTile(
 ) {
   const zClient = useApiClient()
 
-  return useQuery<Zoriapi.V1.Analytics.SessionDurationResponse>({
+  return useQuery<Zoriapi.V1.Analytics.UniqueSessionsResponse>({
     queryKey: ['sessions', params],
-    queryFn: (): Promise<Zoriapi.V1.Analytics.SessionDurationResponse> =>
-      zClient.v1.analytics.tiles.sessionDuration(params),
+    queryFn: (): Promise<Zoriapi.V1.Analytics.UniqueSessionsResponse> =>
+      zClient.v1.analytics.tiles.uniqueSessions(params),
   })
 }
 

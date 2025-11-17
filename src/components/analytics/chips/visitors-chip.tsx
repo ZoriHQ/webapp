@@ -1,6 +1,6 @@
 import { Users } from 'lucide-react'
-import { useUniqueSessionsTile } from '@/hooks/use-analytics-tiles'
 import { AnalyticChip } from './analytic-chip'
+import { useUniqueSessionsTile } from '@/hooks/use-analytics-tiles'
 
 interface VisitorsChipProps {
   projectId: string
