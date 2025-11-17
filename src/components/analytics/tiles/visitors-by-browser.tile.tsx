@@ -11,6 +11,7 @@ import { ErrorTile } from './error.tile'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAppContext } from '@/contexts/app.context'
 import { useVisitorsByBrowserTile } from '@/hooks/use-analytics-tiles'
+import { Progress } from '@/components/ui/progress'
 
 const getBrowserIcon = (browserName: string) => {
   const name = browserName.toLowerCase()
@@ -91,30 +92,33 @@ export const VisitorsByBrowserTile = () => {
                     : '0.0'
 
                 return (
-                  <div key={idx} className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 flex-1">
-                      <div className="text-muted-foreground">
-                        {getBrowserIcon(browser.browser_name || 'Unknown')}
+                  <div key={idx} className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 flex-1">
+                        <div className="text-muted-foreground">
+                          {getBrowserIcon(browser.browser_name || 'Unknown')}
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium">
+                            {browser.browser_name || 'Unknown'}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {percentage}% of total
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium">
-                          {browser.browser_name || 'Unknown'}
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-bold">
+                          {count.toLocaleString()}
                         </span>
-                        <span className="text-xs text-muted-foreground">
-                          {percentage}% of total
+                        <span
+                          className={`text-xs ${getChangeColor(count, previousCount)}`}
+                        >
+                          {formatChange(count, previousCount)}
                         </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm font-bold">
-                        {count.toLocaleString()}
-                      </span>
-                      <span
-                        className={`text-xs ${getChangeColor(count, previousCount)}`}
-                      >
-                        {formatChange(count, previousCount)}
-                      </span>
-                    </div>
+                    <Progress value={parseFloat(percentage)} className="h-2" />
                   </div>
                 )
               })
