@@ -50,6 +50,30 @@ export function useBounceRateTile(
   })
 }
 
+export function useTopEntryPagesTile(
+  params: Zoriapi.V1.Analytics.Tiles.TileEntryPagesParams,
+) {
+  const zClient = useApiClient()
+
+  return useQuery<Zoriapi.V1.Analytics.EntryPagesResponse>({
+    queryKey: ['topEntryPages'],
+    queryFn: (): Promise<Zoriapi.V1.Analytics.EntryPagesResponse> =>
+      zClient.v1.analytics.tiles.entryPages(params),
+  })
+}
+
+export function useTopExitPagesTile(
+  params: Zoriapi.V1.Analytics.Tiles.TileExitPagesParams,
+) {
+  const zClient = useApiClient()
+
+  return useQuery<Zoriapi.V1.Analytics.ExitPagesResponse>({
+    queryKey: ['topExitPages', params],
+    queryFn: (): Promise<Zoriapi.V1.Analytics.ExitPagesResponse> =>
+      zClient.v1.analytics.tiles.exitPages(params),
+  })
+}
+
 export function usePagesPerSessionTile(
   params: Zoriapi.V1.Analytics.Tiles.TilePagesPerSessionParams,
 ) {

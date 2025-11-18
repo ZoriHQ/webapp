@@ -10,6 +10,10 @@ import { VisitorTimeline } from '@/components/overview/visitor-timeline'
 import { TrafficSourcesJoinedTile } from '@/components/analytics/tiles/traffic-sources.joined-tile'
 import { VisitorsByBrowserTile } from '@/components/analytics/tiles/visitors-by-browser.tile'
 import { VisitorsByOSTile } from '@/components/analytics/tiles/visitors-by-os.tile'
+import { TopEntryPagesTile } from '@/components/analytics/tiles/pages.entry.tile'
+import { TopExitPagesTile } from '@/components/analytics/tiles/pages.exit.tile'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useAppContext } from '@/contexts/app.context'
 
 export const Route = createFileRoute(
   '/_protected/projects/$projectId/analytics',
@@ -25,6 +29,12 @@ function ProjectDetailPage() {
   const [isVisitorModalOpen, setIsVisitorModalOpen] = useState(false)
 
   const { isLoading: projectLoading } = useProject(projectId)
+  const { storedValues } = useAppContext()
+
+  const tileParams = {
+    project_id: projectId,
+    time_range: storedValues?.timeRange || 'last_7_days',
+  }
 
   const handleVisitorClick = (visitorId: string) => {
     setSelectedVisitorId(visitorId)
@@ -55,6 +65,27 @@ function ProjectDetailPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <VisitorsByBrowserTile />
             <VisitorsByOSTile />
+          </div>
+
+          {/* Entry and Exit Pages */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <Card>
+              <CardHeader>
+                <CardTitle>Top Entry Pages</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <TopEntryPagesTile params={tileParams} />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Top Exit Pages</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <TopExitPagesTile params={tileParams} />
+              </CardContent>
+            </Card>
           </div>
 
           <div className="mb-8">

@@ -76,7 +76,7 @@
     "vaul": "^1.1.2",
     "vite-tsconfig-paths": "^5.1.4",
     "zod": "^4.1.11",
-    "zorihq": "^0.17.0"
+    "zorihq": "^0.18.0"
   },
   "devDependencies": {
     "@tanstack/eslint-config": "^0.3.0",
