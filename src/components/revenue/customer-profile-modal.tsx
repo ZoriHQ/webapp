@@ -1,6 +1,7 @@
 import { Calendar, DollarSign, ShoppingCart, TrendingUp } from 'lucide-react'
 import { format } from 'date-fns'
 import { useCustomerProfile } from '@/hooks/use-revenue'
+import { getTrafficOriginDisplay } from '@/lib/traffic-origin-utils'
 import {
   Dialog,
   DialogContent,
@@ -172,7 +173,7 @@ export function CustomerProfileModal({
                 <div>
                   <span className="text-muted-foreground">Traffic Origin:</span>{' '}
                   <span className="font-medium">
-                    {data.first_traffic_origin || 'Direct'}
+                    {getTrafficOriginDisplay(data)}
                   </span>
                 </div>
                 {data.first_utm_source && (

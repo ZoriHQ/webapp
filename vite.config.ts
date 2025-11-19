@@ -15,6 +15,9 @@ function injectZoriAnalytics(): Plugin {
         'zori_pt_a06776c2d31f612efb69c3dfeed1d6e4121364797b6e3b253c'
 
       const analyticsScript = `
+  <script>
+    window.ZoriHQ = window.ZoriHQ || [];
+  </script>
   <script
     async
     src="https://cdn.zorihq.com/script.min.js"

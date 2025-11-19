@@ -12,7 +12,7 @@ export const UniqueVisitorsTile = () => {
   })
 
   const currentCount = data?.count ?? 0
-  const previousCount = data?.previous_count ?? 0;
+  const previousCount = data?.previous_count ?? 0
 
   console.log('Error: ', error)
 

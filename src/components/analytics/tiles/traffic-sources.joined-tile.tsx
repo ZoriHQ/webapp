@@ -36,7 +36,7 @@ export function TrafficSourcesJoinedTile() {
                 'text-sm px-3 py-1 rounded transition-colors',
                 activeTab === tab.value
                   ? 'text-primary font-medium underline underline-offset-4'
-                  : 'text-muted-foreground hover:text-foreground'
+                  : 'text-muted-foreground hover:text-foreground',
               )}
             >
               {tab.label}
@@ -45,8 +45,12 @@ export function TrafficSourcesJoinedTile() {
         </div>
       </CardHeader>
       <CardContent>
-        {activeTab === 'country' && <TrafficSourceCountryTile params={params} />}
-        {activeTab === 'referer' && <TrafficSourceRefererTile params={params} />}
+        {activeTab === 'country' && (
+          <TrafficSourceCountryTile params={params} />
+        )}
+        {activeTab === 'referer' && (
+          <TrafficSourceRefererTile params={params} />
+        )}
         {activeTab === 'utm' && <TrafficSourceUtmTile params={params} />}
       </CardContent>
     </Card>

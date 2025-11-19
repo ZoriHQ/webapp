@@ -17,6 +17,7 @@ import {
 import { Separator } from '@/components/ui/separator'
 import { getAuthMode, useAuthState } from '@/lib/auth'
 import { AppContextProvider } from '@/contexts/app.context'
+import { useZoriIdentify } from '@/hooks/use-zori-identify'
 
 export const Route = createFileRoute('/_protected')({
   beforeLoad: async ({ location }) => {
@@ -34,6 +35,9 @@ function ProtectedLayout() {
   const { isAuthenticated, isLoading } = useAuthState()
   const navigate = useNavigate()
   const authMode = getAuthMode()
+
+  // Identify user with ZoriHQ analytics after auth loads
+  useZoriIdentify()
 
   useEffect(() => {
     if (authMode === 'clerk' && !isLoading && !isAuthenticated) {

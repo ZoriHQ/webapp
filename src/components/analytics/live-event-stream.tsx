@@ -194,7 +194,9 @@ export function LiveEventStream({
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Badge variant={getEventBadgeVariant(event.event_name)}>
+                          <Badge
+                            variant={getEventBadgeVariant(event.event_name)}
+                          >
                             {event.event_name || 'unknown'}
                           </Badge>
                           {onFilterByEvent && event.event_name && (

@@ -42,6 +42,7 @@ import {
 import { useCustomerProfile } from '@/hooks/use-revenue'
 import { countryCodeToFlag, getCountryName } from '@/lib/country-utils'
 import { formatFullDate, formatTimestamp } from '@/lib/utils'
+import { getTrafficOriginDisplay } from '@/lib/traffic-origin-utils'
 
 interface VisitorProfileModalProps {
   projectId: string
@@ -482,7 +483,7 @@ export function VisitorProfileModal({
                             Traffic Origin (First Touch)
                           </p>
                           <p className="text-sm font-medium truncate">
-                            {customerProfile.first_traffic_origin || 'Direct'}
+                            {getTrafficOriginDisplay(customerProfile)}
                           </p>
                         </div>
                       </div>
@@ -698,7 +699,7 @@ export function VisitorProfileModal({
                           Traffic Origin
                         </p>
                         <p className="text-sm truncate">
-                          {profile.first_traffic_origin || 'Direct'}
+                          {getTrafficOriginDisplay(profile)}
                         </p>
                       </div>
                     </div>

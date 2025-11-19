@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { countryCodeToFlag, getCountryName } from '@/lib/country-utils'
+import { getTrafficOriginShort } from '@/lib/traffic-origin-utils'
 
 interface TopCustomersTableProps {
   data: Zoriapi.V1.Revenue.TopCustomersResponse | undefined
@@ -163,7 +164,7 @@ export function TopCustomersTable({
                         )}
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground max-w-[150px] truncate">
-                        {customer.first_traffic_origin || 'Direct'}
+                        {getTrafficOriginShort(customer)}
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground">
                         {formatTimestamp(customer.first_payment_date)}

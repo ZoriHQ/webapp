@@ -1,7 +1,6 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { AlertCircle } from 'lucide-react'
-import type { TimeRange } from '@/hooks/use-revenue'
 import {
   useConversionMetrics,
   useRevenueByOrigin,
@@ -20,6 +19,7 @@ import { ConversionMetricsCard } from '@/components/revenue/conversion-metrics-c
 import { CustomerProfileModal } from '@/components/revenue/customer-profile-modal'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { useAppContext } from '@/contexts/app.context'
 
 export const Route = createFileRoute('/_protected/projects/$projectId/revenue')(
   {
@@ -29,11 +29,14 @@ export const Route = createFileRoute('/_protected/projects/$projectId/revenue')(
 
 function RevenuePage() {
   const { projectId } = Route.useParams()
-  const [timeRange, setTimeRange] = useState<TimeRange>('last_7_days')
+  const { storedValues } = useAppContext()
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(
     null,
   )
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false)
+
+  // Get time range from context
+  const timeRange = storedValues?.timeRange || 'last_7_days'
 
   // Fetch project details
   const { data: projectData } = useProject(projectId)
@@ -63,11 +66,7 @@ function RevenuePage() {
 
   return (
     <>
-      <ProjectHeader
-        projectName={projectData?.name}
-        timeRange={timeRange}
-        onTimeRangeChange={setTimeRange}
-      />
+      <ProjectHeader />
 
       {/* Payment Provider Warning */}
       {!hasPaymentProvider && (

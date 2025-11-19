@@ -9,11 +9,7 @@ export const WindowsIcon = ({ className }: { className?: string }) => (
 )
 
 export const AppleIcon = ({ className }: { className?: string }) => (
-  <img
-    src={appleIcon}
-    alt="macOS"
-    className={`${className} dark:invert`}
-  />
+  <img src={appleIcon} alt="macOS" className={`${className} dark:invert`} />
 )
 
 export const LinuxIcon = ({ className }: { className?: string }) => (
@@ -25,9 +21,5 @@ export const AndroidIcon = ({ className }: { className?: string }) => (
 )
 
 export const IOSIcon = ({ className }: { className?: string }) => (
-  <img
-    src={appleIcon}
-    alt="iOS"
-    className={`${className} dark:invert`}
-  />
+  <img src={appleIcon} alt="iOS" className={`${className} dark:invert`} />
 )

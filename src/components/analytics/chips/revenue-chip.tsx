@@ -13,7 +13,8 @@ export function RevenueChip({ projectId }: RevenueChipProps) {
   const previousRevenue = data?.previous_total_revenue ?? 0
   const change = currentRevenue - previousRevenue
 
-  const formatCurrency = (value: number) => `$${Math.abs(value).toFixed(2)}`
+  const formatCurrency = (value: number) =>
+    `$${Math.abs(value / 100).toFixed(2)}`
 
   const changeText =
     change === 0

@@ -44,9 +44,9 @@ export function EventsFilterBar({
   onRefresh,
   isLoadingOptions = false,
 }: EventsFilterBarProps) {
-  const [openPopover, setOpenPopover] = useState<'pages' | 'origins' | 'eventNames' | null>(
-    null,
-  )
+  const [openPopover, setOpenPopover] = useState<
+    'pages' | 'origins' | 'eventNames' | null
+  >(null)
 
   const togglePage = (page: string) => {
     const newPages = filters.pages.includes(page)
@@ -99,7 +99,12 @@ export function EventsFilterBar({
   }
 
   const clearAllFilters = () => {
-    onFiltersChange({ pages: [], traffic_origins: [], event_names: [], visitor_id: undefined })
+    onFiltersChange({
+      pages: [],
+      traffic_origins: [],
+      event_names: [],
+      visitor_id: undefined,
+    })
   }
 
   const hasActiveFilters =
@@ -261,7 +266,9 @@ export function EventsFilterBar({
                       >
                         <Check className="h-3 w-3" />
                       </div>
-                      <span className="truncate font-mono text-xs">{eventName}</span>
+                      <span className="truncate font-mono text-xs">
+                        {eventName}
+                      </span>
                     </CommandItem>
                   )
                 })}
