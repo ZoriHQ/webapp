@@ -14,6 +14,7 @@ import { TopEntryPagesTile } from '@/components/analytics/tiles/pages.entry.tile
 import { TopExitPagesTile } from '@/components/analytics/tiles/pages.exit.tile'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAppContext } from '@/contexts/app.context'
+import { useTopUniqueVisitorsTile } from '@/hooks/use-analytics-tiles'
 
 export const Route = createFileRoute(
   '/_protected/projects/$projectId/analytics',
@@ -28,7 +29,7 @@ function ProjectDetailPage() {
   )
   const [isVisitorModalOpen, setIsVisitorModalOpen] = useState(false)
 
-  const { isLoading: projectLoading } = useProject(projectId)
+  const { data: project } = useProject(projectId)
   const { storedValues } = useAppContext()
 
   const tileParams = {
@@ -36,18 +37,29 @@ function ProjectDetailPage() {
     time_range: storedValues?.timeRange || 'last_7_days',
   }
 
+  // Check if there are any events by querying unique visitors
+  const { data: visitorData, isLoading: isLoadingVisitors } =
+    useTopUniqueVisitorsTile(tileParams)
+
   const handleVisitorClick = (visitorId: string) => {
     setSelectedVisitorId(visitorId)
     setIsVisitorModalOpen(true)
   }
 
+  // Show empty state only if data is loaded and there are no visitors
+  const hasNoEvents =
+    !isLoadingVisitors && visitorData && visitorData.count === 0
+
   return (
     <>
       <ProjectHeader />
 
-      {/* Show empty state if no events have been received */}
-      {projectLoading ? (
-        <EmptyEventsState projectId={projectId} projectName={'Loading...'} />
+      {/* Show empty state only if there are no events */}
+      {hasNoEvents ? (
+        <EmptyEventsState
+          projectId={projectId}
+          projectName={project?.name || 'Your project'}
+        />
       ) : (
         <>
           {/* Engagement Metrics Cards */}
