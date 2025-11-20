@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { IconCheck, IconCopy } from '@tabler/icons-react'
 import { SiHtml5, SiNextdotjs, SiReact, SiVuedotjs } from 'react-icons/si'
+import { ArrowRight } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
 import useWebSocket from 'react-use-websocket'
 import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter'
 import jsx from 'react-syntax-highlighter/dist/cjs/languages/prism/jsx'
@@ -140,11 +142,22 @@ export function ProjectOnboardingState({
 
         {/* Status indicator */}
         {firstEventReceived ? (
-          <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900/50">
-            <IconCheck className="w-5 h-5 text-green-600 dark:text-green-400" />
-            <p className="text-sm text-green-700 dark:text-green-300">
-              Connected! We received your first event.
-            </p>
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900/50">
+              <IconCheck className="w-5 h-5 text-green-600 dark:text-green-400" />
+              <p className="text-sm text-green-700 dark:text-green-300">
+                Connected! We received your first event.
+              </p>
+            </div>
+            <Link
+              to="/projects/$projectId/analytics"
+              params={{ projectId }}
+            >
+              <Button className="w-full gap-2">
+                View Analytics
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
           </div>
         ) : (
           <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50">
