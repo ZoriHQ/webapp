@@ -14,16 +14,9 @@ import { ChartContainer, ChartTooltip } from '@/components/ui/chart'
 import { useAppContext } from '@/contexts/app.context'
 
 const chartConfig = {
-  visitors: {
-    label: 'Visitors',
-  },
-  desktop: {
-    label: 'Desktop',
+  totalVisitors: {
+    label: 'Total Visitors',
     color: 'hsl(217, 91%, 60%)',
-  },
-  mobile: {
-    label: 'Mobile',
-    color: 'hsl(32, 98%, 56%)',
   },
   revenue: {
     label: 'Revenue',
@@ -46,17 +39,29 @@ export function VisitorTimeline() {
         ? new Date(item.time_bucket).getTime()
         : 0
 
+      const desktop = (item.num_desktop_visits ?? 0) + (item.num_unknown_visits ?? 0)
+      const mobile = item.num_mobile_visits ?? 0
+
       return {
         date: timestamp,
-        desktop:
-          (item.num_desktop_visits ?? 0) + (item.num_unknown_visits ?? 0),
-        mobile: item.num_mobile_visits ?? 0,
-        revenue: item.num_revenue ?? 0,
+        desktop,
+        mobile,
+        totalVisitors: desktop + mobile,
+        revenue: (item.num_revenue ?? 0) / 100, // Convert from cents to dollars
       }
     })
   }, [data])
 
   const hasData = chartData.length > 0
+
+  // Calculate summary statistics
+  const totalVisitorsSum = useMemo(() => {
+    return chartData.reduce((sum, item) => sum + item.totalVisitors, 0)
+  }, [chartData])
+
+  const totalRevenueSum = useMemo(() => {
+    return chartData.reduce((sum, item) => sum + item.revenue, 0)
+  }, [chartData])
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (!active || !payload?.length) return null
@@ -82,12 +87,12 @@ export function VisitorTimeline() {
       })
     }
 
-    const desktop =
-      payload.find((p: any) => p.dataKey === 'desktop')?.value || 0
-    const mobile = payload.find((p: any) => p.dataKey === 'mobile')?.value || 0
-    const revenue =
-      payload.find((p: any) => p.dataKey === 'revenue')?.value || 0
-    const total = desktop + mobile
+    // Extract data from the payload
+    const dataPoint = payload[0]?.payload
+    const totalVisitors = dataPoint?.totalVisitors || 0
+    const desktop = dataPoint?.desktop || 0
+    const mobile = dataPoint?.mobile || 0
+    const revenue = dataPoint?.revenue || 0
 
     return (
       <div className="bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-lg p-3 min-w-[200px]">
@@ -96,50 +101,43 @@ export function VisitorTimeline() {
         </p>
         <div className="space-y-1.5">
           <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <div
-                className="w-2.5 h-2.5 rounded-full"
-                style={{ backgroundColor: 'hsl(217, 91%, 60%)' }}
-              />
-              <span className="text-sm text-muted-foreground">Desktop</span>
-            </div>
+            <span className="text-sm font-medium text-foreground">
+              Total Visitors
+            </span>
+            <span className="text-sm font-bold text-foreground">
+              {totalVisitors.toLocaleString()}
+            </span>
+          </div>
+          <div className="h-px bg-border my-1.5" />
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-sm text-muted-foreground">Desktop</span>
             <span className="text-sm font-semibold text-foreground">
               {desktop.toLocaleString()}
             </span>
           </div>
           <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <div
-                className="w-2.5 h-2.5 rounded-full"
-                style={{ backgroundColor: 'hsl(32, 98%, 56%)' }}
-              />
-              <span className="text-sm text-muted-foreground">Mobile</span>
-            </div>
+            <span className="text-sm text-muted-foreground">Mobile</span>
             <span className="text-sm font-semibold text-foreground">
               {mobile.toLocaleString()}
             </span>
           </div>
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <div
-                className="w-2.5 h-2.5 rounded-full"
-                style={{ backgroundColor: 'hsl(142, 76%, 36%)' }}
-              />
-              <span className="text-sm text-muted-foreground">Revenue</span>
-            </div>
-            <span className="text-sm font-semibold text-green-600 dark:text-green-400">
-              ${revenue.toLocaleString()}
-            </span>
-          </div>
-          <div className="h-px bg-border my-1.5" />
-          <div className="flex items-center justify-between gap-4">
-            <span className="text-sm font-medium text-foreground">
-              Total Visitors
-            </span>
-            <span className="text-sm font-bold text-foreground">
-              {total.toLocaleString()}
-            </span>
-          </div>
+          {revenue > 0 && (
+            <>
+              <div className="h-px bg-border my-1.5" />
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-2">
+                  <div
+                    className="w-2.5 h-2.5 rounded-full"
+                    style={{ backgroundColor: 'hsl(142, 76%, 36%)' }}
+                  />
+                  <span className="text-sm text-muted-foreground">Revenue</span>
+                </div>
+                <span className="text-sm font-semibold text-green-600 dark:text-green-400">
+                  ${revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              </div>
+            </>
+          )}
         </div>
       </div>
     )
@@ -147,13 +145,33 @@ export function VisitorTimeline() {
 
   return (
     <Card className="h-full">
-      <CardHeader>
-        <CardTitle>Visitor Activity</CardTitle>
-        <CardDescription>
-          {isLoading
-            ? 'Loading visitor timeline...'
-            : 'Visitor timeline over time'}
-        </CardDescription>
+      <CardHeader className="pb-4">
+        <div className="flex items-start justify-between">
+          <div>
+            <CardTitle>Visitor Activity</CardTitle>
+            <CardDescription>
+              {isLoading
+                ? 'Loading visitor timeline...'
+                : 'Visitor timeline over time'}
+            </CardDescription>
+          </div>
+          {!isLoading && hasData && (
+            <div className="flex gap-4">
+              <div className="text-right">
+                <div className="text-sm text-muted-foreground">Total Visitors</div>
+                <div className="text-2xl font-bold">
+                  {totalVisitorsSum.toLocaleString()}
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-sm text-muted-foreground">Revenue</div>
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                  ${totalRevenueSum.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -175,27 +193,15 @@ export function VisitorTimeline() {
           >
             <AreaChart data={chartData}>
               <defs>
-                <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="fillVisitors" x1="0" y1="0" x2="0" y2="1">
                   <stop
                     offset="5%"
-                    stopColor="var(--color-desktop)"
+                    stopColor="var(--color-totalVisitors)"
                     stopOpacity={0.8}
                   />
                   <stop
                     offset="95%"
-                    stopColor="var(--color-desktop)"
-                    stopOpacity={0.2}
-                  />
-                </linearGradient>
-                <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
-                  <stop
-                    offset="5%"
-                    stopColor="var(--color-mobile)"
-                    stopOpacity={0.6}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor="var(--color-mobile)"
+                    stopColor="var(--color-totalVisitors)"
                     stopOpacity={0.2}
                   />
                 </linearGradient>
@@ -232,36 +238,25 @@ export function VisitorTimeline() {
               />
               <ChartTooltip content={<CustomTooltip />} />
               <Area
-                dataKey="mobile"
+                dataKey="totalVisitors"
                 type="monotone"
-                fill="url(#fillMobile)"
-                stroke="var(--color-mobile)"
+                fill="url(#fillVisitors)"
+                stroke="var(--color-totalVisitors)"
                 strokeWidth={2}
-                stackId="a"
                 dot={(props: any) => {
                   const hasRevenue = props.payload?.revenue > 0
                   if (!hasRevenue) return <></>
                   return (
                     <Dot
                       {...props}
-                      r={4}
-                      fill="hsl(142, 76%, 36%)"
-                      stroke="hsl(142, 76%, 36%)"
+                      r={5}
+                      fill="var(--color-revenue)"
+                      stroke="var(--color-revenue)"
                       strokeWidth={2}
                     />
                   )
                 }}
-                activeDot={{ r: 5, strokeWidth: 2 }}
-              />
-              <Area
-                dataKey="desktop"
-                type="monotone"
-                fill="url(#fillDesktop)"
-                stroke="var(--color-desktop)"
-                strokeWidth={2}
-                stackId="a"
-                dot={false}
-                activeDot={{ r: 5, strokeWidth: 2 }}
+                activeDot={{ r: 6, strokeWidth: 2 }}
               />
             </AreaChart>
           </ChartContainer>

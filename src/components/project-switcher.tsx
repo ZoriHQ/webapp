@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import { IconChevronDown, IconPlus } from '@tabler/icons-react'
-import { useLocation, useNavigate, useParams } from '@tanstack/react-router'
+import { useLocation, useNavigate, useParams, useRouterState } from '@tanstack/react-router'
 import { useProjects } from '@/hooks/use-projects'
 import {
   DropdownMenu,
@@ -23,6 +23,8 @@ export function ProjectSwitcher() {
   const location = useLocation()
   const params = useParams({ strict: false })
   const projectId = (params as { projectId?: string }).projectId
+  const routerState = useRouterState()
+  const queryClient = routerState.matches[0]?.context.queryClient
 
   const { data: projectsData, isLoading } = useProjects()
   const projects = projectsData?.projects || []
@@ -43,6 +45,9 @@ export function ProjectSwitcher() {
 
   const handleProjectSwitch = (newProjectId: string) => {
     if (newProjectId) {
+      // Invalidate all queries when switching projects
+      queryClient?.invalidateQueries()
+
       navigate({
         to: `/projects/$projectId`,
         params: { projectId: newProjectId },
