@@ -1,19 +1,29 @@
 import { useEffect, useState } from 'react'
 import { IconCheck, IconCopy } from '@tabler/icons-react'
-import { SiHtml5, SiNextdotjs, SiReact, SiVuedotjs } from 'react-icons/si'
+import {
+  SiHtml5,
+  SiNextdotjs,
+  SiReact,
+  SiSvelte,
+  SiVuedotjs,
+} from 'react-icons/si'
 import { ArrowRight } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import useWebSocket from 'react-use-websocket'
 import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter'
+import bash from 'react-syntax-highlighter/dist/cjs/languages/prism/bash'
 import jsx from 'react-syntax-highlighter/dist/cjs/languages/prism/jsx'
 import markup from 'react-syntax-highlighter/dist/cjs/languages/prism/markup'
+import typescript from 'react-syntax-highlighter/dist/cjs/languages/prism/typescript'
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/cjs/styles/prism'
 import { Button } from '@/components/ui/button'
 import { GlobeVisualization } from '@/components/overview/globe-visualization'
 import { useAuthState } from '@/lib/auth'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
+SyntaxHighlighter.registerLanguage('bash', bash)
 SyntaxHighlighter.registerLanguage('jsx', jsx)
+SyntaxHighlighter.registerLanguage('typescript', typescript)
 SyntaxHighlighter.registerLanguage('xml', markup)
 
 interface ProjectOnboardingStateProps {
@@ -93,29 +103,76 @@ export function ProjectOnboardingState({
     setTimeout(() => setCopiedTab(null), 2000)
   }
 
-  const nextJsCode = `<Script
-  src="https://cdn.zorihq.com/script.min.js"
-  data-key="${projectToken}"
-  strategy="afterInteractive"
-/>`
+  const nextJsInstall = `pnpm add @zorihq/nextjs`
 
-  const reactCode = `<script>
-  window.ZoriHQ = window.ZoriHQ || [];
-</script>
-<script
-  async
-  src="https://cdn.zorihq.com/script.min.js"
-  data-key="${projectToken}">
-</script>`
+  const nextJsCode = `// app/providers.tsx
+'use client';
 
-  const vueCode = `<script>
-  window.ZoriHQ = window.ZoriHQ || [];
+import { ZoriProvider } from '@zorihq/nextjs';
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <ZoriProvider
+      config={{
+        publishableKey: '${projectToken}',
+      }}
+      autoTrackPageViews={true}
+    >
+      {children}
+    </ZoriProvider>
+  );
+}`
+
+  const reactInstall = `pnpm add @zorihq/react`
+
+  const reactCode = `import { ZoriProvider } from '@zorihq/react';
+
+function App() {
+  return (
+    <ZoriProvider
+      config={{
+        publishableKey: '${projectToken}',
+      }}
+      autoTrackPageViews={true}
+    >
+      <YourApp />
+    </ZoriProvider>
+  );
+}`
+
+  const vueInstall = `pnpm add @zorihq/vue`
+
+  const vueCode = `// main.ts
+import { createApp } from 'vue';
+import { ZoriPlugin } from '@zorihq/vue';
+import App from './App.vue';
+import router from './router';
+
+const app = createApp(App);
+
+app.use(ZoriPlugin, {
+  config: {
+    publishableKey: '${projectToken}',
+  },
+  router,
+  autoTrackPageViews: true,
+});
+
+app.use(router);
+app.mount('#app');`
+
+  const svelteInstall = `pnpm add @zorihq/svelte`
+
+  const svelteCode = `<!-- +layout.svelte or App.svelte -->
+<script lang="ts">
+  import { initZori } from '@zorihq/svelte';
+
+  initZori({
+    publishableKey: '${projectToken}',
+  });
 </script>
-<script
-  async
-  src="https://cdn.zorihq.com/script.min.js"
-  data-key="${projectToken}">
-</script>`
+
+<slot />`
 
   const htmlCode = `<script>
   window.ZoriHQ = window.ZoriHQ || [];
@@ -149,10 +206,7 @@ export function ProjectOnboardingState({
                 Connected! We received your first event.
               </p>
             </div>
-            <Link
-              to="/projects/$projectId/analytics"
-              params={{ projectId }}
-            >
+            <Link to="/projects/$projectId/analytics" params={{ projectId }}>
               <Button className="w-full gap-2">
                 View Analytics
                 <ArrowRight className="h-4 w-4" />
@@ -170,7 +224,7 @@ export function ProjectOnboardingState({
 
         {/* Installation Tabs */}
         <Tabs defaultValue="nextjs" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="nextjs" className="flex items-center gap-2">
               <SiNextdotjs className="h-4 w-4" />
               <span className="hidden sm:inline">Next.js</span>
@@ -183,157 +237,298 @@ export function ProjectOnboardingState({
               <SiVuedotjs className="h-4 w-4" />
               <span className="hidden sm:inline">Vue</span>
             </TabsTrigger>
+            <TabsTrigger value="svelte" className="flex items-center gap-2">
+              <SiSvelte className="h-4 w-4" />
+              <span className="hidden sm:inline">Svelte</span>
+            </TabsTrigger>
             <TabsTrigger value="html" className="flex items-center gap-2">
               <SiHtml5 className="h-4 w-4" />
-              <span className="hidden sm:inline">HTML</span>
+              <span className="hidden sm:inline">JS</span>
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="nextjs" className="mt-4">
-            <div className="relative">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="absolute right-2 top-2 z-10"
-                onClick={() => handleCopy(nextJsCode, 'nextjs')}
-              >
-                {copiedTab === 'nextjs' ? (
-                  <>
-                    <IconCheck className="mr-2 h-4 w-4" />
-                    Copied!
-                  </>
-                ) : (
-                  <>
-                    <IconCopy className="mr-2 h-4 w-4" />
-                    Copy
-                  </>
-                )}
-              </Button>
-
-              <div className="rounded-lg border overflow-hidden">
-                <SyntaxHighlighter
-                  language="jsx"
-                  style={vscDarkPlus}
-                  customStyle={{
-                    margin: 0,
-                    padding: '1rem',
-                    fontSize: '0.875rem',
-                  }}
+          <TabsContent value="nextjs" className="mt-4 space-y-3">
+            <div className="rounded-lg border overflow-hidden">
+              <div className="flex items-center justify-between bg-muted/50 px-3 py-2 border-b">
+                <span className="text-xs text-muted-foreground">
+                  1. Install the package
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2"
+                  onClick={() => handleCopy(nextJsInstall, 'nextjs-install')}
                 >
-                  {nextJsCode}
-                </SyntaxHighlighter>
+                  {copiedTab === 'nextjs-install' ? (
+                    <IconCheck className="h-3.5 w-3.5" />
+                  ) : (
+                    <IconCopy className="h-3.5 w-3.5" />
+                  )}
+                </Button>
               </div>
+              <SyntaxHighlighter
+                language="bash"
+                style={vscDarkPlus}
+                customStyle={{
+                  margin: 0,
+                  padding: '0.75rem 1rem',
+                  fontSize: '0.875rem',
+                }}
+              >
+                {nextJsInstall}
+              </SyntaxHighlighter>
+            </div>
+            <div className="rounded-lg border overflow-hidden">
+              <div className="flex items-center justify-between bg-muted/50 px-3 py-2 border-b">
+                <span className="text-xs text-muted-foreground">
+                  2. Add the provider
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2"
+                  onClick={() => handleCopy(nextJsCode, 'nextjs')}
+                >
+                  {copiedTab === 'nextjs' ? (
+                    <IconCheck className="h-3.5 w-3.5" />
+                  ) : (
+                    <IconCopy className="h-3.5 w-3.5" />
+                  )}
+                </Button>
+              </div>
+              <SyntaxHighlighter
+                language="typescript"
+                style={vscDarkPlus}
+                customStyle={{
+                  margin: 0,
+                  padding: '0.75rem 1rem',
+                  fontSize: '0.8rem',
+                }}
+              >
+                {nextJsCode}
+              </SyntaxHighlighter>
             </div>
           </TabsContent>
 
-          <TabsContent value="react" className="mt-4">
-            <div className="relative">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="absolute right-2 top-2 z-10"
-                onClick={() => handleCopy(reactCode, 'react')}
-              >
-                {copiedTab === 'react' ? (
-                  <>
-                    <IconCheck className="mr-2 h-4 w-4" />
-                    Copied!
-                  </>
-                ) : (
-                  <>
-                    <IconCopy className="mr-2 h-4 w-4" />
-                    Copy
-                  </>
-                )}
-              </Button>
-
-              <div className="rounded-lg border overflow-hidden">
-                <SyntaxHighlighter
-                  language="xml"
-                  style={vscDarkPlus}
-                  customStyle={{
-                    margin: 0,
-                    padding: '1rem',
-                    fontSize: '0.875rem',
-                  }}
+          <TabsContent value="react" className="mt-4 space-y-3">
+            <div className="rounded-lg border overflow-hidden">
+              <div className="flex items-center justify-between bg-muted/50 px-3 py-2 border-b">
+                <span className="text-xs text-muted-foreground">
+                  1. Install the package
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2"
+                  onClick={() => handleCopy(reactInstall, 'react-install')}
                 >
-                  {reactCode}
-                </SyntaxHighlighter>
+                  {copiedTab === 'react-install' ? (
+                    <IconCheck className="h-3.5 w-3.5" />
+                  ) : (
+                    <IconCopy className="h-3.5 w-3.5" />
+                  )}
+                </Button>
               </div>
+              <SyntaxHighlighter
+                language="bash"
+                style={vscDarkPlus}
+                customStyle={{
+                  margin: 0,
+                  padding: '0.75rem 1rem',
+                  fontSize: '0.875rem',
+                }}
+              >
+                {reactInstall}
+              </SyntaxHighlighter>
+            </div>
+            <div className="rounded-lg border overflow-hidden">
+              <div className="flex items-center justify-between bg-muted/50 px-3 py-2 border-b">
+                <span className="text-xs text-muted-foreground">
+                  2. Add the provider
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2"
+                  onClick={() => handleCopy(reactCode, 'react')}
+                >
+                  {copiedTab === 'react' ? (
+                    <IconCheck className="h-3.5 w-3.5" />
+                  ) : (
+                    <IconCopy className="h-3.5 w-3.5" />
+                  )}
+                </Button>
+              </div>
+              <SyntaxHighlighter
+                language="typescript"
+                style={vscDarkPlus}
+                customStyle={{
+                  margin: 0,
+                  padding: '0.75rem 1rem',
+                  fontSize: '0.8rem',
+                }}
+              >
+                {reactCode}
+              </SyntaxHighlighter>
             </div>
           </TabsContent>
 
-          <TabsContent value="vue" className="mt-4">
-            <div className="relative">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="absolute right-2 top-2 z-10"
-                onClick={() => handleCopy(vueCode, 'vue')}
-              >
-                {copiedTab === 'vue' ? (
-                  <>
-                    <IconCheck className="mr-2 h-4 w-4" />
-                    Copied!
-                  </>
-                ) : (
-                  <>
-                    <IconCopy className="mr-2 h-4 w-4" />
-                    Copy
-                  </>
-                )}
-              </Button>
-
-              <div className="rounded-lg border overflow-hidden">
-                <SyntaxHighlighter
-                  language="xml"
-                  style={vscDarkPlus}
-                  customStyle={{
-                    margin: 0,
-                    padding: '1rem',
-                    fontSize: '0.875rem',
-                  }}
+          <TabsContent value="vue" className="mt-4 space-y-3">
+            <div className="rounded-lg border overflow-hidden">
+              <div className="flex items-center justify-between bg-muted/50 px-3 py-2 border-b">
+                <span className="text-xs text-muted-foreground">
+                  1. Install the package
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2"
+                  onClick={() => handleCopy(vueInstall, 'vue-install')}
                 >
-                  {vueCode}
-                </SyntaxHighlighter>
+                  {copiedTab === 'vue-install' ? (
+                    <IconCheck className="h-3.5 w-3.5" />
+                  ) : (
+                    <IconCopy className="h-3.5 w-3.5" />
+                  )}
+                </Button>
               </div>
+              <SyntaxHighlighter
+                language="bash"
+                style={vscDarkPlus}
+                customStyle={{
+                  margin: 0,
+                  padding: '0.75rem 1rem',
+                  fontSize: '0.875rem',
+                }}
+              >
+                {vueInstall}
+              </SyntaxHighlighter>
+            </div>
+            <div className="rounded-lg border overflow-hidden">
+              <div className="flex items-center justify-between bg-muted/50 px-3 py-2 border-b">
+                <span className="text-xs text-muted-foreground">
+                  2. Add the plugin
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2"
+                  onClick={() => handleCopy(vueCode, 'vue')}
+                >
+                  {copiedTab === 'vue' ? (
+                    <IconCheck className="h-3.5 w-3.5" />
+                  ) : (
+                    <IconCopy className="h-3.5 w-3.5" />
+                  )}
+                </Button>
+              </div>
+              <SyntaxHighlighter
+                language="typescript"
+                style={vscDarkPlus}
+                customStyle={{
+                  margin: 0,
+                  padding: '0.75rem 1rem',
+                  fontSize: '0.8rem',
+                }}
+              >
+                {vueCode}
+              </SyntaxHighlighter>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="svelte" className="mt-4 space-y-3">
+            <div className="rounded-lg border overflow-hidden">
+              <div className="flex items-center justify-between bg-muted/50 px-3 py-2 border-b">
+                <span className="text-xs text-muted-foreground">
+                  1. Install the package
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2"
+                  onClick={() => handleCopy(svelteInstall, 'svelte-install')}
+                >
+                  {copiedTab === 'svelte-install' ? (
+                    <IconCheck className="h-3.5 w-3.5" />
+                  ) : (
+                    <IconCopy className="h-3.5 w-3.5" />
+                  )}
+                </Button>
+              </div>
+              <SyntaxHighlighter
+                language="bash"
+                style={vscDarkPlus}
+                customStyle={{
+                  margin: 0,
+                  padding: '0.75rem 1rem',
+                  fontSize: '0.875rem',
+                }}
+              >
+                {svelteInstall}
+              </SyntaxHighlighter>
+            </div>
+            <div className="rounded-lg border overflow-hidden">
+              <div className="flex items-center justify-between bg-muted/50 px-3 py-2 border-b">
+                <span className="text-xs text-muted-foreground">
+                  2. Initialize in your layout
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2"
+                  onClick={() => handleCopy(svelteCode, 'svelte')}
+                >
+                  {copiedTab === 'svelte' ? (
+                    <IconCheck className="h-3.5 w-3.5" />
+                  ) : (
+                    <IconCopy className="h-3.5 w-3.5" />
+                  )}
+                </Button>
+              </div>
+              <SyntaxHighlighter
+                language="xml"
+                style={vscDarkPlus}
+                customStyle={{
+                  margin: 0,
+                  padding: '0.75rem 1rem',
+                  fontSize: '0.8rem',
+                }}
+              >
+                {svelteCode}
+              </SyntaxHighlighter>
             </div>
           </TabsContent>
 
           <TabsContent value="html" className="mt-4">
-            <div className="relative">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="absolute right-2 top-2 z-10"
-                onClick={() => handleCopy(htmlCode, 'html')}
-              >
-                {copiedTab === 'html' ? (
-                  <>
-                    <IconCheck className="mr-2 h-4 w-4" />
-                    Copied!
-                  </>
-                ) : (
-                  <>
-                    <IconCopy className="mr-2 h-4 w-4" />
-                    Copy
-                  </>
-                )}
-              </Button>
-
-              <div className="rounded-lg border overflow-hidden">
-                <SyntaxHighlighter
-                  language="xml"
-                  style={vscDarkPlus}
-                  customStyle={{
-                    margin: 0,
-                    padding: '1rem',
-                    fontSize: '0.875rem',
-                  }}
+            <div className="rounded-lg border overflow-hidden">
+              <div className="flex items-center justify-between bg-muted/50 px-3 py-2 border-b">
+                <span className="text-xs text-muted-foreground">
+                  Add to your HTML {'<head>'}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2"
+                  onClick={() => handleCopy(htmlCode, 'html')}
                 >
-                  {htmlCode}
-                </SyntaxHighlighter>
+                  {copiedTab === 'html' ? (
+                    <IconCheck className="h-3.5 w-3.5" />
+                  ) : (
+                    <IconCopy className="h-3.5 w-3.5" />
+                  )}
+                </Button>
               </div>
+              <SyntaxHighlighter
+                language="xml"
+                style={vscDarkPlus}
+                customStyle={{
+                  margin: 0,
+                  padding: '0.75rem 1rem',
+                  fontSize: '0.875rem',
+                }}
+              >
+                {htmlCode}
+              </SyntaxHighlighter>
             </div>
           </TabsContent>
         </Tabs>
