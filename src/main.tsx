@@ -2,10 +2,12 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { RouterProvider } from '@tanstack/react-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ZoriProvider } from '@zorihq/react'
 import { createAppRouter } from './router'
 import type { Container } from 'react-dom/client'
 import { AuthProviderComponent } from '@/lib/auth'
 import { ThemeProvider } from '@/components/theme-provider'
+import { getAuthMode } from '@/lib/auth/types'
 import {
   handleUnauthorized,
   isUnauthorizedError,
@@ -41,8 +43,11 @@ const queryClient = new QueryClient({
 
 const router = createAppRouter(queryClient)
 
+const isCloudMode = getAuthMode() === 'clerk'
+const zoriPublishableKey = import.meta.env.VITE_ZORI_PUBLISHABLE_KEY
+
 function RootApp() {
-  return (
+  const appContent = (
     <AuthProviderComponent>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
@@ -51,6 +56,23 @@ function RootApp() {
       </QueryClientProvider>
     </AuthProviderComponent>
   )
+
+  // Only wrap with ZoriProvider in cloud mode
+  if (isCloudMode && zoriPublishableKey) {
+    return (
+      <ZoriProvider
+        config={{
+          publishableKey: zoriPublishableKey,
+          baseUrl: 'https://ingestion.zorihq.com/ingest',
+        }}
+        autoTrackPageViews={true}
+      >
+        {appContent}
+      </ZoriProvider>
+    )
+  }
+
+  return appContent
 }
 
 const rootElement = document.getElementById('root')

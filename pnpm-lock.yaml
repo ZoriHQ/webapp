@@ -119,6 +119,9 @@ importers:
       '@types/react-syntax-highlighter':
         specifier: ^15.5.13
         version: 15.5.13
+      '@zorihq/react':
+        specifier: ^1.0.0
+        version: 1.0.0(react@19.2.0)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -2438,6 +2441,14 @@ packages:
 
   '@vitest/utils@3.2.4':
     resolution: {integrity: sha512-fB2V0JFrQSMsCo9HiSq3Ezpdv4iYaXRG1Sx8edX3MwxfyNn83mKiGzOcH+Fkxt4MHxr3y42fQi1oeAInqgX2QA==}
+
+  '@zorihq/react@1.0.0':
+    resolution: {integrity: sha512-hFIk/dcTaHLnin8o3tCtS1v6WKZjj47AIuTd/FjYc31gijaP8vwviM6V4D7y45+yc1vEfGApMRJTJznjnHJ+OA==}
+    peerDependencies:
+      react: '>=16.8.0'
+
+  '@zorihq/types@1.0.0':
+    resolution: {integrity: sha512-5XcYod8Pbz34iAkIWBxnFop4djdzj8z5JDj47uOh3Xsj453ok7lpvl2DjcQOcVoaWRn6F69GjM6jQBzulOxHDg==}
 
   accessor-fn@1.5.3:
     resolution: {integrity: sha512-rkAofCwe/FvYFUlMB0v0gWmhqtfAtV1IUkdPbfhTUyYniu5LrC0A0UJkTH0Jv3S8SvwkmfuAlY+mQIJATdocMA==}
@@ -6511,6 +6522,13 @@ snapshots:
       '@vitest/pretty-format': 3.2.4
       loupe: 3.2.1
       tinyrainbow: 2.0.0
+
+  '@zorihq/react@1.0.0(react@19.2.0)':
+    dependencies:
+      '@zorihq/types': 1.0.0
+      react: 19.2.0
+
+  '@zorihq/types@1.0.0': {}
 
   accessor-fn@1.5.3: {}
 
