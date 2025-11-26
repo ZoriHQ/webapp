@@ -11,46 +11,30 @@ import { ErrorTile } from './error.tile'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAppContext } from '@/contexts/app.context'
 import { useVisitorsByBrowserTile } from '@/hooks/use-analytics-tiles'
-import { Progress } from '@/components/ui/progress'
+import { BarList } from '@/components/ui/bar-list'
 
 const getBrowserIcon = (browserName: string) => {
   const name = browserName.toLowerCase()
 
   if (name.includes('chrome') || name.includes('chromium')) {
-    return <ChromeIcon className="h-6 w-6" />
+    return <ChromeIcon className="h-5 w-5" />
   }
   if (name.includes('firefox')) {
-    return <FirefoxIcon className="h-6 w-6" />
+    return <FirefoxIcon className="h-5 w-5" />
   }
   if (name.includes('safari')) {
-    return <SafariIcon className="h-6 w-6" />
+    return <SafariIcon className="h-5 w-5" />
   }
   if (name.includes('edge')) {
-    return <EdgeIcon className="h-6 w-6" />
+    return <EdgeIcon className="h-5 w-5" />
   }
   if (name.includes('opera')) {
-    return <OperaIcon className="h-6 w-6" />
+    return <OperaIcon className="h-5 w-5" />
   }
   if (name.includes('brave')) {
-    return <BraveIcon className="h-6 w-6" />
+    return <BraveIcon className="h-5 w-5" />
   }
-  return <Globe className="h-6 w-6" />
-}
-
-const formatChange = (current: number, previous: number): string => {
-  if (!previous) return 'N/A'
-  const change = ((current - previous) / previous) * 100
-  return `${change > 0 ? '+' : ''}${change.toFixed(1)}%`
-}
-
-const getChangeColor = (current: number, previous: number): string => {
-  if (!previous) return 'text-muted-foreground'
-  const change = current - previous
-  return change > 0
-    ? 'text-green-600'
-    : change < 0
-      ? 'text-red-600'
-      : 'text-muted-foreground'
+  return <Globe className="h-5 w-5" />
 }
 
 export const VisitorsByBrowserTile = () => {
@@ -61,7 +45,12 @@ export const VisitorsByBrowserTile = () => {
   })
 
   const browsers = data?.data || []
-  const totalVisitors = browsers.reduce((sum, b) => sum + (b.count || 0), 0)
+
+  const barListData = browsers.slice(0, 5).map((browser) => ({
+    name: browser.browser_name || 'Unknown',
+    value: browser.count || 0,
+    icon: getBrowserIcon(browser.browser_name || 'Unknown'),
+  }))
 
   return (
     <Card>
@@ -76,54 +65,15 @@ export const VisitorsByBrowserTile = () => {
           <div className="text-2xl font-bold text-muted-foreground">
             Loading...
           </div>
+        ) : browsers.length === 0 ? (
+          <div className="text-sm text-muted-foreground">No data available</div>
         ) : (
-          <div className="space-y-3">
-            {browsers.length === 0 ? (
-              <div className="text-sm text-muted-foreground">
-                No data available
-              </div>
-            ) : (
-              browsers.slice(0, 5).map((browser, idx) => {
-                const count = browser.count || 0
-                const previousCount = browser.previous_count || 0
-                const percentage =
-                  totalVisitors > 0
-                    ? ((count / totalVisitors) * 100).toFixed(1)
-                    : '0.0'
-
-                return (
-                  <div key={idx} className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 flex-1">
-                        <div className="text-muted-foreground">
-                          {getBrowserIcon(browser.browser_name || 'Unknown')}
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-sm font-medium">
-                            {browser.browser_name || 'Unknown'}
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            {percentage}% of total
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className="text-sm font-bold">
-                          {count.toLocaleString()}
-                        </span>
-                        <span
-                          className={`text-xs ${getChangeColor(count, previousCount)}`}
-                        >
-                          {formatChange(count, previousCount)}
-                        </span>
-                      </div>
-                    </div>
-                    <Progress value={parseFloat(percentage)} className="h-2" />
-                  </div>
-                )
-              })
-            )}
-          </div>
+          <BarList
+            data={barListData}
+            valueFormatter={(value) => value.toLocaleString()}
+            sortOrder="none"
+            color="bg-blue-500"
+          />
         )}
       </CardContent>
     </Card>

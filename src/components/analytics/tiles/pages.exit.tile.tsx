@@ -1,25 +1,13 @@
 import { useState } from 'react'
-import { Bar, BarChart, XAxis, YAxis } from 'recharts'
 import type { Zoriapi } from 'zorihq'
-import type { ChartConfig } from '@/components/ui/chart'
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from '@/components/ui/chart'
+
+import { BarList } from '@/components/ui/bar-list'
 import { Button } from '@/components/ui/button'
 import { useTopExitPagesTile } from '@/hooks/use-analytics-tiles'
 
 interface TopExitPagesTileProps {
   params: Zoriapi.V1.Analytics.Tiles.TileExitPagesParams
 }
-
-const chartConfig = {
-  visitors: {
-    label: 'Visitors',
-    color: '#3b82f6',
-  },
-} satisfies ChartConfig
 
 const trimPagePath = (path: string, maxLength: number = 35): string => {
   if (path.length <= maxLength) return path
@@ -31,14 +19,9 @@ const trimPagePath = (path: string, maxLength: number = 35): string => {
 
 export function TopExitPagesTile({ params }: TopExitPagesTileProps) {
   const [showAll, setShowAll] = useState(false)
-  const { isLoading, data, isError } = useTopExitPagesTile(params)
+  const { isLoading, data } = useTopExitPagesTile(params)
 
   const pageData = data?.data || []
-  const maxValue =
-    pageData.reduce((max, item) => {
-      const count = item.count || 0
-      return Math.max(max, count)
-    }, 0) || 1
 
   if (isLoading) {
     return (
@@ -62,70 +45,23 @@ export function TopExitPagesTile({ params }: TopExitPagesTileProps) {
 
   const displayData = showAll ? pageData : pageData.slice(0, 6)
 
+  const barListData = displayData.map((page) => {
+    const pagePath = page.page || '/'
+    return {
+      name: trimPagePath(pagePath),
+      value: page.count || 0,
+      key: pagePath,
+    }
+  })
+
   return (
     <>
-      <div className="space-y-4">
-        {displayData.map((page, idx) => {
-          const pagePath = page.page || '/'
-          const displayPath = trimPagePath(pagePath)
-
-          return (
-            <div key={idx} className="flex items-center gap-4">
-              <div className="flex items-center gap-3 w-48 flex-shrink-0">
-                <p className="text-sm font-medium" title={pagePath}>
-                  {displayPath}
-                </p>
-              </div>
-
-              <ChartContainer
-                config={chartConfig}
-                className="h-10 w-full flex-1"
-              >
-                <BarChart
-                  layout="vertical"
-                  data={[
-                    {
-                      name: pagePath,
-                      visitors: page.count || 0,
-                    },
-                  ]}
-                  margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
-                >
-                  <XAxis type="number" hide domain={[0, maxValue]} />
-                  <YAxis type="category" dataKey="name" hide />
-                  <ChartTooltip
-                    content={
-                      <ChartTooltipContent
-                        formatter={(value, name) => {
-                          if (name === 'visitors') {
-                            return (
-                              <div className="flex items-center justify-between w-full gap-3">
-                                <span className="text-muted-foreground flex items-center gap-1.5">
-                                  Visitors
-                                </span>
-                                <span className="font-mono font-medium tabular-nums">
-                                  {Number(value).toLocaleString()}
-                                </span>
-                              </div>
-                            )
-                          }
-                          return null
-                        }}
-                      />
-                    }
-                    cursor={false}
-                  />
-                  <Bar
-                    dataKey="visitors"
-                    fill="var(--color-visitors)"
-                    radius={4}
-                  />
-                </BarChart>
-              </ChartContainer>
-            </div>
-          )
-        })}
-      </div>
+      <BarList
+        data={barListData}
+        valueFormatter={(value) => value.toLocaleString()}
+        sortOrder="none"
+        color="bg-blue-500"
+      />
       {pageData.length > 6 && (
         <Button
           variant="ghost"

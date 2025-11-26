@@ -1,14 +1,7 @@
-import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts'
 import { format } from 'date-fns'
 import type Zoriapi from 'zorihq'
+
+import { AreaChart } from '@/components/ui/area-chart'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface RevenueTimelineChartProps {
@@ -25,21 +18,44 @@ export function RevenueTimelineChart({
   const chartData =
     data?.data?.map((item) => ({
       timestamp: item.timestamp || '',
+      dateFormatted: formatXAxis(item.timestamp || '', timeRange),
       revenue: (item.total_revenue || 0) / 100, // Convert from cents to dollars
       payments: item.payment_count || 0,
     })) || []
 
-  const formatXAxis = (timestamp: string) => {
-    if (!timestamp) return ''
-    const date = new Date(timestamp)
+  // Custom tooltip component
+  const CustomTooltip = ({
+    active,
+    payload,
+  }: {
+    active?: boolean
+    payload?: Array<{
+      value: number
+      name: string
+      payload: Record<string, unknown>
+    }>
+    label?: string
+  }) => {
+    if (!active || !payload?.[0]) return null
 
-    if (timeRange === 'last_hour' || timeRange === 'today') {
-      return format(date, 'HH:mm')
-    } else if (timeRange === 'last_7_days') {
-      return format(date, 'EEE')
-    } else {
-      return format(date, 'MMM d')
-    }
+    const dataPoint = payload[0].payload
+    const timestamp = dataPoint.timestamp as string
+    const revenue = (dataPoint.revenue as number) || 0
+    const payments = (dataPoint.payments as number) || 0
+
+    return (
+      <div className="rounded-lg border bg-background p-3 shadow-md">
+        <div className="space-y-1">
+          <p className="text-xs text-muted-foreground">
+            {format(new Date(timestamp), 'PPp')}
+          </p>
+          <p className="text-sm font-semibold text-green-600 dark:text-green-400">
+            Revenue: ${revenue.toFixed(2)}
+          </p>
+          <p className="text-xs text-muted-foreground">Payments: {payments}</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -61,64 +77,31 @@ export function RevenueTimelineChart({
             </p>
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={chartData}>
-              <defs>
-                <linearGradient
-                  id="revenueGradient"
-                  x1="0"
-                  y1="0"
-                  x2="0"
-                  y2="1"
-                >
-                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-              <XAxis
-                dataKey="timestamp"
-                tickFormatter={formatXAxis}
-                className="text-xs"
-                stroke="currentColor"
-              />
-              <YAxis
-                className="text-xs"
-                stroke="currentColor"
-                tickFormatter={(value) => `$${value}`}
-              />
-              <Tooltip
-                content={({ active, payload }) => {
-                  if (!active || !payload?.[0]) return null
-                  const data = payload[0].payload
-                  return (
-                    <div className="rounded-lg border bg-background p-3 shadow-md">
-                      <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground">
-                          {format(new Date(data.timestamp), 'PPp')}
-                        </p>
-                        <p className="text-sm font-semibold text-green-600 dark:text-green-400">
-                          Revenue: ${data.revenue.toFixed(2)}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          Payments: {data.payments}
-                        </p>
-                      </div>
-                    </div>
-                  )
-                }}
-              />
-              <Area
-                type="monotone"
-                dataKey="revenue"
-                stroke="#10b981"
-                strokeWidth={2}
-                fill="url(#revenueGradient)"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
+          <AreaChart
+            className="h-[300px]"
+            data={chartData}
+            index="dateFormatted"
+            categories={['revenue']}
+            colors={['emerald']}
+            valueFormatter={(value) => `$${value.toFixed(2)}`}
+            showLegend={false}
+            customTooltip={CustomTooltip}
+          />
         )}
       </CardContent>
     </Card>
   )
+}
+
+function formatXAxis(timestamp: string, timeRange: string): string {
+  if (!timestamp) return ''
+  const date = new Date(timestamp)
+
+  if (timeRange === 'last_hour' || timeRange === 'today') {
+    return format(date, 'HH:mm')
+  } else if (timeRange === 'last_7_days') {
+    return format(date, 'EEE')
+  } else {
+    return format(date, 'MMM d')
+  }
 }

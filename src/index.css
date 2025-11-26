@@ -193,3 +193,88 @@ body {
     @apply bg-sidebar text-foreground;
   }
 }
+
+/* Tremor design tokens */
+:root {
+  /* Tremor light mode */
+  --tremor-content: #6b7280;
+  --tremor-content-subtle: #9ca3af;
+  --tremor-content-strong: #111827;
+  --tremor-content-emphasis: #374151;
+  --tremor-content-inverted: #f9fafb;
+  --tremor-border-default: #e5e7eb;
+  --tremor-background-default: #ffffff;
+  --tremor-background-muted: #f9fafb;
+  --tremor-background-subtle: #f3f4f6;
+  --tremor-background-emphasis: #374151;
+  --tremor-ring: #e5e7eb;
+  --tremor-brand: #3b82f6;
+  --tremor-brand-muted: #bfdbfe;
+  --tremor-brand-subtle: #60a5fa;
+  --tremor-brand-emphasis: #1d4ed8;
+  --tremor-brand-inverted: #ffffff;
+}
+
+.dark {
+  /* Tremor dark mode */
+  --tremor-content: #9ca3af;
+  --tremor-content-subtle: #6b7280;
+  --tremor-content-strong: #f9fafb;
+  --tremor-content-emphasis: #d1d5db;
+  --tremor-content-inverted: #111827;
+  --tremor-border-default: #374151;
+  --tremor-background-default: #111827;
+  --tremor-background-muted: #1f2937;
+  --tremor-background-subtle: #374151;
+  --tremor-background-emphasis: #d1d5db;
+  --tremor-ring: #374151;
+  --tremor-brand: #3b82f6;
+  --tremor-brand-muted: #1e3a8a;
+  --tremor-brand-subtle: #2563eb;
+  --tremor-brand-emphasis: #60a5fa;
+  --tremor-brand-inverted: #111827;
+}
+
+/* Tremor utility classes */
+@layer utilities {
+  .text-tremor-default {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+  .text-tremor-title {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
+  .text-tremor-metric {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
+  .text-tremor-label {
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+  .text-tremor-content {
+    color: var(--tremor-content);
+  }
+  .text-tremor-content-subtle {
+    color: var(--tremor-content-subtle);
+  }
+  .text-tremor-content-strong {
+    color: var(--tremor-content-strong);
+  }
+  .text-tremor-content-emphasis {
+    color: var(--tremor-content-emphasis);
+  }
+  .text-dark-tremor-content {
+    color: var(--tremor-content);
+  }
+  .text-dark-tremor-content-strong {
+    color: var(--tremor-content-strong);
+  }
+  .border-tremor-border {
+    border-color: var(--tremor-border-default);
+  }
+  .dark .border-dark-tremor-border {
+    border-color: var(--tremor-border-default);
+  }
+}
