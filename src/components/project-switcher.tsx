@@ -50,7 +50,12 @@ export function ProjectSwitcher() {
 
   const handleProjectSwitch = (newProjectId: string) => {
     if (newProjectId) {
-      queryClient.invalidateQueries()
+      // Remove all project-specific cached data to prevent stale data from showing
+      queryClient.removeQueries({ queryKey: ['analytics'] })
+      queryClient.removeQueries({ queryKey: ['revenue'] })
+      queryClient.removeQueries({ queryKey: ['paymentProviders'] })
+      queryClient.removeQueries({ queryKey: ['goals'] })
+      queryClient.removeQueries({ queryKey: ['liveVisitors'] })
 
       navigate({
         to: `/projects/$projectId`,
@@ -63,7 +68,8 @@ export function ProjectSwitcher() {
     navigate({ to: '/projects/new' })
   }
 
-  // Auto-select first project if none selected
+  // Auto-select project if none selected
+  // Prioritize previously selected project from localStorage, fallback to first project
   // But don't redirect if user is on specific pages like /projects/new or team settings
   useEffect(() => {
     const isOnProjectCreationPage = location.pathname === '/projects/new'
@@ -78,12 +84,20 @@ export function ProjectSwitcher() {
       !isOnProjectsListPage &&
       !isOnTeamPage
     ) {
-      const firstProjectId = projects[0]?.id
-      if (firstProjectId) {
-        handleProjectSwitch(firstProjectId)
+      // Check if stored project still exists in the projects list
+      const storedProjectExists =
+        storedValues?.projectId &&
+        projects.some((p) => p.id === storedValues.projectId)
+
+      const targetProjectId = storedProjectExists
+        ? storedValues.projectId
+        : projects[0]?.id
+
+      if (targetProjectId) {
+        handleProjectSwitch(targetProjectId)
       }
     }
-  }, [projectId, projects, isLoading, location.pathname])
+  }, [projectId, projects, isLoading, location.pathname, storedValues?.projectId])
 
   if (isLoading) {
     return (
