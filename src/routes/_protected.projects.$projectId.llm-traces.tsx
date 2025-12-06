@@ -1,13 +1,20 @@
+import { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { IconBrain, IconPlus } from '@tabler/icons-react'
+import { IconSettings } from '@tabler/icons-react'
 import { useProject } from '@/hooks/use-projects'
+import { useAppContext } from '@/contexts/app.context'
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+  useLlmTraces,
+  useLlmCostTile,
+  useLlmTopModelsCostTile,
+  type LlmTimeRange,
+} from '@/hooks/use-llm-traces'
+import { ProjectHeader } from '@/components/analytics/project-header'
+import { EmptyTracesState } from '@/components/llm-traces/empty-traces-state'
+import { LlmMetricsCards } from '@/components/llm-traces/llm-metrics-cards'
+import { LlmTracesTable } from '@/components/llm-traces/llm-traces-table'
+import { LlmTopModels } from '@/components/llm-traces/llm-top-models'
+import { ConnectLLMProviderDialog } from '@/components/llm-providers/connect-provider-dialog'
 import { Button } from '@/components/ui/button'
 
 export const Route = createFileRoute(
@@ -18,72 +25,83 @@ export const Route = createFileRoute(
 
 function LLMTracesPage() {
   const { projectId } = Route.useParams()
-  const { data: projectData, isLoading: projectLoading } = useProject(projectId)
+  const { storedValues } = useAppContext()
+  const { data: project, isLoading: projectLoading } = useProject(projectId)
+  const [configDialogOpen, setConfigDialogOpen] = useState(false)
+
+  const timeRange = (storedValues?.timeRange || 'last_7_days') as LlmTimeRange
+
+  const tileParams = {
+    project_id: projectId,
+    time_range: timeRange,
+  }
+
+  // Fetch LLM data
+  const { data: tracesData, isLoading: tracesLoading } = useLlmTraces({
+    ...tileParams,
+    limit: 50,
+  })
+
+  const { data: costData, isLoading: costLoading } = useLlmCostTile(tileParams)
+
+  const { data: topModelsData, isLoading: topModelsLoading } =
+    useLlmTopModelsCostTile(tileParams)
+
+  // Check if we have any traces
+  const hasTraces = (tracesData?.total ?? 0) > 0
+  const isLoadingInitial = projectLoading || tracesLoading
+
+  // Show empty state when no traces and not loading
+  if (!isLoadingInitial && !hasTraces) {
+    return (
+      <>
+        <ProjectHeader />
+        <EmptyTracesState project={project} />
+      </>
+    )
+  }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">LLM Traces</h1>
-          <p className="text-muted-foreground">
-            Track LLM usage and expenses for{' '}
-            {projectData?.name || 'your project'}
-          </p>
-        </div>
-        <Button disabled>
-          <IconPlus className="mr-2 h-4 w-4" />
-          Configure Integration
+    <>
+      <ProjectHeader />
+
+      {/* Integration Settings Button */}
+      <div className="flex justify-end mb-6">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setConfigDialogOpen(true)}
+        >
+          <IconSettings className="h-4 w-4 mr-2" />
+          Integration Settings
         </Button>
       </div>
 
-      <Card className="border-dashed">
-        <CardHeader className="text-center pb-4">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-            <IconBrain className="h-8 w-8 text-muted-foreground" />
-          </div>
-          <CardTitle>LLM Traces Coming Soon</CardTitle>
-          <CardDescription className="max-w-md mx-auto">
-            We're building a comprehensive LLM tracking system that will help
-            you monitor usage, costs, and performance of your AI integrations.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="text-center pb-8">
-          <div className="space-y-4">
-            <div className="grid gap-3 text-left max-w-md mx-auto">
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 h-2 w-2 rounded-full bg-primary" />
-                <p className="text-sm text-muted-foreground">
-                  Track token usage and API costs by customer
-                </p>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 h-2 w-2 rounded-full bg-primary" />
-                <p className="text-sm text-muted-foreground">
-                  Analyze spending patterns across segments
-                </p>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 h-2 w-2 rounded-full bg-primary" />
-                <p className="text-sm text-muted-foreground">
-                  Monitor model performance and latency
-                </p>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 h-2 w-2 rounded-full bg-primary" />
-                <p className="text-sm text-muted-foreground">
-                  Set budget alerts and usage limits
-                </p>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 h-2 w-2 rounded-full bg-primary" />
-                <p className="text-sm text-muted-foreground">
-                  View detailed request and response traces
-                </p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+      {/* Summary Metrics */}
+      <div className="mb-8">
+        <LlmMetricsCards
+          costData={costData}
+          tracesData={tracesData}
+          isLoadingCost={costLoading}
+          isLoadingTraces={tracesLoading}
+        />
+      </div>
+
+      {/* Top Models by Cost */}
+      <div className="mb-8">
+        <LlmTopModels data={topModelsData} isLoading={topModelsLoading} />
+      </div>
+
+      {/* Traces Table */}
+      <div className="mb-8">
+        <LlmTracesTable data={tracesData} isLoading={tracesLoading} />
+      </div>
+
+      <ConnectLLMProviderDialog
+        open={configDialogOpen}
+        onOpenChange={setConfigDialogOpen}
+        project={project}
+      />
+    </>
   )
 }

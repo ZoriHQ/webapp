@@ -1,11 +1,15 @@
 import { Separator } from '@/components/ui/separator'
 import { ProviderList } from '@/components/payment-providers/provider-list'
+import { LLMProvidersSection } from '@/components/settings/llm-providers-section'
+import { useProject } from '@/hooks/use-projects'
 
 interface IntegrationsTabProps {
   projectId: string
 }
 
 export function IntegrationsTab({ projectId }: IntegrationsTabProps) {
+  const { data: project } = useProject(projectId)
+
   return (
     <div className="space-y-6">
       <div>
@@ -18,6 +22,10 @@ export function IntegrationsTab({ projectId }: IntegrationsTabProps) {
       <Separator />
 
       <ProviderList projectId={projectId} />
+
+      <Separator />
+
+      <LLMProvidersSection project={project} />
     </div>
   )
 }

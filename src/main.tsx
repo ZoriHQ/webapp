@@ -8,10 +8,7 @@ import type { Container } from 'react-dom/client'
 import { AuthProviderComponent } from '@/lib/auth'
 import { ThemeProvider } from '@/components/theme-provider'
 import { getAuthMode } from '@/lib/auth/types'
-import {
-  handleUnauthorized,
-  isUnauthorizedError,
-} from '@/lib/auth/unauthorized-handler'
+import { isUnauthorizedError } from '@/lib/auth/unauthorized-handler'
 import './index.css'
 
 const queryClient = new QueryClient({
@@ -20,7 +17,6 @@ const queryClient = new QueryClient({
       staleTime: 1000 * 60 * 5, // 5 minutes
       gcTime: 1000 * 60 * 10, // 10 minutes
       retry: (failureCount, error) => {
-        // Don't retry on 401 errors
         if (isUnauthorizedError(error)) {
           return false
         }
@@ -57,7 +53,6 @@ function RootApp() {
     </AuthProviderComponent>
   )
 
-  // Only wrap with ZoriProvider in cloud mode
   if (isCloudMode && zoriPublishableKey) {
     return (
       <ZoriProvider
