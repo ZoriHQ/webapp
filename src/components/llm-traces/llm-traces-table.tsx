@@ -19,7 +19,7 @@ interface LlmTracesTableProps {
 
 export function LlmTracesTable({ data, isLoading }: LlmTracesTableProps) {
   const formatCurrency = (value: number | undefined) => {
-    if (value === undefined || value === null) return '$0.00'
+    if (value === undefined) return '$0.00'
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
@@ -29,7 +29,7 @@ export function LlmTracesTable({ data, isLoading }: LlmTracesTableProps) {
   }
 
   const formatNumber = (value: number | undefined) => {
-    if (value === undefined || value === null) return '0'
+    if (value === undefined) return '0'
     return new Intl.NumberFormat('en-US').format(value)
   }
 

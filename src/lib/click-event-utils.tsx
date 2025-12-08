@@ -1,14 +1,14 @@
 import {
-  Link,
-  Square,
-  Send,
-  MousePointer,
-  ExternalLink,
   Download,
-  Star,
+  ExternalLink,
   Eye,
   EyeOff,
+  Link,
   LogOut,
+  MousePointer,
+  Send,
+  Square,
+  Star,
 } from 'lucide-react'
 import type Zoriapi from 'zorihq'
 import { Badge } from '@/components/ui/badge'
