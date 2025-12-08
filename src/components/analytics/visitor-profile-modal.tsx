@@ -11,7 +11,7 @@ import {
   IconUserPlus,
   IconWorld,
 } from '@tabler/icons-react'
-import { DollarSign, ShoppingCart, TrendingUp } from 'lucide-react'
+import { Calendar, DollarSign, ShoppingCart, TrendingUp } from 'lucide-react'
 import { toast } from 'sonner'
 import { format } from 'date-fns'
 import {
@@ -30,6 +30,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
+import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -41,29 +42,15 @@ import {
 } from '@/hooks/use-analytics'
 import { useCustomerProfile } from '@/hooks/use-revenue'
 import { countryCodeToFlag, getCountryName } from '@/lib/country-utils'
-import { formatFullDate, formatTimestamp } from '@/lib/utils'
+import { formatFullDate } from '@/lib/utils'
 import { getTrafficOriginDisplay } from '@/lib/traffic-origin-utils'
+import { EventRow } from '@/components/analytics/event-row'
 
 interface VisitorProfileModalProps {
   projectId: string
   visitorId: string | null
   open: boolean
   onOpenChange: (open: boolean) => void
-}
-
-function getEventBadgeVariant(
-  eventName: string | undefined,
-): 'default' | 'secondary' | 'destructive' | 'outline' {
-  switch (eventName) {
-    case 'page_view':
-      return 'default'
-    case 'page_unload':
-      return 'destructive'
-    case 'page_hidden':
-      return 'outline'
-    default:
-      return 'secondary'
-  }
 }
 
 export function VisitorProfileModal({
@@ -78,8 +65,8 @@ export function VisitorProfileModal({
   const { data: visitorEvents, isLoading: eventsLoading } = useRecentEvents({
     project_id: projectId,
     visitor_id: visitorId as string,
-    time_range: 'today',
-    limit: 100,
+    time_range: 'last_7_days',
+    limit: 20,
     offset: 0,
   })
   const identifyVisitor = useIdentifyVisitor(projectId)
@@ -134,12 +121,12 @@ export function VisitorProfileModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-7xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-7xl max-h-[85vh] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-muted-foreground/20 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-muted-foreground/30">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {profile?.is_identified ? (
               <>
-                <IconUserCheck className="h-5 w-5 text-green-600" />
+                <IconUserCheck className="h-5 w-5 text-primary" />
                 Customer Profile
               </>
             ) : (
@@ -166,99 +153,6 @@ export function VisitorProfileModal({
           </div>
         ) : profile ? (
           <div className="space-y-6">
-            {/* Identification Status & Info - Top Section */}
-            {profile.is_identified && (
-              <div className="rounded-lg border border-green-200 bg-green-50 dark:bg-green-950 dark:border-green-900 p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <IconUserCheck className="h-5 w-5 text-green-600" />
-                  <h3 className="text-sm font-semibold text-green-900 dark:text-green-100">
-                    Identified Customer
-                  </h3>
-                  <Badge
-                    variant="outline"
-                    className="ml-auto border-green-600 text-green-700 dark:text-green-300"
-                  >
-                    Identified
-                  </Badge>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {profile.name && (
-                    <div className="flex items-start gap-3">
-                      <IconUser className="h-4 w-4 text-green-600 mt-0.5" />
-                      <div className="flex-1">
-                        <p className="text-xs text-green-700 dark:text-green-300">
-                          Name
-                        </p>
-                        <p className="text-sm font-medium text-green-900 dark:text-green-100">
-                          {profile.name}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                  {profile.email && (
-                    <div className="flex items-start gap-3">
-                      <IconMail className="h-4 w-4 text-green-600 mt-0.5" />
-                      <div className="flex-1">
-                        <p className="text-xs text-green-700 dark:text-green-300">
-                          Email
-                        </p>
-                        <p className="text-sm font-medium text-green-900 dark:text-green-100">
-                          {profile.email}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                  {profile.phone && (
-                    <div className="flex items-start gap-3">
-                      <IconPhone className="h-4 w-4 text-green-600 mt-0.5" />
-                      <div className="flex-1">
-                        <p className="text-xs text-green-700 dark:text-green-300">
-                          Phone
-                        </p>
-                        <p className="text-sm font-medium text-green-900 dark:text-green-100">
-                          {profile.phone}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                  {profile.user_id && (
-                    <div className="flex items-start gap-3">
-                      <IconId className="h-4 w-4 text-green-600 mt-0.5" />
-                      <div className="flex-1">
-                        <p className="text-xs text-green-700 dark:text-green-300">
-                          User ID
-                        </p>
-                        <p className="text-sm font-medium font-mono text-green-900 dark:text-green-100 select-all">
-                          {profile.user_id}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                  {profile.external_id && (
-                    <div className="flex items-start gap-3">
-                      <IconId className="h-4 w-4 text-green-600 mt-0.5" />
-                      <div className="flex-1">
-                        <p className="text-xs text-green-700 dark:text-green-300">
-                          External ID
-                        </p>
-                        <p className="text-sm font-medium font-mono text-green-900 dark:text-green-100 select-all">
-                          {profile.external_id}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                {profile.first_identified_at && (
-                  <div className="mt-3 pt-3 border-t border-green-200 dark:border-green-900">
-                    <p className="text-xs text-green-700 dark:text-green-300">
-                      First identified:{' '}
-                      {formatFullDate(profile.first_identified_at)}
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-
             {/* Manual Identification Section */}
             {!profile.is_identified && (
               <div className="rounded-lg border p-4">
@@ -365,178 +259,150 @@ export function VisitorProfileModal({
               </div>
             )}
 
-            {/* Revenue Information - Always show, even if $0 */}
+            {/* Revenue Section */}
             {!isLoadingRevenue && customerProfile && (
-              <div className="rounded-lg border border-green-200 bg-green-50 dark:bg-green-950 dark:border-green-900 p-4">
-                <h3 className="text-sm font-semibold mb-4 text-green-900 dark:text-green-100">
-                  Revenue Summary
-                </h3>
-                <div className="grid gap-4 sm:grid-cols-3 mb-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/50">
-                        <DollarSign className="h-4 w-4 text-green-700 dark:text-green-400" />
-                      </div>
-                      <span className="text-xs text-green-700 dark:text-green-300">
-                        Total Revenue
-                      </span>
-                    </div>
-                    <p className="text-2xl font-bold text-green-900 dark:text-green-100">
-                      $
-                      {(
-                        (customerProfile.total_revenue || 0) / 100
-                      ).toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                    </p>
-                  </div>
+              <div className="space-y-4">
+                <h3 className="text-sm font-semibold">Revenue</h3>
 
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/50">
-                        <ShoppingCart className="h-4 w-4 text-green-700 dark:text-green-400" />
+                {/* Revenue Metrics Cards */}
+                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="p-2 rounded-lg bg-green-50 dark:bg-green-950/30">
+                          <DollarSign className="h-4 w-4 text-green-600 dark:text-green-400" />
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          Total Revenue
+                        </span>
                       </div>
-                      <span className="text-xs text-green-700 dark:text-green-300">
-                        Payment Count
-                      </span>
-                    </div>
-                    <p className="text-2xl font-bold text-green-900 dark:text-green-100">
-                      {customerProfile.payment_count || 0}
-                    </p>
-                  </div>
+                      <p className="text-xl font-bold">
+                        $
+                        {(
+                          (customerProfile.total_revenue || 0) / 100
+                        ).toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </p>
+                    </CardContent>
+                  </Card>
 
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/50">
-                        <TrendingUp className="h-4 w-4 text-green-700 dark:text-green-400" />
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-950/30">
+                          <ShoppingCart className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          Payment Count
+                        </span>
                       </div>
-                      <span className="text-xs text-green-700 dark:text-green-300">
-                        Avg Order Value
-                      </span>
-                    </div>
-                    <p className="text-2xl font-bold text-green-900 dark:text-green-100">
-                      $
-                      {(
-                        (customerProfile.avg_order_value || 0) / 100
-                      ).toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                    </p>
-                  </div>
+                      <p className="text-xl font-bold">
+                        {customerProfile.payment_count || 0}
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="p-2 rounded-lg bg-purple-50 dark:bg-purple-950/30">
+                          <TrendingUp className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          Avg Order Value
+                        </span>
+                      </div>
+                      <p className="text-xl font-bold">
+                        $
+                        {(
+                          (customerProfile.avg_order_value || 0) / 100
+                        ).toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="p-2 rounded-lg bg-orange-50 dark:bg-orange-950/30">
+                          <Calendar className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          First Payment
+                        </span>
+                      </div>
+                      <p className="text-sm font-medium">
+                        {customerProfile.first_payment_date
+                          ? format(
+                              new Date(customerProfile.first_payment_date),
+                              'MMM d, yyyy',
+                            )
+                          : 'N/A'}
+                      </p>
+                    </CardContent>
+                  </Card>
                 </div>
 
-                <Separator className="my-4 bg-green-200 dark:bg-green-900" />
-
-                {/* Revenue Attribution */}
+                {/* Attribution */}
                 {(customerProfile.payment_count ?? 0) > 0 && (
-                  <div className="space-y-3">
-                    <h4 className="text-sm font-semibold text-green-900 dark:text-green-100">
-                      Revenue Attribution
-                    </h4>
-                    <div className="space-y-3 rounded-lg border border-green-200 dark:border-green-900 bg-background p-4">
-                      {customerProfile.first_payment_date && (
-                        <>
-                          <div className="flex items-start gap-3">
-                            <IconClock className="h-4 w-4 text-muted-foreground mt-0.5" />
-                            <div className="flex-1">
-                              <p className="text-xs text-muted-foreground">
-                                First Payment
-                              </p>
-                              <p className="text-sm font-medium">
-                                {format(
-                                  new Date(customerProfile.first_payment_date),
-                                  'MMM d, yyyy HH:mm',
-                                )}
-                              </p>
-                            </div>
-                          </div>
-                          <Separator />
-                        </>
-                      )}
-
-                      {customerProfile.last_payment_date && (
-                        <>
-                          <div className="flex items-start gap-3">
-                            <IconClock className="h-4 w-4 text-muted-foreground mt-0.5" />
-                            <div className="flex-1">
-                              <p className="text-xs text-muted-foreground">
-                                Last Payment
-                              </p>
-                              <p className="text-sm font-medium">
-                                {format(
-                                  new Date(customerProfile.last_payment_date),
-                                  'MMM d, yyyy HH:mm',
-                                )}
-                              </p>
-                            </div>
-                          </div>
-                          <Separator />
-                        </>
-                      )}
-
-                      <div className="flex items-start gap-3">
-                        <IconLink className="h-4 w-4 text-muted-foreground mt-0.5" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs text-muted-foreground">
-                            Traffic Origin (First Touch)
-                          </p>
-                          <p className="text-sm font-medium truncate">
-                            {getTrafficOriginDisplay(customerProfile)}
-                          </p>
-                        </div>
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-semibold">Attribution</h4>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="text-muted-foreground">
+                          Traffic Origin:
+                        </span>{' '}
+                        <span className="font-medium">
+                          {getTrafficOriginDisplay(customerProfile)}
+                        </span>
                       </div>
-
                       {customerProfile.first_utm_source && (
-                        <>
-                          <Separator />
-                          <div className="flex items-start gap-3">
-                            <IconLink className="h-4 w-4 text-muted-foreground mt-0.5" />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs text-muted-foreground">
-                                UTM Source
-                              </p>
-                              <p className="text-sm font-medium truncate">
-                                {customerProfile.first_utm_source}
-                              </p>
-                            </div>
-                          </div>
-                        </>
+                        <div>
+                          <span className="text-muted-foreground">
+                            UTM Source:
+                          </span>{' '}
+                          <span className="font-medium">
+                            {customerProfile.first_utm_source}
+                          </span>
+                        </div>
                       )}
-
                       {customerProfile.first_utm_medium && (
-                        <>
-                          <Separator />
-                          <div className="flex items-start gap-3">
-                            <IconLink className="h-4 w-4 text-muted-foreground mt-0.5" />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs text-muted-foreground">
-                                UTM Medium
-                              </p>
-                              <p className="text-sm font-medium truncate">
-                                {customerProfile.first_utm_medium}
-                              </p>
-                            </div>
-                          </div>
-                        </>
+                        <div>
+                          <span className="text-muted-foreground">
+                            UTM Medium:
+                          </span>{' '}
+                          <span className="font-medium">
+                            {customerProfile.first_utm_medium}
+                          </span>
+                        </div>
                       )}
-
                       {customerProfile.first_utm_campaign && (
-                        <>
-                          <Separator />
-                          <div className="flex items-start gap-3">
-                            <IconLink className="h-4 w-4 text-muted-foreground mt-0.5" />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs text-muted-foreground">
-                                UTM Campaign
-                              </p>
-                              <p className="text-sm font-medium truncate">
-                                {customerProfile.first_utm_campaign}
-                              </p>
-                            </div>
-                          </div>
-                        </>
+                        <div>
+                          <span className="text-muted-foreground">
+                            UTM Campaign:
+                          </span>{' '}
+                          <span className="font-medium">
+                            {customerProfile.first_utm_campaign}
+                          </span>
+                        </div>
+                      )}
+                      {customerProfile.last_payment_date && (
+                        <div>
+                          <span className="text-muted-foreground">
+                            Last Payment:
+                          </span>{' '}
+                          <span className="font-medium">
+                            {format(
+                              new Date(customerProfile.last_payment_date),
+                              'MMM d, yyyy',
+                            )}
+                          </span>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -545,11 +411,9 @@ export function VisitorProfileModal({
                 {/* Payment History */}
                 {customerProfile.payments &&
                   customerProfile.payments.length > 0 && (
-                    <div className="mt-4">
-                      <h4 className="text-sm font-semibold mb-2 text-green-900 dark:text-green-100">
-                        Payment History
-                      </h4>
-                      <div className="rounded-md border border-green-200 dark:border-green-900 max-h-[300px] overflow-y-auto">
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-semibold">Payment History</h4>
+                      <div className="rounded-md border">
                         <Table>
                           <TableHeader className="sticky top-0 bg-background z-10">
                             <TableRow>
@@ -573,7 +437,7 @@ export function VisitorProfileModal({
                                       )
                                     : 'N/A'}
                                 </TableCell>
-                                <TableCell className="text-sm">
+                                <TableCell className="text-sm font-medium">
                                   {payment.product_name || 'N/A'}
                                 </TableCell>
                                 <TableCell className="text-xs">
@@ -607,10 +471,101 @@ export function VisitorProfileModal({
               {/* Left Side - Profile Info */}
               <div className="space-y-4">
                 <div>
-                  <h3 className="text-sm font-semibold mb-3">
-                    Profile Information
-                  </h3>
+                  <div className="flex items-center gap-2 mb-3">
+                    <h3 className="text-sm font-semibold">
+                      Profile Information
+                    </h3>
+                    {profile.is_identified && (
+                      <Badge variant="default" className="text-xs">
+                        Verified
+                      </Badge>
+                    )}
+                  </div>
                   <div className="space-y-3 rounded-lg border p-4">
+                    {/* Identified Customer Info */}
+                    {profile.is_identified && (
+                      <>
+                        {profile.name && (
+                          <div className="flex items-start gap-3">
+                            <IconUser className="h-4 w-4 text-muted-foreground mt-0.5" />
+                            <div className="flex-1">
+                              <p className="text-xs text-muted-foreground">
+                                Name
+                              </p>
+                              <p className="text-sm font-medium">
+                                {profile.name}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                        {profile.email && (
+                          <>
+                            {profile.name && <Separator />}
+                            <div className="flex items-start gap-3">
+                              <IconMail className="h-4 w-4 text-muted-foreground mt-0.5" />
+                              <div className="flex-1">
+                                <p className="text-xs text-muted-foreground">
+                                  Email
+                                </p>
+                                <p className="text-sm font-medium">
+                                  {profile.email}
+                                </p>
+                              </div>
+                            </div>
+                          </>
+                        )}
+                        {profile.phone && (
+                          <>
+                            <Separator />
+                            <div className="flex items-start gap-3">
+                              <IconPhone className="h-4 w-4 text-muted-foreground mt-0.5" />
+                              <div className="flex-1">
+                                <p className="text-xs text-muted-foreground">
+                                  Phone
+                                </p>
+                                <p className="text-sm font-medium">
+                                  {profile.phone}
+                                </p>
+                              </div>
+                            </div>
+                          </>
+                        )}
+                        {profile.user_id && (
+                          <>
+                            <Separator />
+                            <div className="flex items-start gap-3">
+                              <IconId className="h-4 w-4 text-muted-foreground mt-0.5" />
+                              <div className="flex-1">
+                                <p className="text-xs text-muted-foreground">
+                                  User ID
+                                </p>
+                                <p className="text-sm font-mono select-all">
+                                  {profile.user_id}
+                                </p>
+                              </div>
+                            </div>
+                          </>
+                        )}
+                        {profile.external_id && (
+                          <>
+                            <Separator />
+                            <div className="flex items-start gap-3">
+                              <IconId className="h-4 w-4 text-muted-foreground mt-0.5" />
+                              <div className="flex-1">
+                                <p className="text-xs text-muted-foreground">
+                                  External ID
+                                </p>
+                                <p className="text-sm font-mono select-all">
+                                  {profile.external_id}
+                                </p>
+                              </div>
+                            </div>
+                          </>
+                        )}
+                        <Separator />
+                      </>
+                    )}
+
                     <div className="flex items-start gap-3">
                       <IconUser className="h-4 w-4 text-muted-foreground mt-0.5" />
                       <div className="flex-1">
@@ -684,6 +639,23 @@ export function VisitorProfileModal({
                         </p>
                       </div>
                     </div>
+
+                    {profile.is_identified && profile.first_identified_at && (
+                      <>
+                        <Separator />
+                        <div className="flex items-start gap-3">
+                          <IconUserCheck className="h-4 w-4 text-muted-foreground mt-0.5" />
+                          <div className="flex-1">
+                            <p className="text-xs text-muted-foreground">
+                              Identified
+                            </p>
+                            <p className="text-sm">
+                              {formatFullDate(profile.first_identified_at)}
+                            </p>
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
 
@@ -725,51 +697,39 @@ export function VisitorProfileModal({
               </div>
 
               {/* Right Side - Event List */}
-              <div>
+              <div className="flex flex-col">
                 <h3 className="text-sm font-semibold mb-3">
                   Event History ({visitorEvents?.events?.length || 0})
                 </h3>
                 {eventsLoading && <p>Loading...</p>}
-                <div className="rounded-lg border">
+                <div className="rounded-lg border max-h-[400px] overflow-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-muted-foreground/20 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-muted-foreground/30">
                   {visitorEvents && visitorEvents.events!.length > 0 ? (
-                    <div className="max-h-[600px] overflow-y-auto">
-                      <Table>
-                        <TableHeader className="sticky top-0 bg-background z-10">
-                          <TableRow>
-                            <TableHead>Event</TableHead>
-                            <TableHead>Path</TableHead>
-                            <TableHead>Device</TableHead>
-                            <TableHead>Time</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {visitorEvents.events!.map((event, idx) => (
-                            <TableRow key={idx}>
-                              <TableCell>
-                                <Badge
-                                  variant={getEventBadgeVariant(
-                                    event.event_name,
-                                  )}
-                                >
-                                  {event.event_name || 'unknown'}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="font-mono text-xs">
-                                {event.page_path || '/'}
-                              </TableCell>
-                              <TableCell className="text-xs">
-                                {event.device_type || 'N/A'}
-                              </TableCell>
-                              <TableCell className="text-xs text-muted-foreground">
-                                {event.client_timestamp_utc
-                                  ? formatTimestamp(event.client_timestamp_utc)
-                                  : 'N/A'}
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
+                    <table className="w-full caption-bottom text-sm">
+                      <thead className="sticky top-0 bg-background z-10 [&_tr]:border-b">
+                        <tr className="border-b">
+                          <th className="text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap w-[80px]">
+                            Time
+                          </th>
+                          <th className="text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap">
+                            Event
+                          </th>
+                          <th className="text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap">
+                            Page
+                          </th>
+                          <th className="text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap w-[60px]">
+                            Platform
+                          </th>
+                          <th className="text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap w-[60px]">
+                            Location
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="[&_tr:last-child]:border-0">
+                        {visitorEvents.events!.map((event, idx) => (
+                          <EventRow key={idx} event={event} compact />
+                        ))}
+                      </tbody>
+                    </table>
                   ) : (
                     <div className="flex items-center justify-center py-12">
                       <p className="text-sm text-muted-foreground">
