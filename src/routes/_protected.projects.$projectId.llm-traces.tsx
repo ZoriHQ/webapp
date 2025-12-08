@@ -1,14 +1,13 @@
 import { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { IconSettings } from '@tabler/icons-react'
-import type {LlmTimeRange} from '@/hooks/use-llm-traces';
+import type { LlmTimeRange } from '@/hooks/use-llm-traces'
 import { useProject } from '@/hooks/use-projects'
 import { useAppContext } from '@/contexts/app.context'
 import {
-  
   useLlmCostTile,
   useLlmTopModelsCostTile,
-  useLlmTraces
+  useLlmTraces,
 } from '@/hooks/use-llm-traces'
 import { ProjectHeader } from '@/components/analytics/project-header'
 import { EmptyTracesState } from '@/components/llm-traces/empty-traces-state'

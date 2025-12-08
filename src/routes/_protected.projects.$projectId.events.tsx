@@ -17,6 +17,7 @@ const eventsSearchSchema = z.object({
   visitor_id: z.string().optional().catch(undefined),
   limit: z.number().optional().catch(100),
   offset: z.number().optional().catch(0),
+  group_by_session: z.boolean().optional().catch(false),
 })
 
 export const Route = createFileRoute('/_protected/projects/$projectId/events')({
@@ -108,6 +109,16 @@ function EventsPage() {
     })
   }
 
+  const handleGroupBySessionChange = (grouped: boolean) => {
+    navigate({
+      to: '.',
+      search: (prev) => ({
+        ...prev,
+        group_by_session: grouped || undefined,
+      }),
+    })
+  }
+
   const currentFilters: EventFiltersState = {
     visitor_id: searchParams.visitor_id,
     pages: searchParams.pages || [],
@@ -144,6 +155,8 @@ function EventsPage() {
         onFiltersChange={handleFiltersChange}
         onRefresh={handleRefresh}
         isLoadingOptions={filterOptionsLoading}
+        groupBySession={searchParams.group_by_session || false}
+        onGroupBySessionChange={handleGroupBySessionChange}
       />
 
       <LiveEventStream
@@ -155,6 +168,7 @@ function EventsPage() {
         total={recentEventsData?.total}
         limit={eventFilters.limit}
         offset={eventFilters.offset}
+        groupBySession={searchParams.group_by_session || false}
       />
 
       <VisitorProfileModal

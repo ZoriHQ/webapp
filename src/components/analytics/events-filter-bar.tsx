@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Check, Plus, RefreshCw, Search } from 'lucide-react'
+import { Check, Layers, Plus, RefreshCw, Search } from 'lucide-react'
 import { FilterChip } from './filter-chip'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -16,6 +16,12 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 
 export interface EventFiltersState {
@@ -33,6 +39,8 @@ interface EventsFilterBarProps {
   onFiltersChange: (filters: EventFiltersState) => void
   onRefresh?: () => void
   isLoadingOptions?: boolean
+  groupBySession?: boolean
+  onGroupBySessionChange?: (grouped: boolean) => void
 }
 
 export function EventsFilterBar({
@@ -43,6 +51,8 @@ export function EventsFilterBar({
   onFiltersChange,
   onRefresh,
   isLoadingOptions = false,
+  groupBySession = false,
+  onGroupBySessionChange,
 }: EventsFilterBarProps) {
   const [openPopover, setOpenPopover] = useState<
     'pages' | 'origins' | 'eventNames' | null
@@ -324,19 +334,54 @@ export function EventsFilterBar({
         </Button>
       )}
 
-      {/* Spacer to push refresh button to the right */}
+      {/* Spacer to push buttons to the right */}
       <div className="flex-1" />
+
+      {/* Group by Session Toggle */}
+      {onGroupBySessionChange && (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant={groupBySession ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => onGroupBySessionChange(!groupBySession)}
+                className="h-8 gap-2"
+              >
+                <Layers className="h-4 w-4" />
+                <span className="hidden sm:inline">Group by Session</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>
+                {groupBySession
+                  ? 'Click to show flat list'
+                  : 'Click to group events by session'}
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
 
       {/* Refresh Button */}
       {onRefresh && (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onRefresh}
-          className="h-8 w-8 p-0"
-        >
-          <RefreshCw className="h-4 w-4" />
-        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onRefresh}
+                className="h-8 w-8 p-0"
+              >
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Refresh events</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       )}
     </div>
   )
