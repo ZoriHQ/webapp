@@ -54,8 +54,8 @@ export function RevenueStatusIndicator({
               <IconLoader2 className="h-4 w-4 animate-spin text-muted-foreground" />
             ) : hasProviders ? (
               <>
-                <IconCurrencyDollar className="h-4 w-4 text-green-600 dark:text-green-400" />
-                <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-green-500" />
+                <IconCurrencyDollar className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-emerald-500" />
               </>
             ) : (
               <IconAlertTriangle className="h-4 w-4 text-amber-500 dark:text-amber-400" />

@@ -52,7 +52,7 @@ export function renderChangeIndicator({
         ? isPositiveChange
         : !isPositiveChange
 
-  const colorClass = isGoodChange ? 'text-green-600' : 'text-red-600'
+  const colorClass = isGoodChange ? 'text-emerald-600' : 'text-red-600'
   const arrow = isPositiveChange ? '↑' : '↓'
 
   const formattedChange = formatter

@@ -37,7 +37,7 @@ export function ProjectsStats({ projects }: ProjectsStatsProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+          <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
             {activeProjects}
           </div>
         </CardContent>

@@ -39,8 +39,8 @@ export function RevenueDashboardMetrics({
       title: 'Total Revenue',
       value: `$${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       icon: DollarSign,
-      iconColor: 'text-green-600 dark:text-green-400',
-      bgColor: 'bg-green-50 dark:bg-green-950/30',
+      iconColor: 'text-emerald-600 dark:text-emerald-400',
+      bgColor: 'bg-emerald-50 dark:bg-emerald-950/30',
     },
     {
       title: 'Conversion Rate',

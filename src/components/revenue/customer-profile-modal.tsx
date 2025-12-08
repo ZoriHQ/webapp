@@ -96,8 +96,8 @@ export function CustomerProfileModal({
               <Card>
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="p-2 rounded-lg bg-green-50 dark:bg-green-950/30">
-                      <DollarSign className="h-4 w-4 text-green-600 dark:text-green-400" />
+                    <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/30">
+                      <DollarSign className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                     </div>
                     <span className="text-xs text-muted-foreground">
                       Total Revenue
@@ -231,7 +231,7 @@ export function CustomerProfileModal({
                           <TableCell className="text-xs">
                             {payment.provider_type || 'N/A'}
                           </TableCell>
-                          <TableCell className="text-right font-semibold text-green-600 dark:text-green-400">
+                          <TableCell className="text-right font-semibold text-emerald-600 dark:text-emerald-400">
                             ${((payment.amount || 0) / 100).toFixed(2)}
                           </TableCell>
                           <TableCell>

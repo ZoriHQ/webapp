@@ -94,7 +94,7 @@ export function TopCustomersTable({
                           >
                             <div className="flex items-center gap-2">
                               {hasIdentity && (
-                                <IconUserCheck className="h-4 w-4 text-green-600 flex-shrink-0" />
+                                <IconUserCheck className="h-4 w-4 text-emerald-600 flex-shrink-0" />
                               )}
                               <div className="flex flex-col min-w-0">
                                 {customer.name ? (
@@ -133,7 +133,7 @@ export function TopCustomersTable({
                         )}
                       </TableCell>
                       <TableCell className="text-right">
-                        <span className="font-semibold text-green-600 dark:text-green-400">
+                        <span className="font-semibold text-emerald-600 dark:text-emerald-400">
                           $
                           {revenue.toLocaleString(undefined, {
                             minimumFractionDigits: 2,

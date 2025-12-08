@@ -56,7 +56,7 @@ export function TrafficSourceUtmTile({ params }: TrafficSourceUtmTileProps) {
         data={barListData}
         valueFormatter={(value) => value.toLocaleString()}
         sortOrder="none"
-        color="bg-blue-500"
+        color="bg-orange-500"
       />
       {utmData.length > 6 && (
         <Button

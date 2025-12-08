@@ -154,7 +154,7 @@ export function VisitorTimelineChart() {
         <div className="space-y-1">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <div className="h-2.5 w-2.5 rounded-full bg-blue-500" />
+              <div className="h-2.5 w-2.5 rounded-full bg-orange-500" />
               <span className="text-sm text-muted-foreground">Visitors</span>
             </div>
             <span className="text-sm font-medium tabular-nums text-foreground">
@@ -382,7 +382,7 @@ export function TopPagesAndSourcesCards() {
                   <BarList
                     data={category.data.slice(0, 5)}
                     valueFormatter={valueFormatter}
-                    color="bg-blue-500"
+                    color="bg-orange-500"
                   />
 
                   {/* Gradient overlay and show more button */}
@@ -445,7 +445,7 @@ export function TopPagesAndSourcesCards() {
               <BarList
                 data={filteredModalData}
                 valueFormatter={valueFormatter}
-                color="bg-blue-500"
+                color="bg-orange-500"
               />
             ) : (
               <div className="flex h-full items-center justify-center">

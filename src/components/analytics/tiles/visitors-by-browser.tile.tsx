@@ -72,7 +72,7 @@ export const VisitorsByBrowserTile = () => {
             data={barListData}
             valueFormatter={(value) => value.toLocaleString()}
             sortOrder="none"
-            color="bg-blue-500"
+            color="bg-orange-500"
           />
         )}
       </CardContent>

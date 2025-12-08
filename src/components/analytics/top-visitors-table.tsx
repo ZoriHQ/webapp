@@ -132,7 +132,7 @@ export function TopVisitorsTable({ onVisitorClick }: TopVisitorsTableProps) {
                                   </div>
                                 )}
                                 {!isGrouped && hasIdentity && (
-                                  <div className="absolute -bottom-1 -right-1 bg-green-600 rounded-full p-0.5">
+                                  <div className="absolute -bottom-1 -right-1 bg-emerald-600 rounded-full p-0.5">
                                     <IconUserCheck className="h-3 w-3 text-white" />
                                   </div>
                                 )}
@@ -195,7 +195,7 @@ export function TopVisitorsTable({ onVisitorClick }: TopVisitorsTableProps) {
                       </TableCell>
                       <TableCell className="py-3">
                         {hasRevenue ? (
-                          <span className="font-semibold text-green-700 dark:text-green-400">
+                          <span className="font-semibold text-emerald-600 dark:text-emerald-400">
                             {formatCurrency(
                               visitor.total_revenue,
                               visitor.currency,

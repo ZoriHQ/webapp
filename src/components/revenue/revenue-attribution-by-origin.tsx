@@ -80,7 +80,7 @@ export function RevenueAttributionByOrigin({
                         <TableCell className="text-right">
                           {source.paying_customers || 0}
                         </TableCell>
-                        <TableCell className="text-right font-semibold text-green-600 dark:text-green-400">
+                        <TableCell className="text-right font-semibold text-emerald-600 dark:text-emerald-400">
                           $
                           {revenue.toLocaleString(undefined, {
                             minimumFractionDigits: 2,

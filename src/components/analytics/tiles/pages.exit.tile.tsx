@@ -60,7 +60,7 @@ export function TopExitPagesTile({ params }: TopExitPagesTileProps) {
         data={barListData}
         valueFormatter={(value) => value.toLocaleString()}
         sortOrder="none"
-        color="bg-blue-500"
+        color="bg-orange-500"
       />
       {pageData.length > 6 && (
         <Button

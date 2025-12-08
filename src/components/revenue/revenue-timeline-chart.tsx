@@ -49,7 +49,7 @@ export function RevenueTimelineChart({
           <p className="text-xs text-muted-foreground">
             {format(new Date(timestamp), 'PPp')}
           </p>
-          <p className="text-sm font-semibold text-green-600 dark:text-green-400">
+          <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
             Revenue: ${revenue.toFixed(2)}
           </p>
           <p className="text-xs text-muted-foreground">Payments: {payments}</p>

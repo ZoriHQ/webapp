@@ -84,8 +84,20 @@ export const chartColors = {
 
 export type AvailableChartColorsKeys = keyof typeof chartColors
 
-export const AvailableChartColors: Array<AvailableChartColorsKeys> =
-  Object.keys(chartColors) as Array<AvailableChartColorsKeys>
+export const AvailableChartColors: Array<AvailableChartColorsKeys> = [
+  'orange',
+  'amber',
+  'emerald',
+  'cyan',
+  'violet',
+  'pink',
+  'lime',
+  'fuchsia',
+  'red',
+  'indigo',
+  'gray',
+  'blue',
+]
 
 export const constructCategoryColors = (
   categories: Array<string>,

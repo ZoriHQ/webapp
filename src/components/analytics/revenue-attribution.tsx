@@ -94,7 +94,7 @@ export function RevenueAttribution({
                           <TableCell className="text-right">
                             {source.conversions}
                           </TableCell>
-                          <TableCell className="text-right font-semibold text-green-600 dark:text-green-400">
+                          <TableCell className="text-right font-semibold text-emerald-600 dark:text-emerald-400">
                             ${source.revenue.toLocaleString()}
                           </TableCell>
                           <TableCell className="text-right text-muted-foreground">

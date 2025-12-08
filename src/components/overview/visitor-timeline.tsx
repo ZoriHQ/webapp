@@ -84,7 +84,7 @@ export function VisitorTimeline() {
         <div className="space-y-1">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <div className="h-2.5 w-2.5 rounded-full bg-blue-500" />
+              <div className="h-2.5 w-2.5 rounded-full bg-orange-500" />
               <span className="text-sm text-muted-foreground">Visitors</span>
             </div>
             <span className="text-sm font-medium tabular-nums text-foreground">
@@ -143,7 +143,7 @@ export function VisitorTimeline() {
               <li>
                 <div className="flex items-center space-x-2">
                   <span
-                    className="size-3 shrink-0 rounded-sm bg-blue-500"
+                    className="size-3 shrink-0 rounded-sm bg-orange-500"
                     aria-hidden={true}
                   />
                   <p className="font-semibold text-foreground">
@@ -183,10 +183,10 @@ export function VisitorTimeline() {
                       x2="0"
                       y2="1"
                     >
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4} />
+                      <stop offset="5%" stopColor="#f97316" stopOpacity={0.4} />
                       <stop
                         offset="95%"
-                        stopColor="#3b82f6"
+                        stopColor="#f97316"
                         stopOpacity={0.05}
                       />
                     </linearGradient>
@@ -221,7 +221,7 @@ export function VisitorTimeline() {
                   <Area
                     type="monotone"
                     dataKey="visitors"
-                    stroke="#3b82f6"
+                    stroke="#f97316"
                     strokeWidth={2}
                     fill="url(#visitorsGradient)"
                   />
@@ -254,10 +254,10 @@ export function VisitorTimeline() {
                       x2="0"
                       y2="1"
                     >
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4} />
+                      <stop offset="5%" stopColor="#f97316" stopOpacity={0.4} />
                       <stop
                         offset="95%"
-                        stopColor="#3b82f6"
+                        stopColor="#f97316"
                         stopOpacity={0.05}
                       />
                     </linearGradient>
@@ -283,7 +283,7 @@ export function VisitorTimeline() {
                   <Area
                     type="monotone"
                     dataKey="visitors"
-                    stroke="#3b82f6"
+                    stroke="#f97316"
                     strokeWidth={2}
                     fill="url(#visitorsGradientMobile)"
                   />

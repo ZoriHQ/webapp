@@ -73,7 +73,7 @@ export function LlmMetricsCards({
               {costChange !== null && (
                 <div
                   className={`flex items-center text-xs mt-1 ${
-                    costChange > 0 ? 'text-red-500' : 'text-green-500'
+                    costChange > 0 ? 'text-red-500' : 'text-emerald-600'
                   }`}
                 >
                   {costChange > 0 ? (

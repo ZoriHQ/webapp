@@ -89,7 +89,7 @@ export function LlmTopModels({ data, isLoading }: LlmTopModelsProps) {
                     {change !== null && (
                       <span
                         className={`flex items-center text-xs ${
-                          change > 0 ? 'text-red-500' : 'text-green-500'
+                          change > 0 ? 'text-red-500' : 'text-emerald-600'
                         }`}
                       >
                         {change > 0 ? (

@@ -13,11 +13,11 @@ interface AnalyticChipProps {
 
 const colorClasses = {
   green: {
-    bg: 'bg-green-50 dark:bg-green-950/30',
-    border: 'border-green-200 dark:border-green-900/50',
-    icon: 'text-green-600 dark:text-green-500',
-    value: 'text-green-700 dark:text-green-300',
-    label: 'text-green-600 dark:text-green-400',
+    bg: 'bg-emerald-50 dark:bg-emerald-950/30',
+    border: 'border-emerald-200 dark:border-emerald-900/50',
+    icon: 'text-emerald-600 dark:text-emerald-500',
+    value: 'text-emerald-700 dark:text-emerald-300',
+    label: 'text-emerald-600 dark:text-emerald-400',
   },
   blue: {
     bg: 'bg-blue-50 dark:bg-blue-950/30',

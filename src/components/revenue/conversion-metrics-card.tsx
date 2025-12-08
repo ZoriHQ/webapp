@@ -30,8 +30,8 @@ export function ConversionMetricsCard({
       value: `${conversionRate.toFixed(2)}%`,
       description: `${payingCustomers} of ${totalVisitors.toLocaleString()} visitors`,
       icon: TrendingUp,
-      iconColor: 'text-green-600 dark:text-green-400',
-      bgColor: 'bg-green-50 dark:bg-green-950/30',
+      iconColor: 'text-emerald-600 dark:text-emerald-400',
+      bgColor: 'bg-emerald-50 dark:bg-emerald-950/30',
     },
     {
       label: 'Avg Time to First Purchase',

@@ -14,6 +14,10 @@ type Bar<T> = T & {
 
 // Color mapping from Tailwind class names to RGBA values
 const colorMap: Record<string, { light: string; dark: string }> = {
+  'bg-orange-500': {
+    light: 'rgba(249, 115, 22, 0.25)',
+    dark: 'rgba(249, 115, 22, 0.35)',
+  },
   'bg-blue-500': {
     light: 'rgba(59, 130, 246, 0.25)',
     dark: 'rgba(59, 130, 246, 0.35)',
@@ -49,8 +53,8 @@ const getBarColor = (color: string, isDark: boolean): string => {
   if (colorEntry !== null) {
     return isDark ? colorEntry.dark : colorEntry.light
   }
-  // Default blue if color not found
-  return isDark ? 'rgba(59, 130, 246, 0.35)' : 'rgba(59, 130, 246, 0.25)'
+  // Default orange if color not found
+  return isDark ? 'rgba(249, 115, 22, 0.35)' : 'rgba(249, 115, 22, 0.25)'
 }
 
 interface BarListProps<T = unknown>
@@ -70,7 +74,7 @@ function BarListInner<T>(
     showAnimation = false,
     onValueChange,
     sortOrder = 'none',
-    color = 'bg-blue-500',
+    color = 'bg-orange-500',
     className,
     ...props
   }: BarListProps<T>,
@@ -129,7 +133,7 @@ function BarListInner<T>(
               onValueChange?.(item)
             }}
             className={cn(
-              'group relative flex w-full items-center rounded',
+              'group relative flex w-full items-center rounded-sm',
               rowHeight,
               onValueChange
                 ? 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
@@ -138,7 +142,7 @@ function BarListInner<T>(
           >
             {/* Background bar - using inline styles for Tailwind v4 compatibility */}
             <div
-              className="absolute inset-y-0 left-0 rounded"
+              className="absolute inset-y-0 left-0 rounded-sm"
               style={{
                 width: `${widths[index]}%`,
                 backgroundColor: barColor,
