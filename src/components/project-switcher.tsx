@@ -97,7 +97,13 @@ export function ProjectSwitcher() {
         handleProjectSwitch(targetProjectId)
       }
     }
-  }, [projectId, projects, isLoading, location.pathname, storedValues?.projectId])
+  }, [
+    projectId,
+    projects,
+    isLoading,
+    location.pathname,
+    storedValues?.projectId,
+  ])
 
   if (isLoading) {
     return (

@@ -1,9 +1,10 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useTheme } from 'next-themes'
 import Globe from 'react-globe.gl'
+import * as THREE from 'three'
 import { getCountryCoordinates } from '@/lib/country-coordinates'
+import { useTheme } from '@/components/theme-provider'
 import { Card, CardContent } from '@/components/ui/card'
 import { useAppContext } from '@/contexts/app.context'
 import { useTrafficByCountryTile } from '@/hooks/use-analytics-tiles'
@@ -22,6 +23,13 @@ interface PointData {
   color: string
   label: string
   visitors: number
+  country: string
+}
+
+interface HoveredPoint {
+  point: PointData
+  x: number
+  y: number
 }
 
 export function GlobeVisualization({
@@ -29,11 +37,13 @@ export function GlobeVisualization({
 }: GlobeVisualizationProps) {
   const globeEl = useRef<any>(null)
   const globeContainerRef = useRef<HTMLDivElement>(null)
-  const { resolvedTheme } = useTheme()
-  const isDark = resolvedTheme === 'dark'
+  const { theme } = useTheme()
+
+  const isDark = theme === 'dark'
   const [countries, setCountries] = useState({ features: [] })
   const [dimensions, setDimensions] = useState({ width: 600, height: 500 })
   const [isGlobeReady, setIsGlobeReady] = useState(false)
+  const [hoveredPoint, setHoveredPoint] = useState<HoveredPoint | null>(null)
 
   const { storedValues } = useAppContext()
   const { data, isLoading } = useTrafficByCountryTile({
@@ -79,10 +89,11 @@ export function GlobeVisualization({
       points.push({
         lat: highlightPoint.lat,
         lng: highlightPoint.lng,
-        size: 1.5,
-        color: 'rgba(255, 0, 0, 0.9)',
+        size: 1.2,
+        color: isDark ? 'rgba(96, 165, 250, 1)' : 'rgba(234, 88, 12, 1)',
         label: 'First visitor!',
         visitors: 1,
+        country: 'Unknown',
       })
     }
 
@@ -94,22 +105,19 @@ export function GlobeVisualization({
 
           const visitors = country.count || 0
 
-          const size = Math.min(1.5, Math.max(1, Math.log(visitors + 1) / 10))
-          const opacity = Math.min(
-            1,
-            Math.max(0.7, Math.log(visitors + 1) / 12),
-          )
-          const color = isDark
-            ? `rgba(255, 0, 0, ${opacity})`
-            : `rgba(255, 0, 0, ${opacity})`
+          // Enhanced sizing: more pronounced difference between small and large
+          const size = Math.min(1.5, Math.max(0.5, Math.log(visitors + 1) / 6))
 
           return {
             lat: coords.lat,
             lng: coords.lng,
             size,
-            color,
+            color: isDark
+              ? 'rgba(96, 165, 250, 1)' // Blue-400
+              : 'rgba(234, 88, 12, 1)', // Orange-600
             label: `${coords.name}: ${visitors.toLocaleString()} visitors`,
             visitors,
+            country: coords.name,
           }
         })
         .filter((p): p is PointData => p !== null)
@@ -160,10 +168,27 @@ export function GlobeVisualization({
   }, [isGlobeReady, highlightPoint])
 
   const backgroundColor = 'rgba(0,0,0,0)'
-  const globeColor = isDark ? '#0a0a0a' : '#ffffff'
-  const atmosphereColor = isDark ? '#333333' : '#cccccc'
-  const landColor = isDark ? '#1a1a1a' : '#f5f5f5'
-  const borderColor = isDark ? '#ffffff' : '#000000'
+  // Dark theme: deep, immersive ocean with subtle land
+  // Light theme: soft, airy ocean with defined land
+  const globeColor = isDark ? '#0f172a' : '#dbeafe' // Ocean: deep navy / soft blue
+  const atmosphereColor = isDark ? '#3b82f6' : '#fb923c' // Atmosphere: blue glow / warm glow
+  const landColor = isDark ? '#1e293b' : '#94a3b8' // Land: slate-800 / slate-400
+  const borderColor = isDark ? '#475569' : '#64748b' // Borders: slate-600 / slate-500
+
+  // Create proper Three.js material for the globe (ocean)
+  // Dark: subtle glow with blue specular highlights
+  // Light: clean, high-shine surface
+  const globeMaterial = useMemo(() => {
+    return new THREE.MeshPhongMaterial({
+      color: new THREE.Color(globeColor),
+      emissive: new THREE.Color(isDark ? '#1e3a5f' : globeColor),
+      emissiveIntensity: isDark ? 0.15 : 0.02,
+      shininess: isDark ? 8 : 25,
+      specular: new THREE.Color(isDark ? '#1e40af' : '#94a3b8'),
+      transparent: false,
+      opacity: 1,
+    })
+  }, [globeColor, isDark])
 
   return (
     <Card className="overflow-hidden border-0 bg-transparent shadow-none">
@@ -185,7 +210,6 @@ export function GlobeVisualization({
             style={{
               width: '100%',
               alignContent: 'center',
-              pointerEvents: 'none',
             }}
             onWheel={(e) => e.stopPropagation()}
           >
@@ -194,34 +218,91 @@ export function GlobeVisualization({
               width={dimensions.width}
               height={dimensions.height}
               backgroundColor={backgroundColor}
-              globeMaterial={
-                {
-                  color: globeColor,
-                  emissive: globeColor,
-                  emissiveIntensity: 0.05,
-                  shininess: 0.1,
-                } as any
-              }
+              globeMaterial={globeMaterial}
               backgroundImageUrl={null}
-              showAtmosphere={false}
+              showAtmosphere={true}
               atmosphereColor={atmosphereColor}
-              atmosphereAltitude={0.15}
+              atmosphereAltitude={isDark ? 0.2 : 0.12}
               polygonsData={countries.features}
               polygonCapColor={() => landColor}
-              polygonSideColor={() => landColor}
+              polygonSideColor={() => (isDark ? '#0f172a' : '#64748b')}
               polygonStrokeColor={() => borderColor}
-              polygonAltitude={0.001}
-              polygonsTransitionDuration={300}
+              polygonAltitude={isDark ? 0.006 : 0.004}
+              polygonsTransitionDuration={0}
               pointsData={pointsData}
               pointLat="lat"
               pointLng="lng"
-              pointColor="color"
-              pointAltitude={0.01}
-              onZoom={() => {}}
-              pointRadius="size"
-              pointLabel="label"
+              pointColor={(d: object) => {
+                const point = d as PointData
+                return hoveredPoint?.point === point
+                  ? isDark
+                    ? 'rgba(147, 197, 253, 1)' // Blue-300 for hover
+                    : 'rgba(251, 146, 60, 1)' // Orange-400 for hover
+                  : point.color
+              }}
+              pointAltitude={(d: object) => {
+                const point = d as PointData
+                return hoveredPoint?.point === point
+                  ? isDark
+                    ? 0.025
+                    : 0.02
+                  : isDark
+                    ? 0.015
+                    : 0.01
+              }}
+              pointRadius={(d: object) => {
+                const point = d as PointData
+                return hoveredPoint?.point === point
+                  ? point.size * 1.3
+                  : point.size
+              }}
+              pointLabel=""
               pointsMerge={false}
-              enablePointerInteraction={false}
+              enablePointerInteraction={true}
+              onPointHover={(
+                point: object | null,
+                _prevPoint: object | null,
+              ) => {
+                if (point) {
+                  const p = point as PointData
+                  // Get mouse position from window
+                  const handleMouseMove = (e: globalThis.MouseEvent) => {
+                    setHoveredPoint({
+                      point: p,
+                      x: e.clientX,
+                      y: e.clientY,
+                    })
+                    window.removeEventListener('mousemove', handleMouseMove)
+                  }
+                  window.addEventListener('mousemove', handleMouseMove)
+                  // Also set immediately with approximate position
+                  setHoveredPoint({
+                    point: p,
+                    x: window.innerWidth / 2,
+                    y: window.innerHeight / 2,
+                  })
+                } else {
+                  setHoveredPoint(null)
+                }
+              }}
+              onPointClick={(
+                point: object,
+                _event: MouseEvent,
+                _coords: { lat: number; lng: number; altitude: number },
+              ) => {
+                const p = point as PointData
+                // Focus on clicked country
+                if (globeEl.current) {
+                  globeEl.current.pointOfView(
+                    {
+                      lat: p.lat,
+                      lng: p.lng,
+                      altitude: 1.8,
+                    },
+                    1000,
+                  )
+                }
+              }}
               animateIn={true}
               htmlElementsData={
                 highlightPoint &&
@@ -234,12 +315,18 @@ export function GlobeVisualization({
               htmlLng="lng"
               htmlElement={() => {
                 const el = document.createElement('div')
+                const accentColor = isDark
+                  ? 'rgba(96, 165, 250, 0.9)'
+                  : 'rgba(234, 88, 12, 0.9)'
+                const glowColor = isDark
+                  ? 'rgba(96, 165, 250, 0.6)'
+                  : 'rgba(234, 88, 12, 0.6)'
                 el.style.cssText = `
-                  width: 12px;
-                  height: 12px;
-                  background: rgba(255, 0, 0, 0.9);
+                  width: 10px;
+                  height: 10px;
+                  background: ${accentColor};
                   border-radius: 50%;
-                  box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+                  box-shadow: 0 0 12px ${glowColor}, 0 0 24px ${glowColor};
                   animation: pulse 2s ease-in-out infinite;
                 `
                 if (!document.getElementById('globe-pulse-animation')) {
@@ -252,8 +339,8 @@ export function GlobeVisualization({
                         opacity: 1;
                       }
                       50% {
-                        transform: scale(1.5);
-                        opacity: 0.7;
+                        transform: scale(1.3);
+                        opacity: 0.8;
                       }
                     }
                   `
@@ -262,6 +349,34 @@ export function GlobeVisualization({
                 return el
               }}
             />
+            {/* Custom tooltip for hovered points */}
+            {hoveredPoint && (
+              <div
+                className="fixed z-50 pointer-events-none"
+                style={{
+                  left: hoveredPoint.x + 12,
+                  top: hoveredPoint.y - 10,
+                }}
+              >
+                <div
+                  className={`
+                    px-3 py-2 rounded-lg shadow-lg backdrop-blur-sm
+                    ${isDark ? 'bg-slate-800/90 border border-slate-700' : 'bg-white/90 border border-slate-200'}
+                  `}
+                >
+                  <p
+                    className={`text-sm font-medium ${isDark ? 'text-white' : 'text-slate-900'}`}
+                  >
+                    {hoveredPoint.point.country}
+                  </p>
+                  <p
+                    className={`text-xs ${isDark ? 'text-blue-400' : 'text-orange-600'}`}
+                  >
+                    {hoveredPoint.point.visitors.toLocaleString()} visitors
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </CardContent>

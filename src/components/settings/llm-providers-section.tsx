@@ -7,9 +7,9 @@ import { Button } from '@/components/ui/button'
 import { ConnectLLMProviderDialog } from '@/components/llm-providers/connect-provider-dialog'
 import { RequestProviderCTA } from '@/components/llm-providers/request-provider-cta'
 import {
+  LLM_PROVIDER_TYPES,
   getLLMProviderColor,
   getLLMProviderIcon,
-  LLM_PROVIDER_TYPES,
 } from '@/lib/llm-provider-icons'
 
 interface LLMProvidersSectionProps {
